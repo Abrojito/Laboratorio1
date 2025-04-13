@@ -1,6 +1,6 @@
 // src/pages/auth/Login.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import { API_URL } from '../../api/config';
 
 const Login: React.FC = () => {
@@ -35,7 +35,7 @@ const Login: React.FC = () => {
             localStorage.setItem('token', data.token);
             localStorage.setItem('userId', data.userId);
 
-            navigate('/'); // Redirigir a la página principal después de iniciar sesión
+            navigate('/profile'); // Redirigir a la página principal después de iniciar sesión
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
         } finally {

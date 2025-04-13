@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { API_URL } from '../../api/config';
+import {useNavigate} from "react-router-dom";
 
 const Signup: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -8,6 +9,7 @@ const Signup: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -39,8 +41,8 @@ const Signup: React.FC = () => {
             const data = await response.json();
             console.log('Registro exitoso:', data);
 
-            alert('¡Registro exitoso! Ahora puedes iniciar sesión.');
-            // Aquí puedes redirigir al usuario a la página de login
+           navigate("/login")
+
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al registrarse');
         } finally {

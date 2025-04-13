@@ -13,8 +13,8 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Recupera el usuario del localStorage (guardado durante el login)
-        const userData = localStorage.getItem('user');
+       fetch("http://localhost:8080/users")
+
         if (!userData) {
             navigate('/login');
             return;
