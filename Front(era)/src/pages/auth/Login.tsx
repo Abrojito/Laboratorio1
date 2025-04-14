@@ -35,7 +35,7 @@ const Login: React.FC = () => {
             localStorage.setItem('token', data.token);
             localStorage.setItem('userId', data.userId);
 
-            navigate('/profile'); // Redirigir a la página principal después de iniciar sesión
+            navigate('/home'); // Redirigir a la página principal después de iniciar sesión
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
         } finally {

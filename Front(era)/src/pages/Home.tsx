@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '.././App.css'; // Asegúrate de crear este archivo CSS
+import '.././App.css';
 
 interface User {
     id: number;
@@ -9,19 +9,9 @@ interface User {
 }
 
 const Home: React.FC = () => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user] = useState<User | null>({username: 'JohnDoe', fullName: 'John Doe', id: 1}); // Simulando un usuario autenticado
     const navigate = useNavigate();
 
-    useEffect(() => {
-       fetch("http://localhost:8080/users")
-
-        if (!userData) {
-            navigate('/login');
-            return;
-        }
-
-        setUser(JSON.parse(userData));
-    }, [navigate]);
 
     const handleLogout = () => {
         localStorage.removeItem('user');
