@@ -6,6 +6,9 @@ import com.dishly.app.dto.userdto.UpdateRequest;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +16,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
+
     @Autowired
     private UserRepository repository;
-    @Autowired private PasswordEncoder encoder;
+
+    @Autowired
+    private PasswordEncoder encoder;
 
     public UserModel register(RegisterRequest req) {
         UserModel user = new UserModel();
         user.setUsername(req.username());
-        user.setPassword(encoder.encode(req.password()));
+        user.setPassword(encoder.encode(req.password())); // ¡encriptado!
         user.setEmail(req.email());
         return repository.save(user);
     }
@@ -34,6 +40,10 @@ public class UserService {
         return repository.findById(id);
     }
 
+    public Optional<UserModel> getByEmail(String email) {
+        return repository.findByEmail(email);
+    }
+
     public UserModel update(Long id, UpdateRequest req) {
         UserModel user = repository.findById(id).orElseThrow();
         user.setPassword(req.password());
@@ -44,14 +54,15 @@ public class UserService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
-    public UserModel login(LoginRequest req) {
-        UserModel user = repository.findByEmail(req.email())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (!encoder.matches(req.password(), user.getPassword())) {
-            throw new RuntimeException("Contraseña incorrecta");
-        }
 
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserModel user = repository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
+
+        System.out.println("🔍 Usuario encontrado: " + user.getEmail());
+        System.out.println("🔐 Password en BD (hash): " + user.getPassword());
         return user;
     }
 }

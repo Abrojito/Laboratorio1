@@ -49,13 +49,13 @@ public class UserController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
-    @PostMapping("/login")
-    public ResponseEntity<UserModel> login(@RequestBody LoginRequest req) {
-        try {
-            UserModel user = service.login(req);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<UserModel> login(@RequestBody LoginRequest req) {
+//        try {
+//            UserModel user = service.login(req);
+//            return ResponseEntity.ok(user);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//    }
 }

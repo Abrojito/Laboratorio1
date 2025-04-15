@@ -1,7 +1,7 @@
 // src/pages/auth/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate} from 'react-router-dom';
-import { API_URL } from '../../api/config';
+import { AUTH_URL } from '../../api/config';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -16,7 +16,7 @@ const Login: React.FC = () => {
         setError('');
 
         try {
-            const response = await fetch(`${API_URL}/login`, {
+            const response = await fetch(`${AUTH_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -33,7 +33,6 @@ const Login: React.FC = () => {
 
 
             localStorage.setItem('token', data.token);
-            localStorage.setItem('userId', data.userId);
 
             navigate('/home'); // Redirigir a la página principal después de iniciar sesión
         } catch (err) {

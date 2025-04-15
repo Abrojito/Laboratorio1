@@ -22,6 +22,11 @@ const Signup: React.FC = () => {
         setError('');
 
         try {
+            console.log("🧪 Payload enviado:", {
+                username,
+                email,
+                password
+            });
             const response = await fetch(`${API_URL}/register`, {
                 method: 'POST',
                 headers: {
