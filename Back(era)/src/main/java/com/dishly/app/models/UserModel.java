@@ -26,12 +26,12 @@ public class UserModel implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(); // sin roles por ahora
+        return List.of();
     }
 
     @Override
     public String getUsername() {
-        return this.email; // usamos el email como identificador
+        return this.email;
     }
 
     @Override

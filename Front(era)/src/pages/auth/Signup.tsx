@@ -22,7 +22,7 @@ const Signup: React.FC = () => {
         setError('');
 
         try {
-            console.log("🧪 Payload enviado:", {
+            console.log("Payload enviado:", {
                 username,
                 email,
                 password

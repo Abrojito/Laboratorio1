@@ -15,13 +15,13 @@ const Home: React.FC = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        navigate('/login');
+        navigate('/');
     };
 
     if (!user) return <div>Cargando...</div>;
 
     return (
-        <div className="home-container">
+        <div>
             <header className="home-header">
                 <h1>Dishly</h1>
                 <div className="user-info">
@@ -41,6 +41,10 @@ const Home: React.FC = () => {
                     <div className="card">
                         <h3>Recomendaciones</h3>
                         <p>Contenido próximamente...</p>
+                    </div>
+                    <div className="card">
+                        <h3>Ingredientes</h3>
+                        <button onClick={() => navigate('/ingredients')}>Ver ingredientes</button>
                     </div>
                 </div>
             </main>
