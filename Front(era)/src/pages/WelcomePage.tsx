@@ -6,17 +6,17 @@ const WelcomePage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <>
+        <section className="welcome-screen">
             <main className="welcome-content">
-                <img src="/dishly.jpg" alt="Logo"/>
-                <h1>dishly</h1>
-                <p>Tu aplicación de recetas y platos favoritos.</p>
+                <h1 className="brand">
+                    Dishly<span className="dot">.</span>
+                </h1>
                 <div className="button-group">
-                    <button onClick={() => navigate('/login')}>Login</button>
-                    <button onClick={() => navigate('/signup')}>Signup</button>
+                    <button className="login" onClick={() => navigate('/login')}>Login</button>
+                    <button className="signup" onClick={() => navigate('/signup')}>Signup</button>
                 </div>
             </main>
-        </>
+        </section>
     );
 }
 

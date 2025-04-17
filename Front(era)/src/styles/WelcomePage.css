@@ -1,14 +1,12 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: sans-serif;
-}
-
-body {
+.welcome-screen {
+    height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
+    background-image: url('/src/assets/WelcomePage.jpg');
+    background-size: cover;
+    background-position: center;
 }
 
 .welcome-content {
@@ -21,34 +19,42 @@ body {
 }
 
 .welcome-content h1 {
-    font-size: 3rem;
-    margin-bottom: 0.3rem; /* esto los pega al subtítulo */
-}
-
-.welcome-content p {
-    margin-top: 0;
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
-    color: #555;
+    font-size: 5rem;
+    font-weight: 700;
+    margin-bottom: 1rem; /* esto los pega al subtítulo */
 }
 
 .button-group {
     display: flex;
-    gap: 15px;
+    gap: 20px;
 }
 
-
-.welcome-content button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    border: none;
+button.login {
+    padding: .75rem 2.5rem;
+    font-family: 'Albert Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
     border-radius: 6px;
-    background-color: rgb(5, 32, 239);
-    color: white;
+    border: 1px solid #000;
+    background: rgba(0, 0, 0, 0);
+    color: #000;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: opacity .25s ease;
 }
 
-.welcome-content button:hover {
-    background-color: rgba(0, 123, 255, 0.5);
+button.signup {
+    padding: .75rem 2.5rem;
+    font-family: 'Albert Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    border: none;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity .25s ease;
 }
+
+.button-group:hover,
+.button-group:focus { opacity: .85; }
+
