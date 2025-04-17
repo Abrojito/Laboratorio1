@@ -1,0 +1,54 @@
+
+.screen {
+    height: 100vh;
+    width: 100vw;          /* O 100% + margin 0 en body para ocupar todo */
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 8%;
+    align-items: center;
+    background-image: url('/src/assets/splash.jpg');
+    background-size: cover;
+    background-position: 480px center;
+}
+
+.content {
+    max-width: 320px;
+    width: 90%;
+    text-align: left;
+}
+
+.brand {
+    font-family: 'Libre Caslon Text', serif;
+    font-size: 5rem;
+    font-weight: 700;
+    margin-bottom: .5rem;
+}
+
+.dot {
+    color: #A6B240;
+}
+
+.subtitle {
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: -0.5rem;
+    margin-bottom: 5rem;
+}
+
+.cta {
+    padding: .75rem 1.75rem;
+    font-family: 'Albert Sans', sans-serif;
+    font-size: .9rem;
+    font-weight: 500;
+    border-radius: 6px;
+    border: none;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity .25s ease;
+}
+
+.cta:hover,
+.cta:focus { opacity: .85; }

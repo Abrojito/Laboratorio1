@@ -9,7 +9,7 @@ const WelcomePage: React.FC = () => {
         <>
             <main className="welcome-content">
                 <img src="/dishly.jpg" alt="Logo"/>
-                <h1>Dishly</h1>
+                <h1>dishly</h1>
                 <p>Tu aplicación de recetas y platos favoritos.</p>
                 <div className="button-group">
                     <button onClick={() => navigate('/login')}>Login</button>

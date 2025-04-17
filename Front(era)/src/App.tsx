@@ -7,13 +7,17 @@ import Home from './pages/Home';
 import Ingredient from './pages/Ingredient.tsx';
 
 import { Navigate, Route, Routes} from "react-router-dom";
+import Splash from "./pages/Splash.tsx";
 
 const App: React.FC = () => {
     return (
 
                     <Routes>
+
+                        <Route path="" element={<Splash />} />
+
                         {/* Página de bienvenida */}
-                        <Route path="/" element={<WelcomePage />} />
+                        <Route path="/start" element={<WelcomePage />} />
 
                         {/* Rutas públicas */}
                         <Route path="/login" element={<Login />} />
