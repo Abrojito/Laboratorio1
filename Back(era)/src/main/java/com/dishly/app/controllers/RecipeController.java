@@ -1,62 +1,57 @@
 package com.dishly.app.controllers;
 
-import com.dishly.app.models.RecipeModel;
+import com.dishly.app.dto.RecipeRequestDTO;
+import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.services.RecipeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/recipes")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@RequestMapping("/api/recipes")
 public class RecipeController {
-    @Autowired
-    private RecipeService service;
+
+    private final RecipeService service;
+
+    public RecipeController(RecipeService service) {
+        this.service = service;
+    }
+
+    /* ---------- GETs ---------- */
 
     @GetMapping
-    public List<RecipeModel> getAll() {
+    public List<RecipeResponseDTO> getAll() {
         return service.getAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<RecipeModel> getById(@PathVariable Long id) {
-        return service.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("{id}")
+    public RecipeResponseDTO getById(@PathVariable Long id) {
+        return service.getById(id);
     }
 
-    @GetMapping("/search")
-    public List<RecipeModel> search(@RequestParam String term) {
-        return service.searchByName(term);
-    }
-
-    @GetMapping("/category/{category}")
-    public List<RecipeModel> getByCategory(@PathVariable String category) {
-        return service.findByCategory(category);
-    }
-
-    @GetMapping("/author/{authorId}")
-    public List<RecipeModel> getByAuthor(@PathVariable Long authorId) {
-        return service.findByAuthorId(authorId);
-    }
+    /* ---------- POST ---------- */
 
     @PostMapping
-    public ResponseEntity<RecipeModel> create(@RequestBody RecipeModel recipe) {
-        return ResponseEntity.ok(service.save(recipe));
+    @ResponseStatus(HttpStatus.CREATED)
+    public RecipeResponseDTO create(@RequestBody @Valid RecipeRequestDTO dto) {
+        return service.create(dto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<RecipeModel> update(@PathVariable Long id, @RequestBody RecipeModel recipe) {
-        return service.update(id, recipe)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    /* ---------- PUT ---------- */
+
+    @PutMapping("{id}")
+    public RecipeResponseDTO update(@PathVariable Long id,
+                                    @RequestBody @Valid RecipeRequestDTO dto) {
+        return service.update(id, dto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return ResponseEntity.noContent().build();
+    /* ---------- DELETE ---------- */
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
     }
 }

@@ -8,6 +8,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "recipes")
 public class RecipeModel {
     @Id
     @GeneratedValue
@@ -18,6 +20,7 @@ public class RecipeModel {
     private String category;
     private String author;
     private Long userId;
+    private String difficulty;
 
 
     @ManyToMany

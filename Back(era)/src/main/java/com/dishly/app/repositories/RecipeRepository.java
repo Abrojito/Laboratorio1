@@ -17,4 +17,7 @@ public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
 
     // Búsqueda por usuario/autor
     List<RecipeModel> findByUserId(Long userId);
+
+    boolean existsByName(String name);
+
 }
