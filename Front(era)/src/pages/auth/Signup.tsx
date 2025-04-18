@@ -57,11 +57,12 @@ const Signup: React.FC = () => {
 
     return (
         <div className="auth-form">
-            <h2>Registrarse</h2>
+            <h1>Welcome!</h1>
             {error && <p className="error-text">{error}</p>}
+            <p>Signup to Dishly</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="name">Nombre de Usuario</label>
+                    <label htmlFor="name">Username</label>
                     <input
                         type="text"
                         id="name"
@@ -81,7 +82,7 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Contraseña</label>
+                    <label htmlFor="password">Password</label>
                     <input
                         type="password"
                         id="password"
@@ -91,7 +92,7 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="confirm-password">Confirmar Contraseña</label>
+                    <label htmlFor="confirm-password">Confirm Password</label>
                     <input
                         type="password"
                         id="confirm-password"
@@ -101,8 +102,9 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Procesando...' : 'Registrarse'}
+                    {loading ? 'Procesando...' : 'Signup'}
                 </button>
+                <button className="button-signup" onClick={() => navigate('/login')}>Login</button>
             </form>
         </div>
     );

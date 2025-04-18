@@ -1,89 +1,33 @@
-:root {
-  font-family: Inter, system-ui, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* Reset general */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #f5f5f5;
+  font-family: 'Albert Sans', sans-serif;
+  background-color: #ffffff;
+  color: #030303;
 }
 
-.app {
-  max-width: 500px;
-  width: 100%;
-  margin: 2rem auto;
-  padding: 1rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* Variables globales */
+:root {
+  --primary-color: #030303;
+  --accent-color: #A6B240;
+  --text-color: #ffffff;
 }
 
-.tab-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.tab-buttons button {
-  padding: 0.5rem 1rem;
-  border: none;
-  background-color: #e0e0e0;
-  border-radius: 4px;
+/* Estilos generales de botones */
+button {
   cursor: pointer;
-  transition: background-color 0.2s;
+  outline: none;
+  font-family: inherit;
+  transition: opacity 0.25s ease;
 }
 
-.tab-buttons button.active {
-  background-color: #2a6cbf;
-  color: white;
-}
-
-.auth-form {
-  padding: 1rem;
-}
-
-.auth-form h2 {
-  margin-top: 0;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.btn-primary {
-  background-color: #2a6cbf;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #1f5aa8;
+button:hover, button:focus {
+  opacity: 0.85;
 }
 
 .btn-danger {

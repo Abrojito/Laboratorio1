@@ -5,9 +5,11 @@ import UpdateProfile from './pages/auth/UpdateProfile';
 import DeleteAccount from './components/DeleteAccount';
 import Home from './pages/Home';
 import Ingredient from './pages/Ingredient.tsx';
+import Splash from "./pages/Splash.tsx";
+import NewRecipeForm from "./pages/RecipeForm.tsx";
 
 import { Navigate, Route, Routes} from "react-router-dom";
-import Splash from "./pages/Splash.tsx";
+
 
 const App: React.FC = () => {
     return (
@@ -27,6 +29,15 @@ const App: React.FC = () => {
                         <Route path="/home" element={<Home />} />
                         <Route path="/profile" element={<UpdateProfile />} />
                         <Route path="/delete-account" element={<DeleteAccount />} />
+
+                        {/* Rutas de recetas */}
+                        <Route
+                            path="/newrecipe"
+                            element={
+
+                                    <NewRecipeForm />
+
+                            }/>
 
                         {/* Rutas de ingredientes */}
                         <Route path="/ingredients" element={<Ingredient  />} />

@@ -38,7 +38,7 @@ const Ingredient: React.FC = () => {
         <div className="ingredients-page">
             <div className="ingredients-header">
                 <button className="back-button" onClick={() => navigate('/home')}>
-                    ← Volver
+                    ←
                 </button>
                 <h1>Lista de Ingredientes</h1>
             </div>

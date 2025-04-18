@@ -1,4 +1,3 @@
-// src/pages/auth/Login.tsx
 import React, { useState } from 'react';
 import { useNavigate} from 'react-router-dom';
 import { AUTH_URL } from '../../api/config';
@@ -44,8 +43,9 @@ const Login: React.FC = () => {
 
     return (
         <div className="auth-form">
-            <h2>Iniciar Sesión</h2>
+            <h1>Welcome back!</h1>
             {error && <p className="error-text">{error}</p>}
+            <p>Login to your Dishly account</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label htmlFor="email">Email</label>
@@ -58,7 +58,7 @@ const Login: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Contraseña</label>
+                    <label htmlFor="password">Password</label>
                     <input
                         type="password"
                         id="password"
@@ -70,6 +70,8 @@ const Login: React.FC = () => {
                 <button type="submit" className="btn-primary" disabled={loading}>
                     {loading ? 'Procesando...' : 'Iniciar Sesión'}
                 </button>
+
+                <button className="button-signup" onClick={() => navigate('/signup')}>Signup</button>
             </form>
         </div>
     );
