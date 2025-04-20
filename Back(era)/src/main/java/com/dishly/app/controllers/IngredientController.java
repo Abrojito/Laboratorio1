@@ -1,5 +1,6 @@
 package com.dishly.app.controllers;
 
+import com.dishly.app.dto.IngredientDTO;
 import com.dishly.app.models.IngredientModel;
 import com.dishly.app.services.IngredientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +35,9 @@ public class IngredientController {
     }
 
     @PostMapping
-    public ResponseEntity<IngredientModel> create(@RequestBody IngredientModel ingredient) {
-        return ResponseEntity.ok(service.save(ingredient));
+    public ResponseEntity<IngredientDTO> validate(@RequestBody IngredientDTO ingredient) {
+        return ResponseEntity.ok(service.validate(ingredient));
     }
 
-/*    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return ResponseEntity.noContent().build();
-    }*/
+
 }

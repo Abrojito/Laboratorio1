@@ -78,7 +78,7 @@ public class RecipeService {
         m.setCategory(dto.category());
         m.setAuthor(dto.author());
         m.setUserId(dto.userId());
-        m.setDifficulty(dto.difficulty());
+        m.setTime(dto.time());
 
         if (dto.ingredientIds() != null) {
             List<IngredientModel> ings = dto.ingredientIds().stream()
@@ -98,7 +98,7 @@ public class RecipeService {
                 m.getCategory(),
                 m.getAuthor(),
                 m.getUserId(),
-                m.getDifficulty()
+                m.getTime()
         );
     }
 }

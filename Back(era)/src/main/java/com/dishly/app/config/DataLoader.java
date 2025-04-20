@@ -15,11 +15,9 @@ import java.util.List;
 public class DataLoader {
 
     @Bean
-    @Profile("!prod") // No ejecutar en producción
+    @Profile("!prod")
     CommandLineRunner initDatabase(IngredientRepository repository) {
         return args -> {
-
-            repository.deleteAll();
 
             // Lista de ingredientes comunes
             List<String> ingredients = Arrays.asList(
@@ -32,11 +30,13 @@ public class DataLoader {
                     "Mayonesa", "Lechuga"
             );
 
-            ingredients.forEach(name -> {
-                IngredientModel ingredient = new IngredientModel();
-                ingredient.setName(name);
-                repository.save(ingredient);
-            });
+            if (repository.count() == 0) {
+                ingredients.forEach(name -> {
+                    IngredientModel ingredient = new IngredientModel();
+                    ingredient.setName(name);
+                    repository.save(ingredient);
+                });
+            }
         };
     }
 }

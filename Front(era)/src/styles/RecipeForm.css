@@ -1,9 +1,8 @@
-/* HERO ─────────────────────────────────────────────────────────────────── */
 .image-upload {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1;             /* cuadrado responsivo */
-    background: #bfbfbf;             /* gris Figma */
+    aspect-ratio: 1 / 1;
+    background: #bfbfbf;
     display: flex;
     flex-direction: column;
     align-items: center;

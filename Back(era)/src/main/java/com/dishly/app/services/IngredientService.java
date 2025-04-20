@@ -1,5 +1,6 @@
 package com.dishly.app.services;
 
+import com.dishly.app.dto.IngredientDTO;
 import com.dishly.app.models.IngredientModel;
 import com.dishly.app.repositories.IngredientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +24,24 @@ public class IngredientService {
     }
 
     public List<IngredientModel> searchByName(String term) {
-        return repository.findByNameContainingIgnoreCase(term);
+        return null;
     }
 
     public IngredientModel save(IngredientModel ingredient) {
         return repository.save(ingredient);
     }
-
-    public void deleteById(Long id) {
-        repository.deleteById(id);
+    public IngredientDTO validate(IngredientDTO ingredient) {
+        if (ingredient.name() == null) {
+            throw new IllegalArgumentException("El nombre del ingrediente no puede estar vacío");
+        }
+        IngredientModel result = repository.findByNameContainingIgnoreCase(ingredient.name());
+        if (result != null) {
+            return new IngredientDTO(result.getId(), result.getName());
+        } else {
+            IngredientModel newIngredient = new IngredientModel();
+            newIngredient.setName(ingredient.name());
+            repository.save(newIngredient);
+            return new IngredientDTO(newIngredient.getId(), newIngredient.getName());
+        }
     }
 }

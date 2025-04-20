@@ -1,5 +1,6 @@
 import React, { useState, FormEvent, useRef } from 'react';
 import '../styles/RecipeForm.css';
+import {AUTH_URL} from "../api/config.ts";
 
 interface RecipeRequestDTO {
     name: string;
@@ -8,7 +9,7 @@ interface RecipeRequestDTO {
     category: string;
     author: string;
     //userId: number;
-    difficulty: string;
+    time: string;
     ingredientIds: number[];
 }
 
@@ -20,25 +21,14 @@ const NewRecipeForm: React.FC  = () => {
         category: '',
         author: '',
         //userId: 1,
-        difficulty: '',
+        time: '',
         ingredientIds: [],
     });
 
     //const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [newIngredientId, setNewIngredientId] = useState<number>(0);
+    const [newIngredient, setNewIngredient] = useState<string>('');
+    const [newIngredientList, setNewIngredientList] = useState<string[]>([]);
 
-   /* const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64 = reader.result as string;
-                setRecipe({ ...recipe, image: base64 });
-                setImagePreview(base64);
-            };
-            reader.readAsDataURL(file);
-        }
-    };*/
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     /* --- foto ---------------------------------------------------------------- */
@@ -58,31 +48,37 @@ const NewRecipeForm: React.FC  = () => {
 
     const triggerSelect = () => fileInputRef.current?.click();
 
-    const handleAddIngredient = () => {
-        if (!recipe.ingredientIds.includes(newIngredientId) && newIngredientId > 0) {
+    const handleAddIngredient = async () => {
+        const response = await fetch(`http://localhost:8080/ingredients`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: 0, name: newIngredient }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Invalid ingredient');
+        }
+        const data = await response.json();
+        const newIngredientId = data.id;
+
+        if (!recipe.ingredientIds.includes(newIngredientId)) {
             setRecipe({
                 ...recipe,
                 ingredientIds: [...recipe.ingredientIds, newIngredientId],
             });
-            setNewIngredientId(0);
+            setNewIngredientList((prev) => [...prev, newIngredient]);
         }
     };
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         console.log('Receta lista para enviar:', recipe);
-        // Acá harías tu POST al backend
     };
 
     return (
-       /* <form onSubmit={handleSubmit} className="recipe-form">
-            {/!* Imagen *!/}
-            <label>
-                Foto:
-                <input type="file" accept="image/!*" onChange={handleImageChange} />
-            </label>
-            {imagePreview && <img src={imagePreview} alt="preview" width={200} />}
-*/
+
         <form className="recipe-form" onSubmit={handleSubmit}>
             {/* ───────── Hero de imagen ───────── */}
             <div className="image-upload" onClick={triggerSelect}>
@@ -91,7 +87,7 @@ const NewRecipeForm: React.FC  = () => {
                 ) : (
                     <>
                         <span className="camera-icon" />
-                        <p className="image-helper">Añade una foto de tu receta</p>
+                        <p className="image-helper">Add a picture of your recipe</p>
                     </>
                 )}
                 <input
@@ -105,46 +101,49 @@ const NewRecipeForm: React.FC  = () => {
 
             {/* Campos básicos */}
             <input
-                placeholder="Título"
+                placeholder="Title"
                 value={recipe.name}
                 onChange={(e) => setRecipe({ ...recipe, name: e.target.value })}
             />
             <textarea
-                placeholder="Descripción"
+                placeholder="Description"
                 value={recipe.description}
                 onChange={(e) => setRecipe({ ...recipe, description: e.target.value })}
             />
             <input
-                placeholder="Categoría"
+                placeholder="Category"
                 value={recipe.category}
                 onChange={(e) => setRecipe({ ...recipe, category: e.target.value })}
             />
 
             <input
-                placeholder="Dificultad"
-                value={recipe.difficulty}
-                onChange={(e) => setRecipe({ ...recipe, difficulty: e.target.value })}
+                placeholder="Time of duration"
+                value={recipe.time}
+                onChange={(e) => setRecipe({ ...recipe, time: e.target.value })}
             />
 
             {/* Ingredientes */}
             <div>
-                <h4>IDs de ingredientes</h4>
+                <h4>Ingredients</h4>
+
+                <input
+                    type="name"
+                    placeholder="Ingredient"
+                    value={newIngredient || ''}
+                    onChange={(e) => setNewIngredient(e.target.value)}
+                />
+                <button type="button" onClick={handleAddIngredient}>+ Add ingredient</button>
+                <button type="button" onClick={handleAddIngredient}>+ Add Group</button>
+
                 <ul>
-                    {recipe.ingredientIds.map((id, i) => (
-                        <li key={i}>ID: {id}</li>
+                    {newIngredientList.map((name, i) => (
+                        <li key={i}>Name: {name}</li>
                     ))}
                 </ul>
-                <input
-                    type="number"
-                    placeholder="Ingrediente"
-                    value={newIngredientId || ''}
-                    onChange={(e) => setNewIngredientId(parseInt(e.target.value))}
-                />
-                <button type="button" onClick={handleAddIngredient}>+ Agregar ingrediente</button>
-                <button type="button" onClick={handleAddIngredient}>+ Agregar Grupo</button>
+
             </div>
 
-            <button type="btn-primar">Crear receta</button>
+            <button type="btn-primar">Create</button>
         </form>
     );
 };

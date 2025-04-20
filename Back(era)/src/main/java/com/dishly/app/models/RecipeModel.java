@@ -20,7 +20,8 @@ public class RecipeModel {
     private String category;
     private String author;
     private Long userId;
-    private String difficulty;
+    private String time;
+    private List <String> steps;
 
 
     @ManyToMany

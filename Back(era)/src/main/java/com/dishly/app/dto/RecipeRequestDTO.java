@@ -9,7 +9,7 @@ public record RecipeRequestDTO(
         String category,
         String author,
         Long   userId,
-        String difficulty,
+        String time,
         List<Long> ingredientIds    // IDs de ingredientes
 ) {}
 

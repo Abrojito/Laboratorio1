@@ -8,5 +8,5 @@ public record RecipeResponseDTO(
         String category,
         String author,
         Long   userId,
-        String difficulty
+        String time
 ) {}

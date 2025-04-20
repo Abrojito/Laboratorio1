@@ -13,7 +13,7 @@ public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     List<RecipeModel> findByCategoryIgnoreCase(String category);
 
     // Búsqueda por dificultad
-    List<RecipeModel> findByDifficulty(String difficulty);
+    //List<RecipeModel> findByDifficulty(String difficulty);
 
     // Búsqueda por usuario/autor
     List<RecipeModel> findByUserId(Long userId);
