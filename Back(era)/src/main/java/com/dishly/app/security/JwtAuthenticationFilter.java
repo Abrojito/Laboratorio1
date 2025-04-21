@@ -1,5 +1,6 @@
 package com.dishly.app.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,9 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String jwt = authHeader.substring(7); // Quita "Bearer "
-        final String email = jwtUtil.getUsernameFromToken(jwt); // ← si cambiaste a getEmailFromToken, usalo acá
-
+        final String jwt = authHeader.substring(7);
+        final String email;
+        try {
+            email = jwtUtil.getUsernameFromToken(jwt);
+        } catch (JwtException ex) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+            return;
+        }
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 

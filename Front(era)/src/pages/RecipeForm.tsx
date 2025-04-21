@@ -1,5 +1,6 @@
-import React, { useState, FormEvent, useRef } from 'react';
 import '../styles/RecipeForm.css';
+import React, { useState, FormEvent, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {AUTH_URL} from "../api/config.ts";
 
 interface RecipeRequestDTO {
@@ -14,6 +15,7 @@ interface RecipeRequestDTO {
 }
 
 const NewRecipeForm: React.FC  = () => {
+    const navigate = useNavigate();
     const [recipe, setRecipe] = useState<RecipeRequestDTO>({
         name: '',
         description: '',
@@ -72,9 +74,33 @@ const NewRecipeForm: React.FC  = () => {
         }
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        console.log('Receta lista para enviar:', recipe);
+        try {
+            // 1. Obtén el token del localStorage
+            const token = localStorage.getItem('token');
+
+            // 2. Llama al endpoint incluyendo el header Authorization si hay token
+            const response = await fetch('http://localhost:8080/api/recipes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify(recipe),
+            });
+
+            // 3. Manejo de errores
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+
+            // 4. Navega a /home una vez creada la receta
+            navigate('/home');
+        } catch (err: any) {
+            alert('Error creando receta: ' + err.message);
+        }
     };
 
     return (
