@@ -1,6 +1,6 @@
 .image-upload {
     position: relative;
-    width: 100%;
+    width: 430px;
     aspect-ratio: 1 / 1;
     background: #bfbfbf;
     display: flex;
@@ -10,13 +10,6 @@
     cursor: pointer;
 }
 
-.camera-icon {
-    width: 48px;
-    height: 48px;
-    background-image: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fes.123rf.com%2Fphoto_115137255_empareje-fotos-archivos-de-imagen-%25C3%25A1lbum-de-im%25C3%25A1genes-icono-simple-icono-negro-sobre-fondo-blanco.html&psig=AOvVaw2i-UvMpR0NISc4UqsDBkq7&ust=1745102650761000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCIjTgZDU4owDFQAAAAAdAAAAABAJ'); /* usa tu ícono o un SVG inline */
-    background-size: contain;
-    background-repeat: no-repeat;
-}
 
 .image-helper {
     margin-top: 0.5rem;
@@ -63,4 +56,63 @@
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
+}
+
+.h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Contenedor de botones centrados */
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+/* Botones de texto sin borde */
+.text-button {
+    background: transparent;
+    border: none;
+    color: #222121;
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.text-button:hover {
+    color: #A6B240;
+}
+
+/* Header del formulario */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    max-width: 430px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.back-button {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: #030303;
+}
+
+.form-title {
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
 }

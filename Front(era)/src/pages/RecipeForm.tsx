@@ -1,7 +1,8 @@
 import '../styles/RecipeForm.css';
 import React, { useState, FormEvent, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {AUTH_URL} from "../api/config.ts";
+import StyledTextField from "../components/StyledTextField";
+
 
 interface RecipeRequestDTO {
     name: string;
@@ -38,7 +39,7 @@ const NewRecipeForm: React.FC  = () => {
         const reader = new FileReader();
         reader.onloadend = () => {
             const base64 = reader.result as string;
-            setRecipe((prev) => ({ ...prev, image: base64 }));
+            setRecipe((prev) => ({...prev, image: base64}));
         };
         reader.readAsDataURL(file);
     };
@@ -56,7 +57,7 @@ const NewRecipeForm: React.FC  = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ id: 0, name: newIngredient }),
+            body: JSON.stringify({id: 0, name: newIngredient}),
         });
 
         if (!response.ok) {
@@ -85,7 +86,7 @@ const NewRecipeForm: React.FC  = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    ...(token ? {Authorization: `Bearer ${token}`} : {}),
                 },
                 body: JSON.stringify(recipe),
             });
@@ -109,10 +110,10 @@ const NewRecipeForm: React.FC  = () => {
             {/* ───────── Hero de imagen ───────── */}
             <div className="image-upload" onClick={triggerSelect}>
                 {recipe.image ? (
-                    <img src={recipe.image} alt="preview" className="image-preview" />
+                    <img src={recipe.image} alt="preview" className="image-preview"/>
                 ) : (
                     <>
-                        <span className="camera-icon" />
+                        <span className="camera-icon"/>
                         <p className="image-helper">Add a picture of your recipe</p>
                     </>
                 )}
@@ -126,38 +127,42 @@ const NewRecipeForm: React.FC  = () => {
             </div>
 
             {/* Campos básicos */}
-            <input
-                placeholder="Title"
+            <StyledTextField
+                label="Title"
                 value={recipe.name}
-                onChange={(e) => setRecipe({ ...recipe, name: e.target.value })}
+                onChange={(e) => setRecipe({...recipe, name: e.target.value})}
             />
-            <textarea
-                placeholder="Description"
+            <StyledTextField
+                label="Description"
                 value={recipe.description}
-                onChange={(e) => setRecipe({ ...recipe, description: e.target.value })}
-            />
-            <input
-                placeholder="Category"
-                value={recipe.category}
-                onChange={(e) => setRecipe({ ...recipe, category: e.target.value })}
+                onChange={(e) => setRecipe({...recipe, description: e.target.value})}
             />
 
-            <input
-                placeholder="Time of duration"
-                value={recipe.time}
-                onChange={(e) => setRecipe({ ...recipe, time: e.target.value })}
-            />
 
+            <div>
+                <StyledTextField
+                    label="Time of duration"
+                    value={recipe.time}
+                    onChange={(e) => setRecipe({...recipe, time: e.target.value})}
+                />
+            </div>
             {/* Ingredientes */}
             <div>
-                <h4>Ingredients</h4>
+                <h4 style={{
+                    fontFamily: 'Albert Sans, sans-serif',
+                    fontSize: '1.5rem',
+                    fontWeight: 700
+                }}>Ingredients</h4>
 
-                <input
-                    type="name"
-                    placeholder="Ingredient"
-                    value={newIngredient || ''}
-                    onChange={(e) => setNewIngredient(e.target.value)}
-                />
+                <div style={{marginTop: -5}}>
+                    <StyledTextField
+                        type="name"
+                        label="Ingredient"
+                        value={newIngredient || ''}
+                        onChange={(e) => setNewIngredient(e.target.value)}
+                    />
+                </div> className="buttons-container">
+
                 <button type="button" onClick={handleAddIngredient}>+ Add ingredient</button>
                 <button type="button" onClick={handleAddIngredient}>+ Add Group</button>
 
@@ -169,11 +174,23 @@ const NewRecipeForm: React.FC  = () => {
 
             </div>
 
-            <button type="submit"
+            <div className="form-actions">
+                <button
+                    type="back-button"
+                    onClick={() => navigate('/home')}
+                    className="back-button">
+                    ✕
+                </button>
+
+                <button
+                    type="submit"
                     disabled={!recipe.image}
-                    title={!recipe.image ? "You must add a picture" : undefined}>Create</button>
+                    title={!recipe.image ? "You must add a picture" : undefined}>
+                    Create
+                </button>
+            </div>
         </form>
     );
 };
 
-export default NewRecipeForm;
+export default NewRecipeForm

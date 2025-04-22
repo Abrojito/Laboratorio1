@@ -69,7 +69,7 @@ const Login: React.FC = () => {
                     />
                 </div>
                 <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Procesando...' : 'Iniciar Sesión'}
+                    {loading ? 'Procesando...' : 'Login'}
                 </button>
 
                 <button className="button-signup" onClick={() => navigate('/signup')}>Signup</button>
