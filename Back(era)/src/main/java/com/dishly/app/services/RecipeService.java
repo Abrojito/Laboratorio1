@@ -101,4 +101,9 @@ public class RecipeService {
                 m.getTime()
         );
     }
+
+    public List<RecipeResponseDTO> getAllByUser(Long userId) {
+        return recipeRepo.findByUserId(userId)
+                .stream().map(this::toDTO).toList();
+    }
 }

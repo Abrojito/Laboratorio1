@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate} from 'react-router-dom';
-import { AUTH_URL } from '../../api/config';
+
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -15,7 +16,7 @@ const Login: React.FC = () => {
         setError('');
 
         try {
-            const response = await fetch(`${AUTH_URL}/login`, {
+            const response = await fetch(`${BASE}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

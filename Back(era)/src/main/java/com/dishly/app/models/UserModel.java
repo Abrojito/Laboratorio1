@@ -24,6 +24,14 @@ public class UserModel implements UserDetails {
     private String password;
     private String email;
 
+    @Setter
+    @Getter
+    private String fullName;
+
+    @Setter
+    @Getter
+    private String photo;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -45,4 +53,5 @@ public class UserModel implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
+
 }

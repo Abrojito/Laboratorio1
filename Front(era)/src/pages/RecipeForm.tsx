@@ -169,7 +169,9 @@ const NewRecipeForm: React.FC  = () => {
 
             </div>
 
-            <button type="btn-primar">Create</button>
+            <button type="submit"
+                    disabled={!recipe.image}
+                    title={!recipe.image ? "You must add a picture" : undefined}>Create</button>
         </form>
     );
 };

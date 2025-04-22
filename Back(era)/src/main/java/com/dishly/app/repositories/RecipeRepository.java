@@ -20,4 +20,5 @@ public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
 
     boolean existsByName(String name);
 
+
 }

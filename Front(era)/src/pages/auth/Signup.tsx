@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { API_URL } from '../../api/config';
 import {useNavigate} from "react-router-dom";
 
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const Signup: React.FC = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -27,7 +29,7 @@ const Signup: React.FC = () => {
                 email,
                 password
             });
-            const response = await fetch(`${API_URL}/register`, {
+            const response = await fetch(`${BASE}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
