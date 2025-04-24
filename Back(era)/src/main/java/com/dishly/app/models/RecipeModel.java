@@ -21,7 +21,6 @@ public class RecipeModel {
     private String author;
     private Long userId;
     private String time;
-    private List <String> steps;
 
 
     @ManyToMany
@@ -31,4 +30,10 @@ public class RecipeModel {
             inverseJoinColumns = @JoinColumn(name = "ingredient_id")
     )
     private List<IngredientModel> ingredients;
+
+    @ElementCollection
+    @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
+    @Column(name = "step")
+    private List<String> steps;
+
 }

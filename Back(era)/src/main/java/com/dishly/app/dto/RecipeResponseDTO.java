@@ -1,5 +1,7 @@
 package com.dishly.app.dto;
 
+import java.util.List;
+
 public record RecipeResponseDTO(
         Long   id,
         String name,
@@ -8,5 +10,6 @@ public record RecipeResponseDTO(
         String category,
         String author,
         Long   userId,
-        String time
+        String time,
+        List<String> steps
 ) {}

@@ -10,6 +10,7 @@ public record RecipeRequestDTO(
         String author,
         Long   userId,
         String time,
-        List<Long> ingredientIds    // IDs de ingredientes
+        List<Long> ingredientIds,
+        List<String> steps
 ) {}
 

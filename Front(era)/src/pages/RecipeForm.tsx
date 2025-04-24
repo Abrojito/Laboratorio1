@@ -13,6 +13,7 @@ interface RecipeRequestDTO {
     //userId: number;
     time: string;
     ingredientIds: number[];
+    steps: string[];
 }
 
 const NewRecipeForm: React.FC  = () => {
@@ -26,13 +27,24 @@ const NewRecipeForm: React.FC  = () => {
         //userId: 1,
         time: '',
         ingredientIds: [],
+        steps: [],
     });
+
+
+    const [stepsList, setStepsList] = useState<string[]>(['']);
+    const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
+
 
     //const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [newIngredient, setNewIngredient] = useState<string>('');
     const [newIngredientList, setNewIngredientList] = useState<string[]>([]);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const [stepImages, setStepImages] = useState<string[][]>([[]]);
+    const stepImageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+
 
     /* --- foto ---------------------------------------------------------------- */
     const handleImageSelect = (file: File) => {
@@ -104,6 +116,58 @@ const NewRecipeForm: React.FC  = () => {
         }
     };
 
+
+    const handleStepChange = (index: number, value: string) => {
+        const updated = [...stepsList];
+        updated[index] = value;
+        setStepsList(updated);
+    };
+
+    const handleAddStep = () => {
+        setStepsList([...stepsList, '']);
+        setStepImages([...stepImages, []]);
+    };
+
+    const toggleMenu = (index: number) => {
+        setOpenMenuIndex(openMenuIndex === index ? null : index);
+    };
+
+    const handleRemoveStep = (index: number) => {
+        const updated = [...stepsList];
+        updated.splice(index, 1);
+        setStepsList(updated);
+        setOpenMenuIndex(null);
+    };
+
+    const handleAddImageToStep = (index: number) => {
+        stepImageInputRefs.current[index]?.click();
+        setOpenMenuIndex(null);
+    };
+
+    const handleStepImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const fileReaders: Promise<string>[] = Array.from(files).map(
+            (file) =>
+                new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.readAsDataURL(file);
+                })
+        );
+
+        Promise.all(fileReaders).then((base64Images) => {
+            const updated = [...stepImages];
+            if (!updated[index]) updated[index] = [];
+            updated[index] = [...updated[index], ...base64Images];
+            setStepImages(updated);
+        });
+    };
+
+
+
+
     return (
         <>
             <div className="recipe-form-header">
@@ -133,7 +197,6 @@ const NewRecipeForm: React.FC  = () => {
                     <img src={recipe.image} alt="preview" className="image-preview"/>
                 ) : (
                     <>
-                        <span className="camera-icon"/>
                         <p className="image-helper">Add a picture of your recipe</p>
                     </>
                 )}
@@ -198,17 +261,70 @@ const NewRecipeForm: React.FC  = () => {
                     ))}
                 </ul>
             </div>
-         {/*   <div>
-                <button
-                    type="submit"
-                    disabled={!recipe.image}
-                    title={!recipe.image ? "You must add a picture" : undefined}>
-                    Create
-                </button>
-            </div>*/}
+        <div className="steps-section">
+            <h4  style={{
+                fontFamily: 'Albert Sans, sans-serif',
+                fontSize: '1.5rem',
+                fontWeight: 700
+            }}>Steps</h4>
+
+            {stepsList.map((step, index) => (
+                <div key={index} className="step-card">
+                    {/* Línea de número + input + menú: en fila */}
+                    <div className="step-header">
+                        <div className="step-number">{index + 1}</div>
+                        <input
+                            className="step-input"
+                            type="text"
+                            placeholder="Ex: Mix the eggs with the milk..."
+                            value={step}
+                            onChange={(e) => handleStepChange(index, e.target.value)}
+                        />
+                        <div className="step-menu-container">
+                            <button type="button" className="menu-btn" onClick={() => toggleMenu(index)}>⋯</button>
+                            {openMenuIndex === index && (
+                                <div className="menu-dropdown">
+                                    <button type="button" onClick={() => handleAddImageToStep(index)}>Add picture</button>
+                                    <button type="button" onClick={() => handleRemoveStep(index)}>Delete step</button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 👇 Miniaturas de imágenes: fuera del header, así quedan ABAJO */}
+                    <div className="step-images">
+                        {stepImages[index]?.map((img, i) => (
+                            <img
+                                key={i}
+                                src={img}
+                                alt={`Step ${index + 1} - img ${i + 1}`}
+                                className="step-thumbnail"
+                            />
+                        ))}
+                    </div>
+
+                    {/* input file oculto */}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: 'none' }}
+                        ref={(el) => (stepImageInputRefs.current[index] = el)}
+                        onChange={(e) => handleStepImageChange(e, index)}
+                    />
+                </div>
+
+            ))}
+
+            <div className="buttons-container">
+                    <button type="button" className="add-button" onClick={handleAddStep}>
+                        + Add Step
+                    </button>
+                </div>
+           </div>
         </form>
-      </>
-    );
+     </>
+ );
 };
 
-export default NewRecipeForm
+export default NewRecipeForm;
