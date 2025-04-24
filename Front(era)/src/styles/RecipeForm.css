@@ -1,24 +1,30 @@
 .image-upload {
     position: relative;
-    width: 430px;
+    width: 100%;
     aspect-ratio: 1 / 1;
-    background: #bfbfbf;
+    background: rgba(166, 178, 64, 0.19);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
+.image-upload:hover {
+    color: #A6B240;
+}
+
+.image-upload:active {
+    background: rgba(166, 178, 64, 0.50);
+}
 
 
 .image-helper {
     margin-top: 0.5rem;
-    color: #ffffff;
+    color: #222121;
     font-weight: 600;
     text-align: center;
 }
 
-/* Cuando hay preview */
 .image-preview {
     object-fit: cover;
     width: 100%;
@@ -28,7 +34,7 @@
 /* FORM ─────────────────────────────────────────────────────────────────── */
 .recipe-form {
     padding: 1rem;
-    max-width: 430px;
+    max-width: 500px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -73,7 +79,7 @@
 }
 
 /* Botones de texto sin borde */
-.text-button {
+.add-button {
     background: transparent;
     border: none;
     color: #222121;
@@ -85,34 +91,50 @@
     transition: opacity 0.2s ease;
 }
 
-.text-button:hover {
+.add-button:hover {
     color: #A6B240;
 }
 
 /* Header del formulario */
-.form-header {
+.recipe-form-header {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 0.8rem;
+    background-color: #ffffff;
     padding: 1rem;
-    max-width: 430px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .back-button {
-    background: transparent;
+    background: none;
     border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0.5rem;
+    font-size: 2rem;
     color: #030303;
+    cursor: pointer;
+    font-weight: 300;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
 
-.form-title {
+.create-button {
     font-family: 'Albert Sans', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    background-color: #A6B240;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.create-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }

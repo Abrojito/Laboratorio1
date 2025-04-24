@@ -26,6 +26,14 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder encoder;
 
     public UserModel register(RegisterRequest req) {
+        if (repository.existsByUsername(req.username())) {
+            throw new IllegalArgumentException("This username is already taken");
+        }
+
+        // Verificar si ya existe un usuario con el mismo email
+        if (repository.existsByEmail(req.email())) {
+            throw new IllegalArgumentException("Email already in use");
+        }
         UserModel user = new UserModel();
         user.setUsername(req.username());
         user.setPassword(encoder.encode(req.password())); // ¡encriptado!

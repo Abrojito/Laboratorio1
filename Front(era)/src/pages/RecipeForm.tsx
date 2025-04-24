@@ -105,8 +105,28 @@ const NewRecipeForm: React.FC  = () => {
     };
 
     return (
+        <>
+            <div className="recipe-form-header">
+                <button
+                    type="button"
+                    className="back-button"
+                    onClick={() => navigate('/home')}
+                >
+                    ×
+                </button>
 
-        <form className="recipe-form" onSubmit={handleSubmit}>
+                <button
+                    type="submit"
+                    form="recipe-form"
+                    className="create-button"
+                    disabled={!recipe.image}
+                    title={!recipe.image ? "You must add a picture" : undefined}
+                >
+                    Create
+                </button>
+            </div>
+
+    <form className="recipe-form" onSubmit={handleSubmit}>
             {/* ───────── Hero de imagen ───────── */}
             <div className="image-upload" onClick={triggerSelect}>
                 {recipe.image ? (
@@ -161,35 +181,33 @@ const NewRecipeForm: React.FC  = () => {
                         value={newIngredient || ''}
                         onChange={(e) => setNewIngredient(e.target.value)}
                     />
-                </div> className="buttons-container">
+                </div>
 
-                <button type="button" onClick={handleAddIngredient}>+ Add ingredient</button>
-                <button type="button" onClick={handleAddIngredient}>+ Add Group</button>
 
+                <div className="buttons-container">
+
+                    <button type="button" className="add-button" onClick={handleAddIngredient}>+ Add ingredient</button>
+                    <button type="button" className="add-button" onClick={handleAddIngredient}>+ Add Group</button>
+                </div>
+            </div>
+
+            <div>
                 <ul>
                     {newIngredientList.map((name, i) => (
                         <li key={i}>Name: {name}</li>
                     ))}
                 </ul>
-
             </div>
-
-            <div className="form-actions">
-                <button
-                    type="back-button"
-                    onClick={() => navigate('/home')}
-                    className="back-button">
-                    ✕
-                </button>
-
+         {/*   <div>
                 <button
                     type="submit"
                     disabled={!recipe.image}
                     title={!recipe.image ? "You must add a picture" : undefined}>
                     Create
                 </button>
-            </div>
+            </div>*/}
         </form>
+      </>
     );
 };
 

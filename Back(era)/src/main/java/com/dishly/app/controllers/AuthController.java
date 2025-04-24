@@ -1,9 +1,6 @@
 package com.dishly.app.controllers;
 
-import com.dishly.app.dto.userdto.LoginRequest;
-import com.dishly.app.dto.userdto.LoginResponse;
-import com.dishly.app.dto.userdto.RegisterRequest;
-import com.dishly.app.dto.userdto.UpdateRequest;
+import com.dishly.app.dto.userdto.*;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.security.JwtUtil;
 import com.dishly.app.services.UserService;
@@ -13,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import com.dishly.app.dto.userdto.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,8 +32,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            System.out.println("🧪 Login con email: " + request.email());
-            System.out.println("🔓 Password plano: " + request.password());
+            System.out.println("🧪 Login with email: " + request.email());
+            System.out.println("🔓 Password : " + request.password());
 
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.email(), request.password())
@@ -45,7 +43,7 @@ public class AuthController {
             return ResponseEntity.ok(new LoginResponse(token));
 
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email o contraseña incorrectos");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email or password is incorrect");
         }
     }
 
@@ -56,10 +54,20 @@ public class AuthController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/register")
+    /*@PostMapping("/register")
     public ResponseEntity<UserModel> create(@RequestBody RegisterRequest req) {
         UserModel user = service.register(req);
         return ResponseEntity.ok(user);
+    }*/
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            UserModel user = service.register(request);
+            return ResponseEntity.ok(new RegisterResponse(user.getId()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")

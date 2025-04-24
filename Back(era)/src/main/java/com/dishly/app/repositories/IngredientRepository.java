@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface IngredientRepository extends JpaRepository<IngredientModel, Long> {
     IngredientModel findByNameContainingIgnoreCase(String name);
+    boolean existsByNameContainingIgnoreCase(String name);
 }

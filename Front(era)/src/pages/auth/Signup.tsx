@@ -16,7 +16,7 @@ const Signup: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setError('Las contraseñas no coinciden');
+            setError('Passwords do not match');
             return;
         }
 
@@ -24,7 +24,7 @@ const Signup: React.FC = () => {
         setError('');
 
         try {
-            console.log("Payload enviado:", {
+            console.log("Payload sent:", {
                 username,
                 email,
                 password
@@ -42,20 +42,52 @@ const Signup: React.FC = () => {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.log(errorData)
-                throw new Error(errorData.message || 'Error al registrarse');
+                throw new Error(errorData.message || 'Error');
             }
 
             const data = await response.json();
-            console.log('Registro exitoso:', data);
+            console.log('Register successful:', data);
 
            navigate("/login")
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Error al registrarse');
+            setError(err instanceof Error ? err.message : 'Error');
         } finally {
             setLoading(false);
         }
     };
+
+    // Ejemplo usando fetch
+    async function registerUser(userData) {
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Mostrar el mensaje de error al usuario
+                displayError(data.message); // Por ejemplo: "El nombre de usuario ya está en uso"
+                return false;
+            }
+
+            // Registro exitoso
+            return true;
+        } catch (error) {
+            displayError("There has been a connection error");
+            return false;
+        }
+    }
+
+    function displayError(message) {
+        // Mostrar el mensaje en tu interfaz de usuario
+        const errorElement = document.getElementById('error-message');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
 
     return (
         <div className="auth-form">
