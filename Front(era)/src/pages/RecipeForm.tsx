@@ -37,12 +37,29 @@ const NewRecipeForm: React.FC  = () => {
 
     //const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [newIngredient, setNewIngredient] = useState<string>('');
-    const [newIngredientList, setNewIngredientList] = useState<string[]>([]);
+    //const [newIngredientList, setNewIngredientList] = useState<string[]>([]);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const [stepImages, setStepImages] = useState<string[][]>([[]]);
     const stepImageInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+    // Nuevos estados para grupos de ingredientes
+    const [showGroupInput, setShowGroupInput] = useState<boolean>(false);
+    const [newGroupName, setNewGroupName] = useState<string>('');
+    const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>([]);
+    const [activeGroupIndex, setActiveGroupIndex] = useState<number | null>(null);
+
+// Define la interfaz para grupos
+    interface Ingredient {
+        name: string;
+        quantity?: string;
+    }
+
+    interface IngredientGroup {
+        name: string;
+        ingredients: Ingredient[];
+    }
 
 
 
@@ -64,26 +81,50 @@ const NewRecipeForm: React.FC  = () => {
     const triggerSelect = () => fileInputRef.current?.click();
 
     const handleAddIngredient = async () => {
-        const response = await fetch(`http://localhost:8080/ingredients`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({id: 0, name: newIngredient}),
-        });
-
-        if (!response.ok) {
-            throw new Error('Invalid ingredient');
+        if (!newIngredient || newIngredient.trim() === '') {
+            alert('Ingredient name cannot be empty');
+            return;
         }
-        const data = await response.json();
-        const newIngredientId = data.id;
 
-        if (!recipe.ingredientIds.includes(newIngredientId)) {
-            setRecipe({
-                ...recipe,
-                ingredientIds: [...recipe.ingredientIds, newIngredientId],
+        try {
+            let newIngredientId;
+
+            const response = await fetch(`http://localhost:8080/ingredients`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: 0, name: newIngredient }),
             });
-            setNewIngredientList((prev) => [...prev, newIngredient]);
+
+            if (response.ok) {
+                const data = await response.json();
+                newIngredientId = data.id;
+            } else {
+                // Si falla, asumimos que ya existe y lo buscamos por nombre
+                const existing = await fetch(`http://localhost:8080/ingredients/search?name=${encodeURIComponent(newIngredient)}`);
+                if (!existing.ok) throw new Error("Ingredient not found or error on fallback");
+                const data = await existing.json();
+                newIngredientId = data.id;
+            }
+
+            if (!recipe.ingredientIds.includes(newIngredientId)) {
+                setRecipe((prev) => ({
+                    ...prev,
+                    ingredientIds: [...prev.ingredientIds, newIngredientId],
+                }));
+            }
+
+            if (activeGroupIndex !== null) {
+                const updatedGroups = [...ingredientGroups];
+                updatedGroups[activeGroupIndex].ingredients.push({ name: newIngredient, quantity: '' });
+                setIngredientGroups(updatedGroups);
+            } else {
+                setNewIngredientList((prev) => [...prev, { name: newIngredient, quantity: '' }]);
+            }
+
+            setNewIngredient('');
+        } catch (error) {
+            console.error('Error al añadir ingrediente:', error);
+            alert('No se pudo añadir el ingrediente. Inténtalo de nuevo.');
         }
     };
 
@@ -165,6 +206,47 @@ const NewRecipeForm: React.FC  = () => {
         });
     };
 
+    const handleAddGroup = () => {
+        setShowGroupInput(true);
+    };
+
+    const handleCreateGroup = () => {
+        if (newGroupName.trim()) {
+            setIngredientGroups([...ingredientGroups, {
+                name: newGroupName,
+                ingredients: []
+            }]);
+            setNewGroupName('');
+            setShowGroupInput(false);
+            setActiveGroupIndex(ingredientGroups.length);
+        }
+    };
+
+    const [newIngredientList, setNewIngredientList] = useState<{ name: string; quantity: string }[]>([]);
+
+    const handleQuantityChange = (index: number, value: string) => {
+        const updated = [...newIngredientList];
+        updated[index].quantity = value;
+        setNewIngredientList(updated);
+    };
+
+    const handleGroupIngredientQuantityChange = (
+        groupIndex: number,
+        ingredientIndex: number,
+        newQuantity: string
+    ) => {
+        const updated = [...ingredientGroups];
+        updated[groupIndex].ingredients[ingredientIndex].quantity = newQuantity;
+        setIngredientGroups(updated);
+    };
+
+    const handleRemoveGroupIngredient = (groupIndex: number, ingredientIndex: number) => {
+        const updated = [...ingredientGroups];
+        updated[groupIndex].ingredients.splice(ingredientIndex, 1);
+        setIngredientGroups(updated);
+    };
+
+
 
 
 
@@ -229,38 +311,122 @@ const NewRecipeForm: React.FC  = () => {
                     onChange={(e) => setRecipe({...recipe, time: e.target.value})}
                 />
             </div>
-            {/* Ingredientes */}
-            <div>
-                <h4 style={{
-                    fontFamily: 'Albert Sans, sans-serif',
-                    fontSize: '1.5rem',
-                    fontWeight: 700
-                }}>Ingredients</h4>
+        {/* INGREDIENTS SECTION */}
+        <div className="ingredients-section">
+            <h4 className="section-title">Ingredients</h4>
 
-                <div style={{marginTop: -5}}>
-                    <StyledTextField
-                        type="name"
-                        label="Ingredient"
-                        value={newIngredient || ''}
-                        onChange={(e) => setNewIngredient(e.target.value)}
+            <StyledTextField
+                label="Ingredient"
+                value={newIngredient}
+                onChange={(e) => setNewIngredient(e.target.value)}
+            />
+
+            {/* Ingredientes sueltos */}
+            {newIngredientList.map((item, i) => (
+                <div key={i} className="ingredient-row">
+                    <input
+                        type="text"
+                        className="ingredient-qty"
+                        placeholder="Ej: 2"
+                        value={item.quantity}
+                        onChange={(e) => handleQuantityChange(i, e.target.value)}
                     />
+                    <input
+                        type="text"
+                        value={item.name}
+                        disabled
+                        className="ingredient-input"
+                    />
+                    <button
+                        className="delete-ingredient"
+                        type="button"
+                        onClick={() => {
+                            const updated = [...newIngredientList];
+                            updated.splice(i, 1);
+                            setNewIngredientList(updated);
+                        }}
+                    >
+                        ⋯
+                    </button>
                 </div>
+            ))}
 
+            {/* Ingredientes agrupados inline */}
+            {ingredientGroups.map((group, groupIndex) => (
+                <div key={groupIndex} className="ingredient-group-inline">
+                    <div className="group-header-inline">
+                        <span className="group-name">{group.name}</span>
+                        <span
+                            className="group-remove"
+                            onClick={() => {
+                                const updated = [...ingredientGroups];
+                                updated.splice(groupIndex, 1);
+                                setIngredientGroups(updated);
+                            }}
+                        >
+          ✖
+        </span>
+                    </div>
 
-                <div className="buttons-container">
-
-                    <button type="button" className="add-button" onClick={handleAddIngredient}>+ Add ingredient</button>
-                    <button type="button" className="add-button" onClick={handleAddIngredient}>+ Add Group</button>
-                </div>
-            </div>
-
-            <div>
-                <ul>
-                    {newIngredientList.map((name, i) => (
-                        <li key={i}>Name: {name}</li>
+                    {group.ingredients.map((ingredient, idx) => (
+                        <div key={idx} className="ingredient-row">
+                            <input
+                                type="text"
+                                className="ingredient-qty"
+                                placeholder="Ej: 2"
+                                value={ingredient.quantity || ''}
+                                onChange={(e) =>
+                                    handleGroupIngredientQuantityChange(groupIndex, idx, e.target.value)
+                                }
+                            />
+                            <input
+                                type="text"
+                                value={ingredient.name}
+                                disabled
+                                className="ingredient-input"
+                            />
+                            <button
+                                type="button"
+                                className="delete-ingredient"
+                                onClick={() => handleRemoveGroupIngredient(groupIndex, idx)}
+                            >
+                                ⋯
+                            </button>
+                        </div>
                     ))}
-                </ul>
+
+                </div>
+            ))}
+
+            {/* Botones principales */}
+            <div className="buttons-container">
+                <button type="button" className="add-button" onClick={handleAddIngredient}>
+                    + Add ingredient
+                </button>
+                <button type="button" className="add-button" onClick={handleAddGroup}>
+                    + Add Group
+                </button>
             </div>
+
+            {/* Input para nombre de grupo */}
+            {showGroupInput && (
+                <div className="group-input-container">
+                    <StyledTextField
+                        label="Group name"
+                        value={newGroupName}
+                        onChange={(e) => setNewGroupName(e.target.value)}
+                    />
+                    <button
+                        type="button"
+                        className="create-group-button"
+                        onClick={handleCreateGroup}
+                    >
+                        Create group
+                    </button>
+                </div>
+            )}
+        </div>
+
         <div className="steps-section">
             <h4  style={{
                 fontFamily: 'Albert Sans, sans-serif',
