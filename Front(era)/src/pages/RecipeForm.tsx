@@ -314,7 +314,11 @@ const NewRecipeForm: React.FC  = () => {
             </div>
         {/* INGREDIENTS SECTION */}
         <div className="ingredients-section">
-            <h4 className="section-title">Ingredients</h4>
+            <h4 style={{
+            fontFamily: 'Albert Sans, sans-serif',
+            fontSize: '1.5rem',
+            fontWeight: 700
+            }}>Ingredients</h4>
 
             <StyledTextField
                 label="Ingredient"

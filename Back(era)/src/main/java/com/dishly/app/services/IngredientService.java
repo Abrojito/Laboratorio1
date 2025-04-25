@@ -32,7 +32,7 @@ public class IngredientService {
     }
     public IngredientDTO validate(IngredientDTO ingredient) {
         if (ingredient.name() == null) {
-            throw new IllegalArgumentException("El nombre del ingrediente no puede estar vacío");
+            throw new IllegalArgumentException("Ingredient name cannot be null");
         }
         IngredientModel result = repository.findByNameContainingIgnoreCase(ingredient.name());
         if (result != null) {
