@@ -17,5 +17,10 @@ export async function fetchRecipes(token?: string): Promise<Recipe[]> {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) throw new Error('Error fetching recipes');
-    return res.json();
+
+    /** Si el back devolvió 204 o no-JSON, regresamos lista vacía */
+    const ct = res.headers.get('Content-Type') ?? '';
+    if (!ct.includes('application/json')) return [];
+
+    return res.json() as Promise<Recipe[]>;
 }

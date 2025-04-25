@@ -7,6 +7,7 @@ import {
     fetchMyRecipes,
 } from '../api/userApi';
 import { Recipe } from '../api/recipeApi';
+import '../styles/Profile.css';
 
 interface UserProfile {
     id: number;
@@ -20,20 +21,22 @@ const Profile: React.FC = () => {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const token = localStorage.getItem('token')!;
 
+    /* ---------- CARGA datos ---------- */
     useEffect(() => {
-        const token = localStorage.getItem('token');
         if (!token) {
-            navigate('/start'); // o '/login'
+            navigate('/start');
             return;
         }
         fetchProfile(token).then(setProfile).catch(e => setError(e.message));
         fetchMyRecipes(token).then(setRecipes).catch(e => setError(e.message));
-    }, [navigate]);
+    }, [navigate, token]);
 
-    if (error) return <div style={{ color: 'red' }}>{error}</div>;
-    if (!profile) return <div>Cargando perfil…</div>;
+    if (error) return <div className="profile-error">{error}</div>;
+    if (!profile) return <div className="profile-loading">Cargando perfil…</div>;
 
+    /* ---------- Handlers ---------- */
     const handleLogout = () => {
         localStorage.removeItem('token');
         navigate('/start');
@@ -44,7 +47,7 @@ const Profile: React.FC = () => {
         if (!file) return;
         const reader = new FileReader();
         reader.onloadend = () => {
-            updatePhoto(reader.result as string, localStorage.getItem('token')!)
+            updatePhoto(reader.result as string, token)
                 .then(setProfile)
                 .catch(e => setError(e.message));
         };
@@ -52,15 +55,15 @@ const Profile: React.FC = () => {
     };
 
     const handleDeleteRecipe = async (id: number) => {
-        await fetch(`/recipes/${id}`, {
+        await fetch(`/api/recipes/${id}`, {
             method: 'DELETE',
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            headers: { Authorization: `Bearer ${token}` },
         });
         setRecipes(recipes.filter(r => r.id !== id));
     };
 
-    const handleDeleteAccount = () => {
-        deleteAccount(localStorage.getItem('token')!)
+    const handleDeleteMyAccount = () => {
+        deleteAccount(token)
             .then(() => {
                 localStorage.removeItem('token');
                 navigate('/start');
@@ -68,49 +71,60 @@ const Profile: React.FC = () => {
             .catch(e => setError(e.message));
     };
 
+    /* ---------- Render ---------- */
     return (
-        <div style={{ padding: '1rem' }}>
-            <h2>Mi Perfil</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <img
-                    src={profile.photo || '/default-avatar.png'}
-                    alt="avatar"
-                    style={{ width: 80, height: 80, borderRadius: '50%' }}
-                />
-                <div>
-                    <p><strong>Usuario:</strong> {profile.username}</p>
-                    <p><strong>Nombre:</strong> {profile.fullName}</p>
-                </div>
-                <button onClick={handleLogout} style={{ marginLeft: 'auto' }}>
-                    Logout
-                </button>
-            </div>
+        <div className="profile-page">
+            {/* Header */}
+            <header className="profile-header">
+                <button className="back-btn" onClick={() => navigate(-1)}>←</button>
+                <h1 className="profile-username">{profile.username}</h1>
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+            </header>
 
-            <div style={{ margin: '1rem 0' }}>
-                <label>
-                    Cambiar foto:
+            {/* Foto y nombre */}
+            <section className="profile-info">
+                <img
+                    className="profile-photo"
+                    src={profile.photo || '/default-avatar.png'}
+                    alt="Foto de perfil"
+                />
+                <p className="profile-fullname">{profile.fullName}</p>
+
+                <label className="photo-input">
+                    Cambiar foto
                     <input type="file" accept="image/*" onChange={handlePhotoChange} />
                 </label>
-            </div>
+            </section>
 
-            <h3>Mis Recetas</h3>
+            {/* Lista de recetas */}
+            <h2 className="section-title">Mis recetas</h2>
             {recipes.length === 0 ? (
-                <p>No has publicado ninguna receta.</p>
+                <p className="no-recipes">Aún no has publicado recetas.</p>
             ) : (
-                <ul>
+                <div className="recipe-grid">
                     {recipes.map(r => (
-                        <li key={r.id}>
-                            {r.name}{' '}
-                            <button onClick={() => handleDeleteRecipe(r.id)}>Eliminar</button>
-                        </li>
+                        <div key={r.id} className="recipe-card">
+                            <img className="recipe-img" src={r.image} alt={r.name} />
+                            <div className="recipe-body">
+                                <h3 className="recipe-title">{r.name}</h3>
+                                <p className="recipe-desc">{r.description}</p>
+                                <div className="recipe-meta">
+                                    <span className="recipe-time">⏱ {r.time}</span>
+                                    <button
+                                        className="recipe-delete"
+                                        onClick={() => handleDeleteRecipe(r.id)}
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
 
-            <button
-                onClick={handleDeleteAccount}
-                style={{ marginTop: '2rem', color: 'white', background: 'red', padding: '0.5rem 1rem' }}
-            >
+            {/* Eliminar cuenta */}
+            <button className="delete-account-btn" onClick={handleDeleteMyAccount}>
                 Eliminar mi cuenta
             </button>
         </div>

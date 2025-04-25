@@ -1,9 +1,6 @@
 package com.dishly.app.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +33,8 @@ public class UserModel implements UserDetails {
 
     @Setter
     @Getter
+    @Lob
+    @Column(name = "photo", columnDefinition = "LONGVARCHAR")
     private String photo;
 
     @Override

@@ -3,8 +3,10 @@ package com.dishly.app.controllers;
 import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.services.RecipeService;
+import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;   // <-- importa esto
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,45 +15,47 @@ import java.util.List;
 @RequestMapping("/api/recipes")
 public class RecipeController {
 
-    private final RecipeService service;
+    /* === inyecciones ============================ */
+    private final RecipeService recipeService;
+    private final UserService   userService;
 
-    public RecipeController(RecipeService service) {
-        this.service = service;
+    public RecipeController(RecipeService recipeService,
+                            UserService   userService) {
+        this.recipeService = recipeService;
+        this.userService   = userService;
     }
 
     /* ---------- GETs ---------- */
-
     @GetMapping
     public List<RecipeResponseDTO> getAll() {
-        return service.getAll();
+        return recipeService.getAll();
     }
 
     @GetMapping("{id}")
     public RecipeResponseDTO getById(@PathVariable Long id) {
-        return service.getById(id);
+        return recipeService.getById(id);
     }
 
     /* ---------- POST ---------- */
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RecipeResponseDTO create(@RequestBody @Valid RecipeRequestDTO dto) {
-        return service.create(dto);
+    public RecipeResponseDTO create(Authentication auth,
+                                    @RequestBody @Valid RecipeRequestDTO dto) {
+        Long uid = userService.getIdByEmail(auth.getName());
+        return recipeService.createForUser(dto, uid);
     }
 
     /* ---------- PUT ---------- */
-
     @PutMapping("{id}")
     public RecipeResponseDTO update(@PathVariable Long id,
                                     @RequestBody @Valid RecipeRequestDTO dto) {
-        return service.update(id, dto);
+        return recipeService.update(id, dto);
     }
 
     /* ---------- DELETE ---------- */
-
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        service.delete(id);
+        recipeService.delete(id);
     }
 }

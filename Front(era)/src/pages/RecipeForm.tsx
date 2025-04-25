@@ -130,28 +130,29 @@ const NewRecipeForm: React.FC  = () => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        try {
-            // 1. Obtén el token del localStorage
-            const token = localStorage.getItem('token');
 
-            // 2. Llama al endpoint incluyendo el header Authorization si hay token
+        try {
+            const token   = localStorage.getItem('token');
+            const userId  = Number(localStorage.getItem('userId'));   // <-- nuevo
+            const email   = localStorage.getItem('email');            // (por si lo usás)
+
             const response = await fetch('http://localhost:8080/api/recipes', {
-                method: 'POST',
+                method : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(token ? {Authorization: `Bearer ${token}`} : {}),
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
-                body: JSON.stringify(recipe),
+                body: JSON.stringify({ ...recipe, userId }),             // <-- mando userId
             });
 
-            // 3. Manejo de errores
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText);
+                const err = await response.text();
+                throw new Error(err || 'Error creando receta');
             }
 
-            // 4. Navega a /home una vez creada la receta
+            /* ✅ creada con éxito → al Home */
             navigate('/home');
+
         } catch (err: any) {
             alert('Error creando receta: ' + err.message);
         }
@@ -272,7 +273,7 @@ const NewRecipeForm: React.FC  = () => {
                 </button>
             </div>
 
-    <form className="recipe-form" onSubmit={handleSubmit}>
+    <form id="recipe-form" className="recipe-form" onSubmit={handleSubmit}>
             {/* ───────── Hero de imagen ───────── */}
             <div className="image-upload" onClick={triggerSelect}>
                 {recipe.image ? (

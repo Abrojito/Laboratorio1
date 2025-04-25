@@ -69,6 +69,22 @@ public class RecipeService {
         recipeRepo.deleteById(id);
     }
 
+    /* ---------- Creación para un usuario concreto ---------- */
+    @Transactional
+    public RecipeResponseDTO createForUser(RecipeRequestDTO dto, Long userId) {
+
+        // Reaprovechamos la validación de nombre único
+        if (recipeRepo.existsByName(dto.name()))
+            throw new IllegalArgumentException("Ya existe una receta con ese nombre");
+
+        RecipeModel model = new RecipeModel();
+        // copiamos datos
+        updateModel(model, dto);
+        model.setUserId(userId);           // ← vincular al dueño
+
+        return toDTO(recipeRepo.save(model));
+    }
+
     /* ---------- Helpers ---------- */
 
     private void updateModel(RecipeModel m, RecipeRequestDTO dto) {
