@@ -34,7 +34,7 @@ public class UserModel implements UserDetails {
     @Setter
     @Getter
     @Lob
-    @Column(name = "photo", columnDefinition = "LONGVARCHAR")
+    @Column(name = "photo", columnDefinition = "CLOB")
     private String photo;
 
     @Override

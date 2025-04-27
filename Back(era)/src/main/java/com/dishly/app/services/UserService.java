@@ -6,6 +6,8 @@ import com.dishly.app.dto.userdto.RegisterRequest;
 import com.dishly.app.dto.userdto.UpdateRequest;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -68,11 +70,12 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserModel user = repository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + email));
-
-        System.out.println("🔍 Usuario encontrado: " + user.getEmail());
-        System.out.println("🔐 Password en BD (hash): " + user.getPassword());
-        return user;
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(), // sigue usando email para login
+                user.getPassword(),
+                List.of()
+        );
     }
 
     public UserProfileDTO registerAndGetProfile(RegisterRequest req) {
@@ -85,8 +88,15 @@ public class UserService implements UserDetailsService {
      */
     public UserProfileDTO getProfileByEmail(String email) {
         UserModel user = repository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
-        return toProfileDTO(user);
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return new UserProfileDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getFullName(),
+                user.getPhoto()  // asumo que UserModel tiene getPhoto()
+        );
     }
 
     /**
@@ -118,12 +128,37 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
     }
 
+    @Transactional
+    public UserProfileDTO updateProfile(String email, UpdateRequest req) {
+        UserModel user = repository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + email));
+
+        if (req.username() != null && !req.username().isBlank()) {
+            user.setUsername(req.username());
+        }
+        if (req.email() != null && !req.email().isBlank()) {
+            user.setEmail(req.email());
+        }
+        if (req.password() != null && !req.password().isBlank()) {
+            user.setPassword(encoder.encode(req.password()));
+        }
+        if (req.photo() != null && !req.photo().isBlank()) {
+            user.setPhoto(req.photo());
+        }
+
+        repository.save(user);
+        return toProfileDTO(user);
+    }
+
+
     // ==== Helper para mapear a DTO ====
 
     private UserProfileDTO toProfileDTO(UserModel u) {
         return new UserProfileDTO(
                 u.getId(),
                 u.getUsername(),
+                u.getEmail(),
+                u.getPassword(),
                 u.getFullName(),
                 u.getPhoto()        // asumo que UserModel tiene getPhoto()
         );

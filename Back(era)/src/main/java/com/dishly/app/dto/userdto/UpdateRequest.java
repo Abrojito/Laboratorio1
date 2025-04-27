@@ -1,4 +1,7 @@
 package com.dishly.app.dto.userdto;
 
-public record UpdateRequest(String password, String email) {
-}
+public record UpdateRequest(String username,
+                            String email,
+                            String password,
+                            String photo)
+{ }

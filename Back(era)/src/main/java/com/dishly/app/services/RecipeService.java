@@ -96,6 +96,7 @@ public class RecipeService {
         m.setUserId(dto.userId());
         m.setTime(dto.time());
         m.setSteps(dto.steps());
+        m.setPublic(dto.isPublic());
 
         if (dto.ingredientIds() != null) {
             List<IngredientModel> ings = dto.ingredientIds().stream()
@@ -116,7 +117,9 @@ public class RecipeService {
                 m.getAuthor(),
                 m.getUserId(),
                 m.getTime(),
-                m.getSteps()
+                m.getSteps(),
+                m.isPublic()
+
         );
     }
 

@@ -8,6 +8,9 @@ import Ingredient from './pages/Ingredient.tsx';
 import Splash from "./pages/Splash.tsx";
 import NewRecipeForm from "./pages/RecipeForm.tsx";
 import Profile from "./pages/Profile.tsx"
+import MyRecipes from './pages/MyRecipes';
+
+
 
 import { Navigate, Route, Routes} from "react-router-dom";
 
@@ -28,18 +31,13 @@ const App: React.FC = () => {
 
                         {/* Rutas protegidas */}
                         <Route path="/home" element={<Home />} />
-                        <Route path="/profile/update" element={<UpdateProfile />} />
+                        <Route path="/me/update" element={<UpdateProfile />} />
                         <Route path="/delete-account" element={<DeleteAccount />} />
                         <Route path="/profile" element={<Profile />} />
+                        <Route path="/me/myrecipes" element={<MyRecipes />} />
 
                         {/* Rutas de recetas */}
-                        <Route
-                            path="/newrecipe"
-                            element={
-
-                                    <NewRecipeForm />
-
-                            }/>
+                        <Route path="/newrecipe" element={<NewRecipeForm />} />
 
                         {/* Rutas de ingredientes */}
                         <Route path="/ingredients" element={<Ingredient  />} />

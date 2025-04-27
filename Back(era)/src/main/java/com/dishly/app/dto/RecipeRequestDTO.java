@@ -11,6 +11,7 @@ public record RecipeRequestDTO(
         Long   userId,
         String time,
         List<Long> ingredientIds,
-        List<String> steps
+        List<String> steps,
+        boolean isPublic
 ) {}
 

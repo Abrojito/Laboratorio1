@@ -22,6 +22,9 @@ public class RecipeModel {
     private Long userId;
     private String time;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean isPublic = true;
+
 
     @ManyToMany
     @JoinTable(

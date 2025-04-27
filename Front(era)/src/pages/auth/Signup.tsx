@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { API_URL } from '../../api/config';
 import {useNavigate} from "react-router-dom";
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';

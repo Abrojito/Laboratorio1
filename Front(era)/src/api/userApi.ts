@@ -8,11 +8,11 @@ export interface UserProfile {
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export async function fetchProfile(token: string): Promise<UserProfile> {
-    const res = await fetch(`${BASE}/api/users/me`, {
+    const res = await fetch(`http://localhost:8080/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error('Error fetching profile');
-    return res.json();
+    return await res.json();
 }
 
 export async function updatePhoto(photo: string, token: string) {

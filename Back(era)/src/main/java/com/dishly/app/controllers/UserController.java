@@ -88,4 +88,12 @@ public class UserController {
         List<RecipeResponseDTO> mine = recipeService.getAllByUser(userId);
         return ResponseEntity.ok(mine);
     }
+
+    @PutMapping("/me/update")
+    public ResponseEntity<UserProfileDTO> updateProfile(Authentication auth, @RequestBody UpdateRequest req) {
+        System.out.println(req.photo());
+        UserProfileDTO updated = service.updateProfile(auth.getName(), req);
+        return ResponseEntity.ok(updated);
+    }
+
 }
