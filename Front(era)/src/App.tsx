@@ -1,51 +1,46 @@
-import WelcomePage from './pages/WelcomePage';
-import Login from './pages/auth/Login';
-import Signup from './pages/auth/Signup';
-import UpdateProfile from './pages/auth/UpdateProfile';
-import DeleteAccount from './components/DeleteAccount';
-import Home from './pages/Home';
-import Ingredient from './pages/Ingredient.tsx';
-import Splash from "./pages/Splash.tsx";
-import NewRecipeForm from "./pages/RecipeForm.tsx";
-import Profile from "./pages/Profile.tsx"
-import MyRecipes from './pages/MyRecipes';
+/* App.tsx */
+import { Routes, Route, Navigate } from 'react-router-dom';
 
+import Splash         from './pages/Splash';
+import WelcomePage    from './pages/WelcomePage';
+import Login          from './pages/auth/Login';
+import Signup         from './pages/auth/Signup';
+import UpdateProfile  from './pages/auth/UpdateProfile';
+import DeleteAccount  from './components/DeleteAccount';
+import Home           from './pages/Home';
+import Ingredient     from './pages/Ingredient';
+import NewRecipeForm  from './pages/RecipeForm';
+import Profile        from './pages/Profile';
+import MyRecipes      from './pages/MyRecipes';
 
+import { ProtectedRoute, GuestOnlyRoute } from './router/guards';   // 👈 new
 
-import { Navigate, Route, Routes} from "react-router-dom";
+const App: React.FC = () => (
+    <Routes>
+        {/* -------- Splash (sin restricción) -------- */}
+        <Route path="" element={<Splash />} />
 
+        {/* -------- Rutas solo para invitados -------- */}
+        <Route element={<GuestOnlyRoute />}>
+            <Route path="/start"  element={<WelcomePage />} />
+            <Route path="/login"  element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+        </Route>
 
-const App: React.FC = () => {
-    return (
+        {/* -------- Rutas protegidas (requieren token) -------- */}
+        <Route element={<ProtectedRoute />}>
+            <Route path="/home"            element={<Home />} />
+            <Route path="/newrecipe"       element={<NewRecipeForm />} />
+            <Route path="/ingredients"     element={<Ingredient />} />
+            <Route path="/profile"         element={<Profile />} />
+            <Route path="/me/myrecipes"    element={<MyRecipes />} />
+            <Route path="/me/update"       element={<UpdateProfile />} />
+            <Route path="/delete-account"  element={<DeleteAccount />} />
+        </Route>
 
-                    <Routes>
-
-                        <Route path="" element={<Splash />} />
-
-                        {/* Página de bienvenida */}
-                        <Route path="/start" element={<WelcomePage />} />
-
-                        {/* Rutas públicas */}
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/signup" element={<Signup />} />
-
-                        {/* Rutas protegidas */}
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/me/update" element={<UpdateProfile />} />
-                        <Route path="/delete-account" element={<DeleteAccount />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/me/myrecipes" element={<MyRecipes />} />
-
-                        {/* Rutas de recetas */}
-                        <Route path="/newrecipe" element={<NewRecipeForm />} />
-
-                        {/* Rutas de ingredientes */}
-                        <Route path="/ingredients" element={<Ingredient  />} />
-
-                        {/* Redirección por defecto */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-    );
-};
+        {/* -------- Catch-all -------- */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+);
 
 export default App;
