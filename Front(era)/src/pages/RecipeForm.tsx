@@ -14,7 +14,7 @@ interface RecipeRequestDTO {
     time: string;
     ingredientIds: number[];
     steps: string[];
-    isPublic: boolean;
+    publicRecipe: boolean;
 }
 
 const NewRecipeForm: React.FC  = () => {
@@ -29,7 +29,7 @@ const NewRecipeForm: React.FC  = () => {
         time: '',
         ingredientIds: [],
         steps: [],
-        isPublic: true,
+        publicRecipe: true,
     });
 
 
@@ -501,14 +501,15 @@ const NewRecipeForm: React.FC  = () => {
                 <label className="switch">
                     <input
                         type="checkbox"
-                        checked={recipe.isPublic}
-                        onChange={(e) => setRecipe({ ...recipe, isPublic: e.target.checked })}
+                        checked={recipe.publicRecipe}
+                        onChange={e =>
+                            setRecipe({ ...recipe, publicRecipe: e.target.checked })}
                     />
                     <span className="slider"></span>
                 </label>
             </div>
             <p className="visibility-text">
-                {recipe.isPublic ? "This recipe will be public." : "This recipe will be private."}
+                {recipe.publicRecipe ? "This recipe will be public." : "This recipe will be private."}
             </p>
         </div>
 

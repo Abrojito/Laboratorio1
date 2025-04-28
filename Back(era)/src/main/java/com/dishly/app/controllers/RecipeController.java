@@ -26,9 +26,10 @@ public class RecipeController {
     }
 
     /* ---------- GETs ---------- */
-    @GetMapping
-    public List<RecipeResponseDTO> getAll() {
-        return recipeService.getAll();
+
+    @GetMapping            //  /api/recipes
+    public List<RecipeResponseDTO> getAllPublic() {
+        return recipeService.getPublic();      // nuevo wrapper
     }
 
     @GetMapping("{id}")
@@ -58,4 +59,6 @@ public class RecipeController {
     public void delete(@PathVariable Long id) {
         recipeService.delete(id);
     }
+
+
 }

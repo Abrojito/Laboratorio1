@@ -23,7 +23,7 @@ public class RecipeModel {
     private String time;
 
     @Column(columnDefinition = "boolean default true")
-    private boolean isPublic = true;
+    private boolean publicRecipe = true;
 
 
     @ManyToMany

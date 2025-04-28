@@ -12,6 +12,6 @@ public record RecipeRequestDTO(
         String time,
         List<Long> ingredientIds,
         List<String> steps,
-        boolean isPublic
+        Boolean publicRecipe
 ) {}
 

@@ -12,5 +12,5 @@ public record RecipeResponseDTO(
         Long   userId,
         String time,
         List<String> steps,
-        boolean isPublic
+        Boolean publicRecipe
 ) {}

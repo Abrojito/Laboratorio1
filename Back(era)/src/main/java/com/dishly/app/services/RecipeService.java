@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -96,7 +95,9 @@ public class RecipeService {
         m.setUserId(dto.userId());
         m.setTime(dto.time());
         m.setSteps(dto.steps());
-        m.setPublic(dto.isPublic());
+        if (dto.publicRecipe() != null) {
+            m.setPublicRecipe(dto.publicRecipe());
+        }
 
         if (dto.ingredientIds() != null) {
             List<IngredientModel> ings = dto.ingredientIds().stream()
@@ -118,13 +119,18 @@ public class RecipeService {
                 m.getUserId(),
                 m.getTime(),
                 m.getSteps(),
-                m.isPublic()
+                m.isPublicRecipe()
 
         );
     }
 
     public List<RecipeResponseDTO> getAllByUser(Long userId) {
         return recipeRepo.findByUserId(userId)
+                .stream().map(this::toDTO).toList();
+    }
+
+    public List<RecipeResponseDTO> getPublic() {
+        return recipeRepo.findByPublicRecipeTrue()
                 .stream().map(this::toDTO).toList();
     }
 }
