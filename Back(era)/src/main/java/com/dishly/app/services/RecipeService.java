@@ -4,12 +4,15 @@ import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.models.IngredientModel;
 import com.dishly.app.models.RecipeModel;
+import com.dishly.app.models.UserModel;
 import com.dishly.app.repositories.IngredientRepository;
 import com.dishly.app.repositories.RecipeRepository;
+import com.dishly.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -17,11 +20,13 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepo;
     private final IngredientRepository ingRepo;
+    private final UserRepository userRepo;
 
     public RecipeService(RecipeRepository recipeRepo,
-                         IngredientRepository ingRepo) {
+                         IngredientRepository ingRepo, UserRepository userRepo) {
         this.recipeRepo = recipeRepo;
         this.ingRepo = ingRepo;
+        this.userRepo = userRepo;
     }
 
     /* ---------- Lectura ---------- */
@@ -132,5 +137,20 @@ public class RecipeService {
     public List<RecipeResponseDTO> getPublic() {
         return recipeRepo.findByPublicRecipeTrue()
                 .stream().map(this::toDTO).toList();
+    }
+
+    @Transactional
+    public void deleteRecipe(Long recipeId, String email) throws AccessDeniedException {
+        RecipeModel recipe = recipeRepo.findById(recipeId)
+                .orElseThrow(() -> new EntityNotFoundException("Recipe not found"));
+
+        UserModel user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (!recipe.getUserId().equals(user.getId())) {
+            throw new AccessDeniedException("You cannot delete someone else's recipe");
+        }
+
+        recipeRepo.delete(recipe);
     }
 }

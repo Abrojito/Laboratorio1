@@ -41,6 +41,28 @@ const MyRecipes: React.FC = () => {
     navigate(`/recipes/${id}`);
   };
 
+  const handleDeleteRecipe = async (id: number) => {
+    if (!token) return;
+
+    const confirmDelete = window.confirm('¿Estás seguro que querés eliminar esta receta?');
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`http://localhost:8080/api/recipes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error('Error al eliminar la receta');
+
+      setMyRecipes(prev => prev.filter(recipe => recipe.id !== id));
+    } catch (err) {
+      alert('No se pudo eliminar la receta.');
+    }
+  };
+
   return (
       <div style={styles.container}>
         <h2 style={styles.title}>Mis Recetas</h2>
@@ -53,17 +75,29 @@ const MyRecipes: React.FC = () => {
                   <div
                       key={recipe.id}
                       style={styles.card}
-                      onClick={() => handleViewRecipe(recipe.id)}  // <-- click para navegar
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   >
-                    <img
-                        src={recipe.image || '/default-recipe.png'}
-                        alt={recipe.name}
-                        style={styles.image}
-                    />
-                    <h3 style={styles.cardTitle}>{recipe.name}</h3>
-                    <p style={styles.cardDesc}>{recipe.description}</p>
+                    {/* Botón de eliminar */}
+                    <button
+                        style={styles.deleteButton}
+                        onClick={() => handleDeleteRecipe(recipe.id)}
+                        title="Eliminar receta"
+                    >
+                      ×
+                    </button>
+
+                    {/* Card clickable para ver receta */}
+                    <div
+                        onClick={() => handleViewRecipe(recipe.id)}
+                        style={{ cursor: 'pointer' }}
+                    >
+                      <img
+                          src={recipe.image || '/default-recipe.png'}
+                          alt={recipe.name}
+                          style={styles.image}
+                      />
+                      <h3 style={styles.cardTitle}>{recipe.name}</h3>
+                      <p style={styles.cardDesc}>{recipe.description}</p>
+                    </div>
                   </div>
               ))}
             </div>
@@ -91,13 +125,28 @@ const styles: Record<string, React.CSSProperties> = {
     gap: '1.5rem',
   },
   card: {
+    position: 'relative',
     background: '#f8f8f8',
     padding: '1rem',
     borderRadius: '10px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     textAlign: 'center',
-    cursor: 'pointer',
     transition: 'transform 0.2s',
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    background: '#ff4d4d',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '50%',
+    width: '25px',
+    height: '25px',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    lineHeight: '25px',
+    textAlign: 'center',
   },
   image: {
     width: '100%',
