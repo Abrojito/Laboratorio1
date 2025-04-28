@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt = authHeader.substring(7);
         final String email;
         try {
-            email = jwtUtil.getUsernameFromToken(jwt);
+            email = jwtUtil.getEmail(jwt);
         } catch (JwtException ex) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
             return;

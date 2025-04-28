@@ -37,3 +37,21 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+/* ---------- HSQLDB JAR helper ---------- */
+
+// 1) configuración ad-hoc para descargar solo el JAR
+val hsqldbJar by configurations.creating
+
+// 2) asociamos la dependencia a esa configuración
+dependencies {
+	hsqldbJar("org.hsqldb:hsqldb:2.7.3")
+}
+
+// 3) tarea que copia el JAR a build/hsqldb
+tasks.register<Copy>("copyHsqldbJar") {
+	description = "Copia hsqldb-2.7.3.jar a build/hsqldb/"
+	from(hsqldbJar)
+	into("$buildDir/hsqldb")
+}
+

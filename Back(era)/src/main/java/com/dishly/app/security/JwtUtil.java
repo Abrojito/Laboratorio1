@@ -7,38 +7,52 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
-    private final String secret = "clavemuymuyseguraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    private final Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    private final long expiration = 1000 * 60 * 60; // 1 hora
 
-    public String generateToken(String username) {
+    private static final String SECRET =
+            "clavemuymuyseguraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private static final Key   KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
+    private static final long  EXPIRATION_MS = 60 * 60 * 1000;  // 1 h
+
+    /* ========= CREACIÓN ========= */
+
+    /** subject = email  +  claim “username”. */
+    public String generateToken(String email, String username) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
+                .addClaims(Map.of("username", username))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+                .signWith(KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    /* ========= LECTURA ========= */
+
+    public String getEmail(String token) {
+        return parse(token).getBody().getSubject();
     }
+
+    public String getUsername(String token) {
+        return parse(token).getBody().get("username", String.class);
+    }
+
+    /* ========= VALIDACIÓN ====== */
 
     public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
+        try { parse(token); return true; }
+        catch (JwtException | IllegalArgumentException ex) { return false; }
+    }
+
+    /* ========= HELPER ========== */
+
+    private Jws<Claims> parse(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(KEY)
+                .build()
+                .parseClaimsJws(token);
     }
 }
-

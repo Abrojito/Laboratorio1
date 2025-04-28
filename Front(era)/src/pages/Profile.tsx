@@ -9,10 +9,13 @@ interface UserProfile {
     photo: string;
 }
 
+
+
 const Profile: React.FC = () => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
+
 
     useEffect(() => {
         if (!token) {
@@ -36,7 +39,7 @@ const Profile: React.FC = () => {
             <div className="profile-pic-wrapper">
                 <img className="profile-pic" src={profile.photo || '/default-avatar.png'} alt="Profile" />
             </div>
-            <h3 className="profile-name">{profile.fullName}</h3>
+            <h3 className="profile-name">{profile.fullName ?? profile.username}</h3>
             <p className="profile-username">@{profile.username}</p>
 
             <div className="profile-options">

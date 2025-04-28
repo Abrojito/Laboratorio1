@@ -86,18 +86,22 @@ public class UserService implements UserDetailsService {
     /**
      * Obtiene el perfil completo (id, username, fullName, photo) a partir del email.
      */
+    @Transactional
     public UserProfileDTO getProfileByEmail(String email) {
-        UserModel user = repository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-        return new UserProfileDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getFullName(),
-                user.getPhoto()  // asumo que UserModel tiene getPhoto()
-        );
+        UserModel u = repository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        /* ── autoparche ─────────────────────────────────────────────── */
+        if (u.getUsername() == null || u.getUsername().isBlank() || u.getUsername().contains("@")) {
+            String alias = email.substring(0, email.indexOf('@'));
+            u.setUsername(alias);
+            repository.save(u);          // ←  lo corrige “en caliente”
+        }
+        /* ───────────────────────────────────────────────────────────── */
+
+        return toProfileDTO(u);
     }
+
 
     /**
      * Actualiza la foto de perfil (campo photo en la entidad) y devuelve el perfil actualizado.
@@ -154,13 +158,20 @@ public class UserService implements UserDetailsService {
     // ==== Helper para mapear a DTO ====
 
     private UserProfileDTO toProfileDTO(UserModel u) {
+
+        // ► alias “inteligente”
+        String alias = u.getUsername();
+        if (alias == null || alias.isBlank() || alias.contains("@")) {
+            alias = u.getEmail().substring(0, u.getEmail().indexOf('@'));
+        }
+
         return new UserProfileDTO(
-                u.getId(),
-                u.getUsername(),
-                u.getEmail(),
-                u.getPassword(),
-                u.getFullName(),
-                u.getPhoto()        // asumo que UserModel tiene getPhoto()
+                u.getId(),          // id
+                alias,              // username  (alias)
+                u.getEmail(),       // email
+                u.getPassword(),    // password  (HASH, no plano)
+                u.getFullName(),    // fullName
+                u.getPhoto()        // photo
         );
     }
 }
