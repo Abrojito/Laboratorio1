@@ -28,7 +28,7 @@ const MyRecipes: React.FC = () => {
 
   const fetchMyRecipes = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/users/me/myrecipes', {
+      const response = await fetch('http://localhost:8080/api/users/me/recipes', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

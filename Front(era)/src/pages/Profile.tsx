@@ -41,7 +41,7 @@ const Profile: React.FC = () => {
 
             <div className="profile-options">
                 <button onClick={() => navigate('/me/update')}>Edit Profile</button>
-                <button>My Recipes</button>
+                <button onClick={() => navigate('/me/myrecipes')}>My Recipes</button>
             </div>
 
             <button className="logout-btn" onClick={() => {
