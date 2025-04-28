@@ -36,6 +36,10 @@ const Home: React.FC = () => {
         navigate('/newrecipe');
     };
 
+    const handleViewRecipe = (id: number) => {
+        navigate(`/recipes/${id}`);
+    };
+
     if (!user) return <div>Cargando usuario…</div>;
     if (loading) return <div>Cargando recetas…</div>;
     if (error) return <div>Error: {error}</div>;
@@ -59,7 +63,13 @@ const Home: React.FC = () => {
                 ) : (
                     <div style={styles.grid}>
                         {recipes.map((r) => (
-                            <div key={r.id} style={styles.card}>
+                            <div
+                                key={r.id}
+                                style={styles.card}
+                                onClick={() => handleViewRecipe(r.id)}  // <-- agregado para navegar
+                                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                            >
                                 <img
                                     src={r.image || '/default-recipe.png'}
                                     alt={r.name}
@@ -107,7 +117,8 @@ const styles: Record<string, React.CSSProperties> = {
     },
     card: {
         background: '#f8f8f8', padding: '1rem', borderRadius: '10px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center'
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center',
+        cursor: 'pointer', transition: 'transform 0.2s',  // <-- para efecto al pasar el mouse
     },
     image: {
         width: '100%', height: '200px', objectFit: 'cover',

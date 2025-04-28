@@ -13,7 +13,8 @@ import NewRecipeForm  from './pages/RecipeForm';
 import Profile        from './pages/Profile';
 import MyRecipes      from './pages/MyRecipes';
 
-import { ProtectedRoute, GuestOnlyRoute } from './router/guards';   // 👈 new
+import { ProtectedRoute, GuestOnlyRoute } from './router/guards';
+import RecipeDetail from "./pages/RecipeDetail.tsx";   // 👈 new
 
 const App: React.FC = () => (
     <Routes>
@@ -36,6 +37,8 @@ const App: React.FC = () => (
             <Route path="/me/myrecipes"    element={<MyRecipes />} />
             <Route path="/me/update"       element={<UpdateProfile />} />
             <Route path="/delete-account"  element={<DeleteAccount />} />
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
+
         </Route>
 
         {/* -------- Catch-all -------- */}

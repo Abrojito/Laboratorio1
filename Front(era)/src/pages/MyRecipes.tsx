@@ -12,7 +12,6 @@ interface Recipe {
 const MyRecipes: React.FC = () => {
   const navigate = useNavigate();
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
-  const [publicRecipes, setPublicRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState<string | null>(null);
   const token = localStorage.getItem('token');
 
@@ -21,10 +20,8 @@ const MyRecipes: React.FC = () => {
       navigate('/start');
       return;
     }
-
     fetchMyRecipes();
-    fetchPublicRecipes();
-  }, []);
+  }, [token, navigate]);
 
   const fetchMyRecipes = async () => {
     try {
@@ -40,58 +37,44 @@ const MyRecipes: React.FC = () => {
     }
   };
 
-  const fetchPublicRecipes = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/api/recipes');
-      const data = await response.json();
-      setPublicRecipes(data);
-    } catch (err) {
-      setError('Error cargando recetas públicas.');
-    }
+  const handleViewRecipe = (id: number) => {
+    navigate(`/recipes/${id}`);
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Mis Recetas</h2>
-      {myRecipes.length === 0 ? (
-        <p>No tenés recetas creadas.</p>
-      ) : (
-        <div style={styles.grid}>
-          {myRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
-      )}
+      <div style={styles.container}>
+        <h2 style={styles.title}>Mis Recetas</h2>
 
-      <h2 style={styles.title}>Recetas Públicas</h2>
-      {publicRecipes.length === 0 ? (
-        <p>No hay recetas públicas disponibles.</p>
-      ) : (
-        <div style={styles.grid}>
-          {publicRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </div>
-      )}
+        {myRecipes.length === 0 ? (
+            <p>No tenés recetas creadas.</p>
+        ) : (
+            <div style={styles.grid}>
+              {myRecipes.map((recipe) => (
+                  <div
+                      key={recipe.id}
+                      style={styles.card}
+                      onClick={() => handleViewRecipe(recipe.id)}  // <-- click para navegar
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  >
+                    <img
+                        src={recipe.image || '/default-recipe.png'}
+                        alt={recipe.name}
+                        style={styles.image}
+                    />
+                    <h3 style={styles.cardTitle}>{recipe.name}</h3>
+                    <p style={styles.cardDesc}>{recipe.description}</p>
+                  </div>
+              ))}
+            </div>
+        )}
 
-      {error && <div style={styles.error}>{error}</div>}
-    </div>
+        {error && <div style={styles.error}>{error}</div>}
+      </div>
   );
 };
 
-const RecipeCard: React.FC<{ recipe: Recipe }> = ({ recipe }) => (
-  <div style={styles.card}>
-    <img
-      src={recipe.image || '/default-recipe.png'}
-      alt={recipe.name}
-      style={styles.image}
-    />
-    <h3 style={styles.cardTitle}>{recipe.name}</h3>
-    <p style={styles.cardDesc}>{recipe.description}</p>
-  </div>
-);
-
-const styles: { [key: string]: React.CSSProperties } = {
+const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: '2rem',
     maxWidth: '1200px',
@@ -113,6 +96,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '10px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'transform 0.2s',
   },
   image: {
     width: '100%',
