@@ -1,5 +1,8 @@
 package com.dishly.app.controllers;
 
+import com.dishly.app.dto.userdto.UserUpdateResponseDTO;
+import com.dishly.app.security.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import com.dishly.app.dto.PhotoDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
@@ -22,11 +25,18 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
 
+    private final JwtUtil jwtUtil;
+
+
     @Autowired
     private UserService service;
 
     @Autowired
     private RecipeService recipeService;
+
+    public UserController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @GetMapping
     public List<UserModel> list() {
@@ -90,10 +100,11 @@ public class UserController {
     }
 
     @PutMapping("/me/update")
-    public ResponseEntity<UserProfileDTO> updateProfile(Authentication auth, @RequestBody UpdateRequest req) {
-        System.out.println(req.photo());
-        UserProfileDTO updated = service.updateProfile(auth.getName(), req);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<UserUpdateResponseDTO> updateMyProfile(Authentication auth,
+                                                                 @RequestBody @Valid UpdateRequest dto) {
+        System.out.println("Payload recibido: " + dto);
+        UserUpdateResponseDTO response = service.updateProfile(auth.getName(), dto, jwtUtil);
+        return ResponseEntity.ok(response);
     }
 
 }

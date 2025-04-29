@@ -129,11 +129,13 @@ public class RecipeService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeResponseDTO> getAllByUser(Long userId) {
         return recipeRepo.findByUserId(userId)
                 .stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeResponseDTO> getPublic() {
         return recipeRepo.findByPublicRecipeTrue()
                 .stream().map(this::toDTO).toList();

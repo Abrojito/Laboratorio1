@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/recipes").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/recipes/**").authenticated() // 🛠️ AGREGADO ESTO
+                        .requestMatchers(HttpMethod.DELETE, "/api/recipes/**").authenticated()
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

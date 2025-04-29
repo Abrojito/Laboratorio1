@@ -43,3 +43,18 @@ export async function fetchMyRecipes(token: string) {
     if (!res.ok) throw new Error('Error fetching my recipes');
     return res.json();
 }
+
+export async function updateProfile(username: string, password: string, photo: string, token: string): Promise<void> {
+    const res = await fetch(`http://localhost:8080/api/users/me/update`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ username, password, photo })
+    });
+
+    if (!res.ok) {
+        throw new Error('Error updating profile');
+    }
+}

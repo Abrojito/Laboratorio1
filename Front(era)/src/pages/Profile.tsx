@@ -39,8 +39,7 @@ const Profile: React.FC = () => {
             <div className="profile-pic-wrapper">
                 <img className="profile-pic" src={profile.photo || '/default-avatar.png'} alt="Profile" />
             </div>
-            <h3 className="profile-name">{profile.fullName ?? profile.username}</h3>
-            <p className="profile-username">@{profile.username}</p>
+            <h3 className="profile-name">@{profile.username}</h3>
 
             <div className="profile-options">
                 <button onClick={() => navigate('/me/update')}>Edit Profile</button>

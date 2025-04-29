@@ -1,0 +1,60 @@
+.update-profile-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Albert Sans', sans-serif;
+}
+
+.update-profile-container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.update-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.update-profile-form label {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.update-profile-form input[type="text"],
+.update-profile-form input[type="password"],
+.update-profile-form input[type="file"] {
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    width: 100%;
+}
+
+.update-profile-form button {
+    padding: 0.75rem;
+    background-color: #A6B240;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.update-profile-form button:hover {
+    background-color: #8a992e;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}

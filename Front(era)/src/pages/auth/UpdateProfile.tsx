@@ -1,167 +1,149 @@
-import React, { useEffect, useState, FormEvent, ChangeEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { updateProfile } from '../../api/userApi';
+import { useNavigate } from 'react-router-dom';
 
-const UpdateProfile: React.FC = () => {
+const UpdateProfile = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [error, setError] = useState('');
+
     const navigate = useNavigate();
-    const [newUsername, setNewUsername] = useState("");
-    const [newEmail, setNewEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [newPhoto, setNewPhoto] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-    const token = localStorage.getItem("token");
 
-    useEffect(() => {
-        if (!token) setError("Debes iniciar sesión primero");
-    }, [token]);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
 
-    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('No token found.');
+                return;
+            }
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setNewPhoto(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+            await updateProfile(username, password, photo, token);
+            navigate('/profile');
+        } catch (err) {
+            console.error(err);
+            setError('Error al actualizar el perfil.');
+        }
     };
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        if (!token) return;
-
-        const updateData: any = {};
-        if (newUsername) updateData.username = newUsername;
-        if (newEmail) updateData.email = newEmail;
-        if (newPassword) updateData.password = newPassword;
-        if (newPhoto) updateData.photo = newPhoto;
-
-        console.log("Token que estoy mandando:", token);
-
-        const response = await fetch("http://localhost:8080/api/users/me/update", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify(updateData),
-        });
-
-        if (response.ok) {
-            setSuccess("Perfil actualizado exitosamente.");
-            setTimeout(() => navigate("/profile"), 1500);
-        } else {
-            const errorText = await response.text();
-            setError("Error al actualizar: " + errorText);
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (reader.result) {
+                    setPhoto(reader.result as string);
+                }
+            };
+            reader.readAsDataURL(file);
         }
     };
 
     return (
         <div style={styles.container}>
+            <h2 style={styles.title}>Actualizar Perfil</h2>
+
+            {error && <p style={styles.error}>{error}</p>}
+
             <form onSubmit={handleSubmit} style={styles.form}>
-                <h2 style={styles.title}>Actualizar Perfil</h2>
+                <div style={styles.inputGroup}>
+                    <label style={styles.label}>Nuevo Username</label>
+                    <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="username actual: "
+                        style={styles.input}
+                    />
+                </div>
 
-                {error && <div style={styles.error}>{error}</div>}
-                {success && <div style={styles.success}>{success}</div>}
+                <div style={styles.inputGroup}>
+                    <label style={styles.label}>Nueva Contraseña</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Contraseña actual: "
+                        style={styles.input}
+                    />
+                </div>
 
-                <label style={styles.label}>Nombre</label>
-                <input
-                    type="text"
-                    value={newUsername}
-                    onChange={(e) => setNewUsername(e.target.value)}
-                    style={styles.input}
-                    placeholder="Nuevo nombre"
-                />
+                <div style={styles.inputGroup}>
+                    <label style={styles.label}>Foto de Perfil</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        style={styles.fileInput}
+                    />
+                </div>
 
-                <label style={styles.label}>Email</label>
-                <input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    style={styles.input}
-                    placeholder="Nuevo email"
-                />
-
-                <label style={styles.label}>Contraseña</label>
-                <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    style={styles.input}
-                    placeholder="Nueva contraseña"
-                />
-
-                <label style={styles.label}>Foto de perfil</label>
-                <input type="file" accept="image/*" onChange={handleImageChange} style={{ marginBottom: "1rem" }} />
-
-                <button type="submit" style={styles.button}>
-                    Actualizar Perfil
-                </button>
+                <button type="submit" style={styles.button}>Actualizar Perfil</button>
             </form>
         </div>
     );
 };
 
-const styles: { [key: string]: React.CSSProperties } = {
+const styles = {
     container: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        backgroundColor: "#ffffff",
-    },
-    form: {
-        background: "#fafafa",
-        padding: "2rem",
-        borderRadius: "12px",
-        boxShadow: "0 0 15px rgba(0, 0, 0, 0.1)",
-        width: "90%",
-        maxWidth: "400px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-    },
-    title: {
-        fontSize: "1.5rem",
-        fontWeight: 600,
-        marginBottom: "1rem",
-        textAlign: "center",
-    },
-    label: {
-        fontSize: "0.9rem",
-        fontWeight: 500,
-    },
-    input: {
-        padding: "0.5rem 0.75rem",
-        fontSize: "1rem",
-        border: "1px solid #ccc",
-        borderRadius: "6px",
+        maxWidth: '400px',
+        margin: '2rem auto',
+        padding: '2rem',
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
         fontFamily: "'Albert Sans', sans-serif",
     },
-    button: {
-        padding: "0.6rem",
-        backgroundColor: "#111",
-        color: "#fff",
-        border: "none",
-        borderRadius: "6px",
-        cursor: "pointer",
-        fontWeight: 500,
+    title: {
+        textAlign: 'center',
+        marginBottom: '1.5rem',
+        color: '#333',
     },
     error: {
-        backgroundColor: "#fdd",
-        padding: "0.5rem",
-        borderRadius: "6px",
-        color: "#800",
-        fontSize: "0.9rem",
-        textAlign: "center",
+        color: 'red',
+        fontSize: '0.9rem',
+        textAlign: 'center',
+        marginBottom: '1rem',
     },
-    success: {
-        backgroundColor: "#dfd",
-        padding: "0.5rem",
-        borderRadius: "6px",
-        color: "#060",
-        fontSize: "0.9rem",
-        textAlign: "center",
+    form: {
+        display: 'flex',
+        flexDirection: 'column' as 'column',
+        gap: '1rem',
+    },
+    inputGroup: {
+        display: 'flex',
+        flexDirection: 'column' as 'column',
+    },
+    label: {
+        marginBottom: '0.5rem',
+        fontWeight: '500',
+        fontSize: '0.95rem',
+        color: '#555',
+    },
+    input: {
+        padding: '0.6rem',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        fontSize: '0.95rem',
+    },
+    fileInput: {
+        padding: '0.6rem 0',
+        fontSize: '0.95rem',
+    },
+    button: {
+        marginTop: '1rem',
+        padding: '0.75rem',
+        backgroundColor: '#A6B240',
+        color: '#fff',
+        border: 'none',
+        borderRadius: '8px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease',
     },
 };
 

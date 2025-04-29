@@ -33,8 +33,7 @@ public class UserModel implements UserDetails {
 
     @Setter
     @Getter
-    @Lob
-    @Column(name = "photo", columnDefinition = "CLOB")
+    @Column(columnDefinition = "TEXT")
     private String photo;
 
     @Override
@@ -44,7 +43,7 @@ public class UserModel implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.email;
+        return username;
     }
 
     @Override
