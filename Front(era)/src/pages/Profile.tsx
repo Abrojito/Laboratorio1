@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile } from '../api/userApi';
 import '../styles/Profile.css';
-import BackButton from "../components/BackButton.tsx";
 
 interface UserProfile {
     username: string;
@@ -35,9 +34,23 @@ const Profile: React.FC = () => {
     if (!profile) return <div className="loading">Loading…</div>;
 
     return (
-        <div>
-            <BackButton />
         <div className="profile-container">
+            {/* Botón de ir al home */}
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                }}
+            >
+                ←
+            </button>
             <h2 className="profile-title">Profile</h2>
             <div className="profile-pic-wrapper">
                 <img className="profile-pic" src={profile.photo || '/default-avatar.png'} alt="Profile" />
@@ -53,7 +66,6 @@ const Profile: React.FC = () => {
                 localStorage.removeItem('token');
                 navigate('/start');
             }}>Logout</button>
-        </div>
         </div>
     );
 };

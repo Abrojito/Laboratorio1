@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Recipe } from "../api/recipeApi"; // el tipo que ya usás
+import { Recipe } from "../api/recipeApi";
+import BackButton from "../components/BackButton.tsx"; // el tipo que ya usás
 
 const RecipeDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,6 +21,8 @@ const RecipeDetail: React.FC = () => {
     if (!recipe) return <div>Cargando receta...</div>;
 
     return (
+        <div>
+            <BackButton />
         <div style={{ padding: '2rem' }}>
             <h1>{recipe.name}</h1>
             <img src={recipe.image || "/default-recipe.png"} alt={recipe.name} style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '8px' }} />
@@ -27,6 +30,7 @@ const RecipeDetail: React.FC = () => {
             <p><strong>Categoría:</strong> {recipe.category}</p>
             <p><strong>Dificultad:</strong> {recipe.difficulty}</p>
             {/* Si querés también mostrar autor, pasos, etc */}
+        </div>
         </div>
     );
 };
