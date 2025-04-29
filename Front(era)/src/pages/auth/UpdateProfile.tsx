@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { updateProfile } from '../../api/userApi';
 import { useNavigate } from 'react-router-dom';
+import BackButton from '../../components/BackButton';
 
 const UpdateProfile = () => {
     const [username, setUsername] = useState('');
@@ -42,7 +43,8 @@ const UpdateProfile = () => {
         }
     };
 
-    return (
+    return (<div>
+        <BackButton />
         <div style={styles.container}>
             <h2 style={styles.title}>Actualizar Perfil</h2>
 
@@ -55,7 +57,7 @@ const UpdateProfile = () => {
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        placeholder="username actual: "
+                        placeholder="insertar nuevo nombre de usuario"
                         style={styles.input}
                     />
                 </div>
@@ -66,7 +68,7 @@ const UpdateProfile = () => {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Contraseña actual: "
+                        placeholder="insertar nueva contraseña"
                         style={styles.input}
                     />
                 </div>
@@ -83,6 +85,7 @@ const UpdateProfile = () => {
 
                 <button type="submit" style={styles.button}>Actualizar Perfil</button>
             </form>
+        </div>
         </div>
     );
 };

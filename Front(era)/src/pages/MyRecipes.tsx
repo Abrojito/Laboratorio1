@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BackButton from "../components/BackButton.tsx";
 
 interface Recipe {
   id: number;
@@ -64,6 +65,8 @@ const MyRecipes: React.FC = () => {
   };
 
   return (
+      <div>
+        <BackButton />
       <div style={styles.container}>
         <h2 style={styles.title}>Mis Recetas</h2>
 
@@ -104,6 +107,7 @@ const MyRecipes: React.FC = () => {
         )}
 
         {error && <div style={styles.error}>{error}</div>}
+      </div>
       </div>
   );
 };
