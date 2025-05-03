@@ -1,8 +1,10 @@
 package com.dishly.app.services;
 
+import com.dishly.app.dto.IngredientQuantityDTO;
 import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.models.IngredientModel;
+import com.dishly.app.models.RecipeIngredientModel;
 import com.dishly.app.models.RecipeModel;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.repositories.IngredientRepository;
@@ -104,16 +106,30 @@ public class RecipeService {
             m.setPublicRecipe(dto.publicRecipe());
         }
 
-        if (dto.ingredientIds() != null) {
-            List<IngredientModel> ings = dto.ingredientIds().stream()
-                    .map(i -> ingRepo.findById(i)
-                            .orElseThrow(() -> new EntityNotFoundException("Ingrediente " + i)))
-                    .toList();
-            m.setIngredients(ings);
+        if (dto.ingredients() != null) {
+            List<RecipeIngredientModel> links = dto.ingredients().stream().map(entry -> {
+                IngredientModel ing = ingRepo.findById(entry.getIngredientId())
+                        .orElseThrow(() -> new EntityNotFoundException("Ingrediente " + entry.getIngredientId()));
+                RecipeIngredientModel link = new RecipeIngredientModel();
+                link.setIngredient(ing);
+                link.setQuantity(entry.getQuantity());
+                link.setRecipe(m);  // vincular la receta actual
+                return link;
+            }).toList();
+
+            m.setIngredients(links);
         }
     }
 
     private RecipeResponseDTO toDTO(RecipeModel m) {
+        List<IngredientQuantityDTO> ingredients = m.getIngredients().stream()
+                .map(link -> new IngredientQuantityDTO(
+                        link.getIngredient().getId(),
+                        link.getIngredient().getName(),
+                        link.getQuantity()
+                ))
+                .toList();
+
         return new RecipeResponseDTO(
                 m.getId(),
                 m.getName(),
@@ -123,9 +139,9 @@ public class RecipeService {
                 m.getAuthor(),
                 m.getUserId(),
                 m.getTime(),
+                ingredients,             // ✅ ahora sí la lista correcta
                 m.getSteps(),
                 m.isPublicRecipe()
-
         );
     }
 

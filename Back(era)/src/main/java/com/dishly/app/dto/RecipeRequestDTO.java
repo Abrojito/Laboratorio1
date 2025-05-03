@@ -10,7 +10,7 @@ public record RecipeRequestDTO(
         String author,
         Long   userId,
         String time,
-        List<Long> ingredientIds,
+        List<IngredientQuantityDTO> ingredients,
         List<String> steps,
         Boolean publicRecipe
 ) {}

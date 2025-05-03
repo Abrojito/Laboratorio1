@@ -11,6 +11,7 @@ public record RecipeResponseDTO(
         String author,
         Long   userId,
         String time,
+        List<IngredientQuantityDTO> ingredients,
         List<String> steps,
         Boolean publicRecipe
 ) {}

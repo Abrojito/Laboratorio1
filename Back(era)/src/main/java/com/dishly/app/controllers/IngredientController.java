@@ -38,6 +38,4 @@ public class IngredientController {
     public ResponseEntity<IngredientDTO> validate(@RequestBody IngredientDTO ingredient) {
         return ResponseEntity.ok(service.validate(ingredient));
     }
-
-
 }
