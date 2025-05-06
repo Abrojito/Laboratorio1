@@ -45,6 +45,7 @@ public class RecipeController {
     public RecipeResponseDTO create(Authentication auth,
                                     @RequestBody @Valid RecipeRequestDTO dto) {
         Long uid = userService.getIdByEmail(auth.getName());
+        System.out.println(uid);
         return recipeService.createForUser(dto, uid);
     }
 

@@ -29,7 +29,18 @@ const RecipeDetail: React.FC = () => {
             <p>{recipe.description}</p>
             <p><strong>Categoría:</strong> {recipe.category}</p>
             <p><strong>Dificultad:</strong> {recipe.difficulty}</p>
-            {/* Si querés también mostrar autor, pasos, etc */}
+            {recipe.steps.length > 0 && (
+                <div style={{ marginTop: '2rem' }}>
+                    <h3>Steps</h3>
+                    <ol>
+                        {recipe.steps.map((step, index) => (
+                            <li key={index} style={{ marginBottom: '1rem' }}>
+                                {step}
+                            </li>
+                        ))}
+                    </ol>
+                </div>
+            )}
         </div>
         </div>
     );

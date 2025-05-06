@@ -144,7 +144,8 @@ const NewRecipeForm: React.FC  = () => {
                     'Content-Type': 'application/json',
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
-                body: JSON.stringify({ ...recipe, userId }),             // <-- mando userId
+                body: JSON.stringify({ ...recipe, userId, steps: stepsList }),
+                // <-- mando userId
             });
 
             if (!response.ok) {

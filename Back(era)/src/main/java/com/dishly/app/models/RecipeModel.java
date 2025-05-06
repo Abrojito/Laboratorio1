@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -26,12 +27,12 @@ public class RecipeModel {
     private boolean publicRecipe = true;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RecipeIngredientModel> ingredients;
+    private List<RecipeIngredientModel> ingredients = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "recipe_steps", joinColumns = @JoinColumn(name = "recipe_id"))
     @Column(name = "step")
-    private List<String> steps;
+    private List<String> steps = new ArrayList<>();
 
 
 }

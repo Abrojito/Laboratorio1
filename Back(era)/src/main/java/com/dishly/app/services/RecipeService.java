@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecipeService {
@@ -80,14 +81,17 @@ public class RecipeService {
     public RecipeResponseDTO createForUser(RecipeRequestDTO dto, Long userId) {
 
         // Reaprovechamos la validación de nombre único
-        if (recipeRepo.existsByName(dto.name()))
+        if (recipeRepo.existsByName(dto.name())) {
+            System.out.println("soy gay");
             throw new IllegalArgumentException("Ya existe una receta con ese nombre");
-
+        }
         RecipeModel model = new RecipeModel();
+        System.out.println("soy menos gay");
         // copiamos datos
         updateModel(model, dto);
         model.setUserId(userId);           // ← vincular al dueño
-
+        model.setSteps(dto.steps());
+        System.out.println("soy menos");
         return toDTO(recipeRepo.save(model));
     }
 
@@ -101,7 +105,10 @@ public class RecipeService {
         m.setAuthor(dto.author());
         m.setUserId(dto.userId());
         m.setTime(dto.time());
-        m.setSteps(dto.steps());
+        if (dto.steps() != null) {
+            m.getSteps().clear();
+            m.getSteps().addAll(dto.steps());
+        }
         if (dto.publicRecipe() != null) {
             m.setPublicRecipe(dto.publicRecipe());
         }
@@ -113,7 +120,7 @@ public class RecipeService {
                 RecipeIngredientModel link = new RecipeIngredientModel();
                 link.setIngredient(ing);
                 link.setQuantity(entry.getQuantity());
-                link.setRecipe(m);  // vincular la receta actual
+                link.setRecipe(m);
                 return link;
             }).toList();
 
@@ -122,13 +129,15 @@ public class RecipeService {
     }
 
     private RecipeResponseDTO toDTO(RecipeModel m) {
-        List<IngredientQuantityDTO> ingredients = m.getIngredients().stream()
-                .map(link -> new IngredientQuantityDTO(
-                        link.getIngredient().getId(),
-                        link.getIngredient().getName(),
-                        link.getQuantity()
-                ))
-                .toList();
+        List<IngredientQuantityDTO> ingredients = Optional.ofNullable(m.getIngredients())
+    .orElse(List.of())
+    .stream()
+    .map(link -> new IngredientQuantityDTO(
+            link.getIngredient().getId(),
+            link.getIngredient().getName(),
+            link.getQuantity()
+    ))
+    .toList();
 
         return new RecipeResponseDTO(
                 m.getId(),
@@ -139,7 +148,7 @@ public class RecipeService {
                 m.getAuthor(),
                 m.getUserId(),
                 m.getTime(),
-                ingredients,             // ✅ ahora sí la lista correcta
+                ingredients,
                 m.getSteps(),
                 m.isPublicRecipe()
         );
