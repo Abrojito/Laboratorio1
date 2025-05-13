@@ -105,22 +105,29 @@ public class RecipeService {
         m.setAuthor(dto.author());
         m.setUserId(dto.userId());
         m.setTime(dto.time());
+
         if (dto.steps() != null) {
             m.getSteps().clear();
             m.getSteps().addAll(dto.steps());
         }
+
         if (dto.publicRecipe() != null) {
             m.setPublicRecipe(dto.publicRecipe());
         }
 
         if (dto.ingredients() != null) {
-            List<RecipeIngredientModel> links = dto.ingredients().stream().map(entry -> {
-                IngredientModel ing = ingRepo.findById(entry.getIngredientId())
-                        .orElseThrow(() -> new EntityNotFoundException("Ingrediente " + entry.getIngredientId()));
+            List<RecipeIngredientModel> links = dto.ingredients().entrySet().stream().map(entry -> {
+                Long ingredientId = entry.getKey();
+                String quantity = entry.getValue();
+
+                IngredientModel ing = ingRepo.findById(ingredientId)
+                        .orElseThrow(() -> new EntityNotFoundException("Ingrediente " + ingredientId));
+
                 RecipeIngredientModel link = new RecipeIngredientModel();
                 link.setIngredient(ing);
-                link.setQuantity(entry.getQuantity());
+                link.setQuantity(quantity);
                 link.setRecipe(m);
+
                 return link;
             }).toList();
 
@@ -128,13 +135,13 @@ public class RecipeService {
         }
     }
 
+
     private RecipeResponseDTO toDTO(RecipeModel m) {
         List<IngredientQuantityDTO> ingredients = Optional.ofNullable(m.getIngredients())
     .orElse(List.of())
     .stream()
     .map(link -> new IngredientQuantityDTO(
             link.getIngredient().getId(),
-            link.getIngredient().getName(),
             link.getQuantity()
     ))
     .toList();

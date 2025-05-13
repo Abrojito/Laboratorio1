@@ -12,7 +12,7 @@ interface RecipeRequestDTO {
     author: string;
     //userId: number;
     time: string;
-    ingredientIds: number[];
+    ingredientIds: Map<number, string>;
     steps: string[];
     publicRecipe: boolean;
 }
@@ -27,7 +27,7 @@ const NewRecipeForm: React.FC  = () => {
         author: '',
         //userId: 1,
         time: '',
-        ingredientIds: [],
+        ingredientIds: new Map<number, string>(),
         steps: [],
         publicRecipe: true,
     });
@@ -51,6 +51,10 @@ const NewRecipeForm: React.FC  = () => {
     const [newGroupName, setNewGroupName] = useState<string>('');
     const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>([]);
     const [activeGroupIndex, setActiveGroupIndex] = useState<number | null>(null);
+    const [ingredientNames, setIngredientNames] = useState<{ id: number; name: string }[]>([]);
+    const [newIngredientQuantity, setNewIngredientQuantity] = useState('0g');
+
+
 
 // Define la interfaz para grupos
     interface Ingredient {
@@ -101,42 +105,70 @@ const NewRecipeForm: React.FC  = () => {
                 const data = await response.json();
                 newIngredientId = data.id;
             } else {
-                // Si falla, asumimos que ya existe y lo buscamos por nombre
                 const existing = await fetch(`http://localhost:8080/ingredients/search?name=${encodeURIComponent(newIngredient)}`);
                 if (!existing.ok) throw new Error("Ingredient not found or error on fallback");
                 const data = await existing.json();
                 newIngredientId = data.id;
             }
 
-            if (!recipe.ingredientIds.includes(newIngredientId)) {
-                setRecipe((prev) => ({
-                    ...prev,
-                    ingredientIds: [...prev.ingredientIds, newIngredientId],
-                }));
-            }
-
             if (activeGroupIndex !== null) {
+                // solo agregar a grupo
                 const updatedGroups = [...ingredientGroups];
-                updatedGroups[activeGroupIndex].ingredients.push({ name: newIngredient, quantity: '' });
+                updatedGroups[activeGroupIndex].ingredients.push({
+                    name: newIngredient,
+                    quantity: newIngredientQuantity || '0g',
+                });
                 setIngredientGroups(updatedGroups);
             } else {
-                setNewIngredientList((prev) => [...prev, { name: newIngredient, quantity: '' }]);
+                // agregar a ingredientIds + ingredientNames
+                setRecipe((prev) => {
+                    const updated = new Map(prev.ingredientIds);
+                    if (!updated.has(newIngredientId)) {
+                        updated.set(newIngredientId, newIngredientQuantity || '0g');
+                    }
+                    return { ...prev, ingredientIds: updated };
+                });
+
+                setIngredientNames((prev) => {
+                    const alreadyExists = prev.some((ing) => ing.id === newIngredientId);
+                    return alreadyExists ? prev : [...prev, { id: newIngredientId, name: newIngredient }];
+                });
             }
 
             setNewIngredient('');
+            setNewIngredientQuantity('0g');
         } catch (error) {
             console.error('Error al añadir ingrediente:', error);
             alert('No se pudo añadir el ingrediente. Inténtalo de nuevo.');
         }
     };
 
+
+
+
+    const handleIngredientQuantityChange = (id: number, value: string) => {
+        setRecipe((prev) => {
+            const updated = new Map(prev.ingredientIds);
+            updated.set(id, value);
+            return { ...prev, ingredientIds: updated };
+        });
+    };
+
+
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         try {
             const token   = localStorage.getItem('token');
-            const userId  = Number(localStorage.getItem('userId'));   // <-- nuevo
-            const email   = localStorage.getItem('email');            // (por si lo usás)
+            const userId  = Number(localStorage.getItem('userId'));
+
+            const payload = {
+                ...recipe,
+                userId,
+                steps: stepsList,
+                ingredientIds: Object.fromEntries(recipe.ingredientIds),
+            };
 
             const response = await fetch('http://localhost:8080/api/recipes', {
                 method : 'POST',
@@ -144,8 +176,7 @@ const NewRecipeForm: React.FC  = () => {
                     'Content-Type': 'application/json',
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
                 },
-                body: JSON.stringify({ ...recipe, userId, steps: stepsList }),
-                // <-- mando userId
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -153,13 +184,13 @@ const NewRecipeForm: React.FC  = () => {
                 throw new Error(err || 'Error creando receta');
             }
 
-            /* ✅ creada con éxito → al Home */
             navigate('/home');
 
         } catch (err: any) {
             alert('Error creando receta: ' + err.message);
         }
     };
+
 
 
     const handleStepChange = (index: number, value: string) => {
@@ -226,13 +257,7 @@ const NewRecipeForm: React.FC  = () => {
         }
     };
 
-    const [newIngredientList, setNewIngredientList] = useState<{ name: string; quantity: string }[]>([]);
 
-    const handleQuantityChange = (index: number, value: string) => {
-        const updated = [...newIngredientList];
-        updated[index].quantity = value;
-        setNewIngredientList(updated);
-    };
 
     const handleGroupIngredientQuantityChange = (
         groupIndex: number,
@@ -323,21 +348,33 @@ const NewRecipeForm: React.FC  = () => {
             fontWeight: 700
             }}>Ingredients</h4>
 
-            <StyledTextField
-                label="Ingredient"
-                value={newIngredient}
-                onChange={(e) => setNewIngredient(e.target.value)}
-            />
+            <div className="ingredient-inputs-row">
+                <StyledTextField
+                    label="Ingredient"
+                    value={newIngredient}
+                    onChange={(e) => setNewIngredient(e.target.value)}
+                    style={{ flex: 2, marginRight: '1rem' }}
+                />
+                <StyledTextField
+                    label="Quantity"
+                    value={newIngredientQuantity}
+                    onChange={(e) => setNewIngredientQuantity(e.target.value)}
+                    style={{ flex: 1 }}
+                />
+            </div>
+
 
             {/* Ingredientes sueltos */}
-            {newIngredientList.map((item, i) => (
-                <div key={i} className="ingredient-row">
+            {ingredientNames.map((item) => (
+                <div key={item.id} className="ingredient-row">
                     <input
                         type="text"
                         className="ingredient-qty"
-                        placeholder="Ej: 2"
-                        value={item.quantity}
-                        onChange={(e) => handleQuantityChange(i, e.target.value)}
+                        placeholder="Ej: 2g"
+                        value={recipe.ingredientIds.get(item.id) || ''}
+                        onChange={(e) =>
+                            handleIngredientQuantityChange(item.id, e.target.value)
+                        }
                     />
                     <input
                         type="text"
@@ -349,15 +386,20 @@ const NewRecipeForm: React.FC  = () => {
                         className="delete-ingredient"
                         type="button"
                         onClick={() => {
-                            const updated = [...newIngredientList];
-                            updated.splice(i, 1);
-                            setNewIngredientList(updated);
+                            const updated = new Map(recipe.ingredientIds);
+                            updated.delete(item.id);
+                            setRecipe({ ...recipe, ingredientIds: updated });
+                            setIngredientNames((prev) =>
+                                prev.filter((ing) => ing.id !== item.id)
+                            );
                         }}
                     >
                         ⋯
                     </button>
                 </div>
             ))}
+
+
 
             {/* Ingredientes agrupados inline */}
             {ingredientGroups.map((group, groupIndex) => (

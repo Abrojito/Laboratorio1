@@ -34,7 +34,7 @@ public class IngredientService {
         if (ingredient.name() == null) {
             throw new IllegalArgumentException("Ingredient name cannot be null");
         }
-        IngredientModel result = repository.findByNameContainingIgnoreCase(ingredient.name());
+        IngredientModel result = repository.findByNameIgnoreCase(ingredient.name());
         if (result != null) {
             return new IngredientDTO(result.getId(), result.getName());
         } else {

@@ -1,6 +1,9 @@
 package com.dishly.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
+import java.util.Map;
 
 public record RecipeRequestDTO(
         String name,
@@ -10,7 +13,7 @@ public record RecipeRequestDTO(
         String author,
         Long   userId,
         String time,
-        List<IngredientQuantityDTO> ingredients,
+        @JsonProperty("ingredientIds") Map<Long, String> ingredients,
         List<String> steps,
         Boolean publicRecipe
 ) {}
