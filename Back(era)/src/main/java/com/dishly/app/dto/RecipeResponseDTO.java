@@ -9,9 +9,11 @@ public record RecipeResponseDTO(
         String image,
         String category,
         String author,
+        String authorPhoto,
         Long   userId,
         String time,
         List<IngredientQuantityDTO> ingredients,
         List<String> steps,
-        Boolean publicRecipe
+        Boolean publicRecipe,
+        List<ReviewDTO> reviews
 ) {}
