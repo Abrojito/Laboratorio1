@@ -55,9 +55,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/recipes/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/recipes").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/recipes/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/recipes/*/reviews").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/recipes/*/reviews").permitAll()
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

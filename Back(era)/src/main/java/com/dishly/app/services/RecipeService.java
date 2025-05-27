@@ -3,18 +3,18 @@ package com.dishly.app.services;
 import com.dishly.app.dto.IngredientQuantityDTO;
 import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
-import com.dishly.app.models.IngredientModel;
-import com.dishly.app.models.RecipeIngredientModel;
-import com.dishly.app.models.RecipeModel;
-import com.dishly.app.models.UserModel;
+import com.dishly.app.dto.ReviewDTO;
+import com.dishly.app.models.*;
 import com.dishly.app.repositories.IngredientRepository;
 import com.dishly.app.repositories.RecipeRepository;
+import com.dishly.app.repositories.ReviewRepository;
 import com.dishly.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,12 +24,14 @@ public class RecipeService {
     private final RecipeRepository recipeRepo;
     private final IngredientRepository ingRepo;
     private final UserRepository userRepo;
+    private final ReviewRepository reviewRepo;
 
     public RecipeService(RecipeRepository recipeRepo,
-                         IngredientRepository ingRepo, UserRepository userRepo) {
+                         IngredientRepository ingRepo, UserRepository userRepo, ReviewRepository reviewRepo) {
         this.recipeRepo = recipeRepo;
         this.ingRepo = ingRepo;
         this.userRepo = userRepo;
+        this.reviewRepo = reviewRepo;
     }
 
     /* ---------- Lectura ---------- */
@@ -62,12 +64,21 @@ public class RecipeService {
     /* ---------- Actualización ---------- */
 
     @Transactional
-    public RecipeResponseDTO update(Long id, RecipeRequestDTO dto) {
-        RecipeModel model = recipeRepo.findById(id)
+    public RecipeResponseDTO update(Long id, RecipeRequestDTO dto, String email) throws AccessDeniedException {
+        RecipeModel recipe = recipeRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada: " + id));
-        updateModel(model, dto);
-        return toDTO(recipeRepo.save(model));
+
+        UserModel user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        if (!recipe.getUserId().equals(user.getId())) {
+            throw new AccessDeniedException("No podés editar una receta que no es tuya");
+        }
+
+        updateModel(recipe, dto);
+        return toDTO(recipeRepo.save(recipe));
     }
+
 
     /* ---------- Borrado ---------- */
 
@@ -107,9 +118,9 @@ public class RecipeService {
         m.setTime(dto.time());
 
         if (dto.steps() != null) {
-            m.getSteps().clear();
-            m.getSteps().addAll(dto.steps());
+            m.setSteps(new ArrayList<>(dto.steps()));
         }
+
 
         if (dto.publicRecipe() != null) {
             m.setPublicRecipe(dto.publicRecipe());
@@ -146,18 +157,38 @@ public class RecipeService {
     ))
     .toList();
 
+        UserModel user = userRepo.findById(m.getUserId())
+                .orElseThrow();
+
+        List<ReviewModel> reviewModels = reviewRepo.findByRecipe(m);
+
+        List<ReviewDTO> reviewDTOs = reviewModels.stream()
+                .map(r -> new ReviewDTO(
+                        r.getId(),
+                        r.getComment(),
+                        r.getRating(),
+                        r.getUser().getUsername(),
+                        r.getUser().getPhoto(),
+                        r.getCreatedAt().toString()
+                ))
+                .toList();
+
+
         return new RecipeResponseDTO(
                 m.getId(),
                 m.getName(),
                 m.getDescription(),
-                m.getImage(),
+                m.getImage(),           // imagen de la receta
                 m.getCategory(),
-                m.getAuthor(),
+                user.getUsername(),     // nombre del autor
+                user.getPhoto(),        // imagen del autor
                 m.getUserId(),
                 m.getTime(),
                 ingredients,
                 m.getSteps(),
-                m.isPublicRecipe()
+                m.isPublicRecipe(),
+                reviewDTOs
+
         );
     }
 

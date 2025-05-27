@@ -15,7 +15,7 @@ public class JwtUtil {
     private static final String SECRET =
             "clavemuymuyseguraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     private static final Key   KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
-    private static final long  EXPIRATION_MS = 60 * 60 * 1000;
+    private static final long  EXPIRATION_MS = 60 * 60 * 5000;
 
     /* ========= CREACIÓN ========= */
 

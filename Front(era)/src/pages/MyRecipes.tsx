@@ -64,6 +64,11 @@ const MyRecipes: React.FC = () => {
     }
   };
 
+  const handleEditRecipe = (id: number) => {
+    navigate(`/recipes/${id}/edit`);
+  };
+
+
   return (
       <div>
         <BackButton />
@@ -79,7 +84,6 @@ const MyRecipes: React.FC = () => {
                       key={recipe.id}
                       style={styles.card}
                   >
-                    {/* Botón de eliminar */}
                     <button
                         style={styles.deleteButton}
                         onClick={() => handleDeleteRecipe(recipe.id)}
@@ -88,11 +92,7 @@ const MyRecipes: React.FC = () => {
                       ×
                     </button>
 
-                    {/* Card clickable para ver receta */}
-                    <div
-                        onClick={() => handleViewRecipe(recipe.id)}
-                        style={{ cursor: 'pointer' }}
-                    >
+                    <div onClick={() => handleViewRecipe(recipe.id)} style={{ cursor: 'pointer' }}>
                       <img
                           src={recipe.image || '/default-recipe.png'}
                           alt={recipe.name}
@@ -101,8 +101,24 @@ const MyRecipes: React.FC = () => {
                       <h3 style={styles.cardTitle}>{recipe.name}</h3>
                       <p style={styles.cardDesc}>{recipe.description}</p>
                     </div>
+
+                    {/* ✅ Botón de editar */}
+                    <button
+                        onClick={() => handleEditRecipe(recipe.id)}
+                        style={{
+                          marginTop: '0.5rem',
+                          background: '#007bff',
+                          color: 'white',
+                          border: 'none',
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '5px',
+                          cursor: 'pointer'
+                        }}
+                    >
+                      ✏️ Editar
+                    </button>
                   </div>
-              ))}
+                ))}
             </div>
         )}
 

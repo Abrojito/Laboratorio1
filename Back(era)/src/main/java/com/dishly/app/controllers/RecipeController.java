@@ -52,9 +52,11 @@ public class RecipeController {
     /* ---------- PUT ---------- */
     @PutMapping("{id}")
     public RecipeResponseDTO update(@PathVariable Long id,
-                                    @RequestBody @Valid RecipeRequestDTO dto) {
-        return recipeService.update(id, dto);
+                                    Authentication auth,
+                                    @RequestBody @Valid RecipeRequestDTO dto) throws AccessDeniedException {
+        return recipeService.update(id, dto, auth.getName());
     }
+
 
     /* ---------- DELETE ---------- */
     @DeleteMapping("/{id}")

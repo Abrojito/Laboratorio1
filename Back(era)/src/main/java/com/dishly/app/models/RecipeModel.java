@@ -34,5 +34,7 @@ public class RecipeModel {
     @Column(name = "step")
     private List<String> steps = new ArrayList<>();
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    private List<ReviewModel> reviews;
 
 }
