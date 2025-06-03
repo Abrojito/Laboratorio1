@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -52,12 +54,15 @@ public class RecipeService {
     /* ---------- Creación ---------- */
 
     @Transactional
-    public RecipeResponseDTO create(RecipeRequestDTO dto) {
+    public RecipeResponseDTO create(RecipeRequestDTO dto, String email) {
         if (recipeRepo.existsByName(dto.name()))
             throw new IllegalArgumentException("Ya existe una receta con ese nombre");
 
+        UserModel user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
         RecipeModel model = new RecipeModel();
-        updateModel(model, dto);
+        updateModel(model, dto, user.getId());
         return toDTO(recipeRepo.save(model));
     }
 
@@ -75,7 +80,7 @@ public class RecipeService {
             throw new AccessDeniedException("No podés editar una receta que no es tuya");
         }
 
-        updateModel(recipe, dto);
+        updateModel(recipe, dto, user.getId());
         return toDTO(recipeRepo.save(recipe));
     }
 
@@ -99,7 +104,7 @@ public class RecipeService {
         RecipeModel model = new RecipeModel();
         System.out.println("soy menos gay");
         // copiamos datos
-        updateModel(model, dto);
+        updateModel(model, dto, userId);
         model.setUserId(userId);           // ← vincular al dueño
         model.setSteps(dto.steps());
         System.out.println("soy menos");
@@ -108,13 +113,13 @@ public class RecipeService {
 
     /* ---------- Helpers ---------- */
 
-    private void updateModel(RecipeModel m, RecipeRequestDTO dto) {
+    private void updateModel(RecipeModel m, RecipeRequestDTO dto, Long userId) {
         m.setName(dto.name());
         m.setDescription(dto.description());
         m.setImage(dto.image());
         m.setCategory(dto.category());
         m.setAuthor(dto.author());
-        m.setUserId(dto.userId());
+        m.setUserId(userId);
         m.setTime(dto.time());
 
         if (dto.steps() != null) {
@@ -127,7 +132,11 @@ public class RecipeService {
         }
 
         if (dto.ingredients() != null) {
-            List<RecipeIngredientModel> links = dto.ingredients().entrySet().stream().map(entry -> {
+            // Vaciar la colección actual (Hibernate la sigue reconociendo)
+            m.getIngredients().clear();
+
+            // Agregar los nuevos elementos
+            for (Map.Entry<Long, String> entry : dto.ingredients().entrySet()) {
                 Long ingredientId = entry.getKey();
                 String quantity = entry.getValue();
 
@@ -139,10 +148,8 @@ public class RecipeService {
                 link.setQuantity(quantity);
                 link.setRecipe(m);
 
-                return link;
-            }).toList();
-
-            m.setIngredients(links);
+                m.getIngredients().add(link); // ✅ usamos la misma instancia de lista
+            }
         }
     }
 

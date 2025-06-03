@@ -11,7 +11,6 @@ public record RecipeRequestDTO(
         String image,          // Base64 o URL
         String category,
         String author,
-        Long   userId,
         String time,
         @JsonProperty("ingredientIds") Map<Long, String> ingredients,
         List<String> steps,

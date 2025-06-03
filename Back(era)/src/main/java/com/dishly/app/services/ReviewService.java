@@ -25,9 +25,8 @@ public class ReviewService {
         RecipeModel recipe = recipeRepository.findById(recipeId).orElseThrow();
         UserModel user = userRepository.findByUsername(dto.username()).orElseThrow(); // 👈 búsqueda por username
 
-        // Reutiliza review si ya existe
-        ReviewModel review = reviewRepository.findByRecipeAndUser(recipe, user)
-                .orElse(new ReviewModel());
+        // Siempre crea una nueva review
+        ReviewModel review = new ReviewModel();
 
         review.setRecipe(recipe);
         review.setUser(user);
