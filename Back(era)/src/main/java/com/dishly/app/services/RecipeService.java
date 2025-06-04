@@ -156,13 +156,14 @@ public class RecipeService {
 
     private RecipeResponseDTO toDTO(RecipeModel m) {
         List<IngredientQuantityDTO> ingredients = Optional.ofNullable(m.getIngredients())
-    .orElse(List.of())
-    .stream()
-    .map(link -> new IngredientQuantityDTO(
-            link.getIngredient().getId(),
-            link.getQuantity()
-    ))
-    .toList();
+                .orElse(List.of())
+                .stream()
+                .map(link -> new IngredientQuantityDTO(
+                        link.getIngredient().getId(),
+                        link.getIngredient().getName(),   // ✅ agregar el nombre acá
+                        link.getQuantity()
+                ))
+                .toList();
 
         UserModel user = userRepo.findById(m.getUserId())
                 .orElseThrow();

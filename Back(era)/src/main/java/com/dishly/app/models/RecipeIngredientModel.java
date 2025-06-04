@@ -17,7 +17,7 @@ public class RecipeIngredientModel {
     @ManyToOne
     private RecipeModel recipe;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private IngredientModel ingredient;
 
     private String quantity;
