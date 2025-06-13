@@ -1,4 +1,3 @@
-/* App.tsx */
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Splash         from './pages/Splash';
@@ -15,7 +14,13 @@ import MyRecipes      from './pages/MyRecipes';
 
 import { ProtectedRoute, GuestOnlyRoute } from './router/guards';
 import RecipeDetail from "./pages/RecipeDetail.tsx";
-import EditRecipeForm from "./pages/EditRecipeForm.tsx";   // 👈 new
+import EditRecipeForm from "./pages/EditRecipeForm.tsx";
+
+
+import MealPrepForm from "./pages/MealPrepForm";
+import MyMealPreps from "./pages/MyMealPreps";
+import MealPrepDetail from "./pages/MealPrepDetail";
+import EditMealPrepForm from "./pages/EditMealPrepForm.tsx";
 
 const App: React.FC = () => (
     <Routes>
@@ -36,14 +41,18 @@ const App: React.FC = () => (
             <Route path="/ingredients"     element={<Ingredient />} />
             <Route path="/profile"         element={<Profile />} />
             <Route path="/me/myrecipes"    element={<MyRecipes />} />
+            <Route path="/me/my-mealpreps" element={<MyMealPreps />} />
+            <Route path="/new-mealprep"    element={<MealPrepForm />} />
             <Route path="/me/update"       element={<UpdateProfile />} />
             <Route path="/delete-account"  element={<DeleteAccount />} />
             <Route path="/recipes/:id" element={<RecipeDetail />} />
             <Route path="/recipes/:id/reviews" element={<RecipeDetail />} />
             <Route path="/recipes/:id/edit" element={<EditRecipeForm />} />
-
-
+            <Route path="/mealpreps/:id/edit" element={<EditMealPrepForm />} />
         </Route>
+
+        {/* -------- Rutas públicas (visibles por todos) -------- */}
+        <Route path="/mealpreps/:id" element={<MealPrepDetail />} />
 
         {/* -------- Catch-all -------- */}
         <Route path="*" element={<Navigate to="/" replace />} />

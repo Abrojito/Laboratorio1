@@ -3,19 +3,11 @@ import { useParams } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { Review } from "../types/Recipe.ts";
 
 interface IngredientWithQuantity {
     ingredientId: number;
     quantity: string;
-}
-
-interface Review {
-    id: number;
-    comment: string;
-    rating: number;
-    username: string;
-    userPhoto: string;
-    createdAt: string;
 }
 
 interface Recipe {

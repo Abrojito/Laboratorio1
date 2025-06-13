@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import { fetchRecipes, Recipe } from '../api/recipeApi';
+import { fetchMealPreps } from '../api/mealPrepApi';
+import { MealPrep } from '../types/MealPrep';
+import MealPrepCard from '../components/MealPrepCard';
 import '../App.css';
 
 interface User {
@@ -15,17 +18,32 @@ const Home: React.FC = () => {
         fullName: 'John Doe',
         id: 1
     });
+
     const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [mealPreps, setMealPreps] = useState<MealPrep[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showMenu, setShowMenu] = useState(false);  // Estado para mostrar/ocultar el submenú
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('jwt');
-        fetchRecipes(token ?? undefined)
-            .then(setRecipes)
-            .catch((err) => setError(err.message))
-            .finally(() => setLoading(false));
+        const loadData = async () => {
+            try {
+                const [recipesData, mealPrepsData] = await Promise.all([
+                    fetchRecipes(),
+                    fetchMealPreps()
+                ]);
+                setRecipes(recipesData);
+                setMealPreps(mealPrepsData);
+            } catch (err) {
+                setError("Error cargando datos.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadData();
     }, []);
 
     const handleProfile = () => {
@@ -36,12 +54,20 @@ const Home: React.FC = () => {
         navigate('/newrecipe');
     };
 
+    const handleOpenMealPrep = () => {
+        navigate('/new-mealprep');
+    };
+
     const handleViewRecipe = (id: number) => {
         navigate(`/recipes/${id}`);
     };
 
+    const handleToggleMenu = () => {
+        setShowMenu(prev => !prev);
+    };
+
     if (!user) return <div>Cargando usuario…</div>;
-    if (loading) return <div>Cargando recetas…</div>;
+    if (loading) return <div>Cargando datos…</div>;
     if (error) return <div>Error: {error}</div>;
 
     return (
@@ -58,6 +84,7 @@ const Home: React.FC = () => {
             </header>
 
             <main style={styles.main}>
+                <h2>Recetas</h2>
                 {recipes.length === 0 ? (
                     <p>No hay recetas todavía.</p>
                 ) : (
@@ -66,7 +93,7 @@ const Home: React.FC = () => {
                             <div
                                 key={r.id}
                                 style={styles.card}
-                                onClick={() => handleViewRecipe(r.id)}  // <-- agregado para navegar
+                                onClick={() => handleViewRecipe(r.id)}
                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             >
@@ -82,12 +109,32 @@ const Home: React.FC = () => {
                     </div>
                 )}
 
+                <h2 style={{ marginTop: '3rem' }}>Meal Preps</h2>
+                {mealPreps.length === 0 ? (
+                    <p>No hay meal preps todavía.</p>
+                ) : (
+                    <div style={styles.grid}>
+                        {mealPreps.map((mp) => (
+                            <MealPrepCard key={mp.id} mealPrep={mp} />
+                        ))}
+                    </div>
+                )}
+
+                {/* Botón flotante */}
                 <button
-                    onClick={handleOpenRecipe}
+                    onClick={handleToggleMenu}
                     style={styles.floatingButton}
                 >
                     +
                 </button>
+
+                {/* Submenú */}
+                {showMenu && (
+                    <div style={styles.menu}>
+                        <button onClick={handleOpenRecipe} style={styles.menuItem}>➕ Nueva Receta</button>
+                        <button onClick={handleOpenMealPrep} style={styles.menuItem}>➕ Nuevo MealPrep</button>
+                    </div>
+                )}
             </main>
         </div>
     );
@@ -118,7 +165,7 @@ const styles: Record<string, React.CSSProperties> = {
     card: {
         background: '#f8f8f8', padding: '1rem', borderRadius: '10px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center',
-        cursor: 'pointer', transition: 'transform 0.2s',  // <-- para efecto al pasar el mouse
+        cursor: 'pointer', transition: 'transform 0.2s',
     },
     image: {
         width: '100%', height: '200px', objectFit: 'cover',
@@ -135,7 +182,21 @@ const styles: Record<string, React.CSSProperties> = {
         width: '60px', height: '60px', borderRadius: '50%',
         border: 'none', backgroundColor: '#030303', color: '#fff',
         fontSize: '2.2rem', display: 'flex', justifyContent: 'center',
-        alignItems: 'center', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.3)'
+        alignItems: 'center', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+        zIndex: 1000
+    },
+    menu: {
+        position: 'fixed', bottom: '110px', right: '25px',
+        background: '#fff', borderRadius: '10px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.15)', padding: '0.5rem',
+        display: 'flex', flexDirection: 'column', gap: '0.5rem',
+        zIndex: 1000
+    },
+    menuItem: {
+        background: '#A6B240', color: '#fff',
+        border: 'none', padding: '0.5rem 1rem',
+        borderRadius: '8px', cursor: 'pointer', fontSize: '1rem',
+        textAlign: 'center'
     }
 };
 

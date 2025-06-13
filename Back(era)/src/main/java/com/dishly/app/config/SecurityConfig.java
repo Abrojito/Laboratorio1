@@ -53,14 +53,28 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
+                        //auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        //users
                         .requestMatchers("/api/users/**").authenticated()
+                        //recipes
                         .requestMatchers(HttpMethod.PUT, "/api/recipes/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/recipes/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/recipes").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/recipes/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/recipes/*/reviews").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/recipes/*/reviews").permitAll()
+                        //mealpreps
+                        .requestMatchers(HttpMethod.GET, "/api/mealpreps").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/mealpreps/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/mealpreps/user/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/mealpreps").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/mealpreps/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/mealpreps/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/mealpreps/*/reviews").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/mealpreps/*/reviews").permitAll()
+
+                        //catch-all
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
