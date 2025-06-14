@@ -73,7 +73,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/mealpreps/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/mealpreps/*/reviews").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps/*/reviews").permitAll()
-
+                        // shopping-lists
+                        .requestMatchers(HttpMethod.GET, "/api/shopping-lists").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/shopping-lists/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/shopping-lists").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/shopping-lists/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/shopping-lists/*/repeat").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/shopping-lists/*/items/*/toggle").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/shopping-lists/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/shopping-lists/*/add-recipes").authenticated()
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/shopping-lists/**").permitAll()
                         //catch-all
                         .anyRequest().denyAll()
                 )

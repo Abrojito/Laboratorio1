@@ -4,6 +4,7 @@ import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Review } from "../types/Recipe.ts";
+import ShoppingListSelector from "../components/ShoppingListSelector.tsx";
 
 interface IngredientWithQuantity {
     ingredientId: number;
@@ -113,6 +114,8 @@ const RecipeDetail: React.FC = () => {
         <div style={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
             <img src={recipe.image} alt="Imagen del plato" style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{recipe.name}</h1>
+
+            <ShoppingListSelector recipeIds={[recipe.id]} />
 
             <h2>Ingredientes</h2>
             <ul style={{ listStyle: "none", padding: 0 }}>

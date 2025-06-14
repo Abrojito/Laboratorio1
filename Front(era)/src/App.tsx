@@ -21,6 +21,8 @@ import MealPrepForm from "./pages/MealPrepForm";
 import MyMealPreps from "./pages/MyMealPreps";
 import MealPrepDetail from "./pages/MealPrepDetail";
 import EditMealPrepForm from "./pages/EditMealPrepForm.tsx";
+import ShoppingListPage from "./pages/ShoppingListPage.tsx";
+import ShoppingListDetailPage from "./pages/ShoppingListDetailPage.tsx";
 
 const App: React.FC = () => (
     <Routes>
@@ -49,6 +51,8 @@ const App: React.FC = () => (
             <Route path="/recipes/:id/reviews" element={<RecipeDetail />} />
             <Route path="/recipes/:id/edit" element={<EditRecipeForm />} />
             <Route path="/mealpreps/:id/edit" element={<EditMealPrepForm />} />
+            <Route path="/shopping-list" element={<ShoppingListPage />} />
+            <Route path="/shopping-list/:id" element={<ShoppingListDetailPage />} />
         </Route>
 
         {/* -------- Rutas públicas (visibles por todos) -------- */}

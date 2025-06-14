@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchMealPrep, createMealPrepReview } from "../api/mealPrepApi";
-import { MealPrep, Review } from "../types/MealPrep";
+import { MealPrep } from "../types/MealPrep";
 import RecipeCard from "../components/RecipeCard";
 import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import ShoppingListSelector from "../components/ShoppingListSelector";
+
 
 const MealPrepDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -36,7 +38,6 @@ const MealPrepDetail: React.FC = () => {
 
         try {
             await createMealPrepReview(Number(id), payload, token);
-            // Refrescamos mealprep con nuevas reviews
             const updatedMealPrep = await fetchMealPrep(Number(id));
             setMealPrep(updatedMealPrep);
             setComment("");
@@ -53,6 +54,8 @@ const MealPrepDetail: React.FC = () => {
             <img src={mealPrep.image} alt={mealPrep.name} style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{mealPrep.name}</h1>
             <p>{mealPrep.description}</p>
+
+            <ShoppingListSelector mealPrepId={mealPrep.id} />
 
             <h2>Recetas</h2>
             <div style={{

@@ -47,6 +47,14 @@ public class JwtUtil {
         catch (JwtException | IllegalArgumentException ex) { return false; }
     }
 
+    public String getEmailFromHeader(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Invalid Authorization header");
+        }
+        String token = authHeader.substring(7);
+        return getEmail(token);
+    }
+
     /* ========= HELPER ========== */
 
     private Jws<Claims> parse(String token) {
