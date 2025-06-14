@@ -4,6 +4,8 @@ import { fetchRecipes, Recipe } from '../api/recipeApi';
 import { fetchMealPreps } from '../api/mealPrepApi';
 import { MealPrep } from '../types/MealPrep';
 import MealPrepCard from '../components/MealPrepCard';
+import BottomNav from '../components/BottomNav';
+import FloatingMenu from '../components/FloatingMenu';
 import '../App.css';
 
 interface User {
@@ -23,7 +25,6 @@ const Home: React.FC = () => {
     const [mealPreps, setMealPreps] = useState<MealPrep[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [showMenu, setShowMenu] = useState(false);  // Estado para mostrar/ocultar el submenú
 
     const navigate = useNavigate();
 
@@ -46,24 +47,8 @@ const Home: React.FC = () => {
         loadData();
     }, []);
 
-    const handleProfile = () => {
-        navigate('/profile');
-    };
-
-    const handleOpenRecipe = () => {
-        navigate('/newrecipe');
-    };
-
-    const handleOpenMealPrep = () => {
-        navigate('/new-mealprep');
-    };
-
     const handleViewRecipe = (id: number) => {
         navigate(`/recipes/${id}`);
-    };
-
-    const handleToggleMenu = () => {
-        setShowMenu(prev => !prev);
     };
 
     if (!user) return <div>Cargando usuario…</div>;
@@ -74,13 +59,6 @@ const Home: React.FC = () => {
         <div>
             <header style={styles.header}>
                 <h1 style={styles.logo}>D<span style={{ color: '#A6B240' }}>.</span></h1>
-                <button
-                    onClick={handleProfile}
-                    style={styles.profileButton}
-                    title="Mi perfil"
-                >
-                    P
-                </button>
             </header>
 
             <main style={styles.main}>
@@ -119,23 +97,10 @@ const Home: React.FC = () => {
                         ))}
                     </div>
                 )}
-
-                {/* Botón flotante */}
-                <button
-                    onClick={handleToggleMenu}
-                    style={styles.floatingButton}
-                >
-                    +
-                </button>
-
-                {/* Submenú */}
-                {showMenu && (
-                    <div style={styles.menu}>
-                        <button onClick={handleOpenRecipe} style={styles.menuItem}>➕ Nueva Receta</button>
-                        <button onClick={handleOpenMealPrep} style={styles.menuItem}>➕ Nuevo MealPrep</button>
-                    </div>
-                )}
             </main>
+
+            <FloatingMenu />
+            <BottomNav />
         </div>
     );
 };
@@ -148,12 +113,6 @@ const styles: Record<string, React.CSSProperties> = {
     },
     logo: {
         fontFamily: 'Libre Caslon Text, serif', fontSize: '2.5rem'
-    },
-    profileButton: {
-        width: '40px', height: '40px', borderRadius: '50%',
-        border: '1px solid #fff', backgroundColor: 'transparent',
-        color: '#fff', fontSize: '1.2rem', cursor: 'pointer',
-        display: 'flex', justifyContent: 'center', alignItems: 'center'
     },
     main: {
         padding: '2rem', maxWidth: '1200px', margin: '0 auto'
@@ -176,27 +135,6 @@ const styles: Record<string, React.CSSProperties> = {
     },
     cardDesc: {
         fontSize: '0.9rem', color: '#555'
-    },
-    floatingButton: {
-        position: 'fixed', bottom: '40px', right: '25px',
-        width: '60px', height: '60px', borderRadius: '50%',
-        border: 'none', backgroundColor: '#030303', color: '#fff',
-        fontSize: '2.2rem', display: 'flex', justifyContent: 'center',
-        alignItems: 'center', cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
-        zIndex: 1000
-    },
-    menu: {
-        position: 'fixed', bottom: '110px', right: '25px',
-        background: '#fff', borderRadius: '10px',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.15)', padding: '0.5rem',
-        display: 'flex', flexDirection: 'column', gap: '0.5rem',
-        zIndex: 1000
-    },
-    menuItem: {
-        background: '#A6B240', color: '#fff',
-        border: 'none', padding: '0.5rem 1rem',
-        borderRadius: '8px', cursor: 'pointer', fontSize: '1rem',
-        textAlign: 'center'
     }
 };
 

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProfile } from '../api/userApi';
 import '../styles/Profile.css';
+import FloatingMenu from "../components/FloatingMenu.tsx";
+import BottomNav from "../components/BottomNav.tsx";
 
 interface UserProfile {
     username: string;
@@ -67,6 +69,8 @@ const Profile: React.FC = () => {
                 localStorage.removeItem('token');
                 navigate('/start');
             }}>Logout</button>
+            <FloatingMenu />
+            <BottomNav />
         </div>
     );
 };

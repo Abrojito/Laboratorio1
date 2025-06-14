@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { fetchPendingShoppingLists, fetchHistoryShoppingLists } from "../api/shoppingListApi";
 import { useNavigate } from "react-router-dom";
+import BottomNav from "../components/BottomNav.tsx";
+import FloatingMenu from "../components/FloatingMenu.tsx";
 
 interface ShoppingListSummary {
     id: number;
@@ -104,6 +106,8 @@ const ShoppingListPage: React.FC = () => {
                     ))
                 )
             )}
+            <FloatingMenu />
+            <BottomNav />
         </div>
     );
 };

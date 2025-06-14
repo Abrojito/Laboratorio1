@@ -7,6 +7,8 @@ import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
 import { RecipeSearchResult } from "../types/Recipe";
 import RecipeSearchCard from "../components/RecipeSearchCard";
+import BottomNav from "../components/BottomNav.tsx";
+import FloatingMenu from "../components/FloatingMenu.tsx";
 
 
 const SearchPage: React.FC = () => {
@@ -182,6 +184,8 @@ const SearchPage: React.FC = () => {
                     </>
                 )
             )}
+            <FloatingMenu />
+            <BottomNav />
 
         </div>
     );
