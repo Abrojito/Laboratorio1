@@ -28,3 +28,14 @@ export async function fetchRecipes(token?: string): Promise<Recipe[]> {
 
     return res.json() as Promise<Recipe[]>;
 }
+
+export async function searchRecipes(filters: {
+    name?: string;
+    ingredient?: string;
+    author?: string;
+}): Promise<Recipe[]> {
+    const query = new URLSearchParams(filters as any).toString();
+    const res = await fetch(`http://localhost:8080/api/recipes/search?${query}`);
+    return await res.json();
+}
+

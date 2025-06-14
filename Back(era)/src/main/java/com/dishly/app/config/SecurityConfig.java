@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/recipes/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/recipes/*/reviews").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/recipes/*/reviews").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/recipes/search").permitAll()
                         //mealpreps
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps/*").permitAll()
@@ -73,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/mealpreps/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/mealpreps/*/reviews").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps/*/reviews").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/mealpreps/search").permitAll()
                         // shopping-lists
                         .requestMatchers(HttpMethod.GET, "/api/shopping-lists").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/shopping-lists/**").authenticated()

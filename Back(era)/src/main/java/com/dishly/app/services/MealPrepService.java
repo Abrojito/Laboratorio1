@@ -103,6 +103,19 @@ public class MealPrepService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<MealPrepResponseDTO> search(String name, String ingredient, String author) {
+        return mealPrepRepo.findAll().stream()
+                .filter(mp -> name == null || mp.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(mp -> author == null || mp.getAuthor().toLowerCase().contains(author.toLowerCase()))
+                .filter(mp -> ingredient == null || mp.getRecipes().stream()
+                        .flatMap(r -> r.getIngredients().stream())
+                        .anyMatch(i -> i.getIngredient().getName().toLowerCase().contains(ingredient.toLowerCase())))
+                .map(this::toDTO)
+                .toList();
+    }
+
+
     private void updateModel(MealPrepModel m, MealPrepRequestDTO dto, UserModel user) {
         m.setName(dto.name());
         m.setDescription(dto.description());

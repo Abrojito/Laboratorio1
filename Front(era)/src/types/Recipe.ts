@@ -26,3 +26,14 @@ export interface Recipe {
     steps: string[];
     reviews: Review[];
 }
+
+export interface RecipeSearchResult {
+    id: number;
+    name: string;
+    image: string;
+    description?: string;
+    author?: string;
+    authorPhoto?: string;
+    time?: string;
+    reviews?: any[];
+}

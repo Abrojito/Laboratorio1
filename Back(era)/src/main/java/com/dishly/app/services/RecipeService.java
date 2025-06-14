@@ -98,18 +98,34 @@ public class RecipeService {
 
         // Reaprovechamos la validación de nombre único
         if (recipeRepo.existsByName(dto.name())) {
-            System.out.println("soy gay");
             throw new IllegalArgumentException("Ya existe una receta con ese nombre");
         }
         RecipeModel model = new RecipeModel();
-        System.out.println("soy menos gay");
         // copiamos datos
         updateModel(model, dto, userId);
-        model.setUserId(userId);           // ← vincular al dueño
+        model.setUserId(userId);
         model.setSteps(dto.steps());
-        System.out.println("soy menos");
+        model.setAuthor(userRepo.findById(userId).orElseThrow().getUsername());
         return toDTO(recipeRepo.save(model));
     }
+
+
+    /* ---------- Búsqueda de recetas públicas ---------- */
+
+    @Transactional(readOnly = true)
+    public List<RecipeResponseDTO> search(String name, String ingredient, String author) {
+        return recipeRepo.findAll().stream()
+                .filter(r -> name == null || r.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(r -> author == null || Optional.ofNullable(r.getAuthor())
+                        .map(a -> a.toLowerCase().contains(author.toLowerCase()))
+                        .orElse(false))
+
+                .filter(r -> ingredient == null || r.getIngredients().stream()
+                        .anyMatch(i -> i.getIngredient().getName().toLowerCase().contains(ingredient.toLowerCase())))
+                .map(this::toDTO)
+                .toList();
+    }
+
 
     /* ---------- Helpers ---------- */
 

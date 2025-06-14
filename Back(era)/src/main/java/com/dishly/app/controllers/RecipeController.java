@@ -39,6 +39,16 @@ public class RecipeController {
         return recipeService.getById(id);
     }
 
+    @GetMapping("/search")
+    public List<RecipeResponseDTO> searchRecipes(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String ingredient,
+            @RequestParam(required = false) String author
+    ) {
+        return recipeService.search(name, ingredient, author);
+    }
+
+
     /* ---------- POST ---------- */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

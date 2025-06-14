@@ -34,6 +34,15 @@ public class MealPrepController {
         return mealPrepService.getById(id);
     }
 
+    @GetMapping("/search")
+    public List<MealPrepResponseDTO> searchMealPreps(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String ingredient,
+            @RequestParam(required = false) String author
+    ) {
+        return mealPrepService.search(name, ingredient, author);
+    }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

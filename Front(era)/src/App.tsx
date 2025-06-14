@@ -23,6 +23,8 @@ import MealPrepDetail from "./pages/MealPrepDetail";
 import EditMealPrepForm from "./pages/EditMealPrepForm.tsx";
 import ShoppingListPage from "./pages/ShoppingListPage.tsx";
 import ShoppingListDetailPage from "./pages/ShoppingListDetailPage.tsx";
+import SearchPage from './pages/SearchPage';
+
 
 const App: React.FC = () => (
     <Routes>
@@ -53,6 +55,7 @@ const App: React.FC = () => (
             <Route path="/mealpreps/:id/edit" element={<EditMealPrepForm />} />
             <Route path="/shopping-list" element={<ShoppingListPage />} />
             <Route path="/shopping-list/:id" element={<ShoppingListDetailPage />} />
+            <Route path="/search" element={<SearchPage />} />
         </Route>
 
         {/* -------- Rutas públicas (visibles por todos) -------- */}

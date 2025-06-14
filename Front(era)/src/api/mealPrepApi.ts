@@ -63,3 +63,13 @@ export async function createMealPrepReview(mealPrepId: number, dto: { comment: s
     if (!res.ok) throw new Error('Error creating mealprep review');
 }
 
+export async function searchMealPreps(filters: {
+    name?: string;
+    ingredient?: string;
+    author?: string;
+}): Promise<MealPrep[]> {
+    const query = new URLSearchParams(filters as any).toString();
+    const res = await fetch(`http://localhost:8080/api/mealpreps/search?${query}`);
+    return await res.json();
+}
+
