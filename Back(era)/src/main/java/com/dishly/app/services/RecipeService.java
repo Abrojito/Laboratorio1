@@ -170,7 +170,7 @@ public class RecipeService {
     }
 
 
-    private RecipeResponseDTO toDTO(RecipeModel m) {
+    public RecipeResponseDTO toDTO(RecipeModel m) {
         List<IngredientQuantityDTO> ingredients = Optional.ofNullable(m.getIngredients())
                 .orElse(List.of())
                 .stream()

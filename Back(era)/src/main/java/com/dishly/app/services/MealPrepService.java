@@ -135,7 +135,7 @@ public class MealPrepService {
         }
     }
 
-    private MealPrepResponseDTO toDTO(MealPrepModel m) {
+    MealPrepResponseDTO toDTO(MealPrepModel m) {
         List<RecipeSummaryDTO> recipeDTOs = m.getRecipes().stream()
                 .map(r -> new RecipeSummaryDTO(r.getId(), r.getName(), r.getImage()))
                 .toList();

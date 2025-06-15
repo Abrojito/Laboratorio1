@@ -5,6 +5,11 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Review } from "../types/Recipe.ts";
 import ShoppingListSelector from "../components/ShoppingListSelector.tsx";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import IconButton from "@mui/material/IconButton";
+import { toggleFavorite, isFavorite } from "../api/favoriteApi";
+
 
 interface IngredientWithQuantity {
     ingredientId: number;
@@ -47,10 +52,19 @@ const RecipeDetail: React.FC = () => {
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState<number | null>(0);
     const [error, setError] = useState<string | null>(null);
+    const [isFav, setIsFav] = useState(false);
 
     useEffect(() => {
         fetchRecipe();
+        checkFavorite();
     }, [id]);
+
+    const checkFavorite = async () => {
+        if (!token || !id) return;
+        const fav = await isFavorite(Number(id));
+        setIsFav(fav);
+    };
+
 
     const fetchRecipe = async () => {
         if (!id) return;
@@ -106,6 +120,13 @@ const RecipeDetail: React.FC = () => {
         setRating(0);
     };
 
+    const handleToggleFavorite = async () => {
+        if (!token || !id) return;
+        await toggleFavorite(Number(id));
+        setIsFav(prev => !prev);
+    };
+
+
 
     if (error) return <p>{error}</p>;
     if (!recipe) return <p>Cargando receta...</p>;
@@ -114,6 +135,11 @@ const RecipeDetail: React.FC = () => {
         <div style={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
             <img src={recipe.image} alt="Imagen del plato" style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{recipe.name}</h1>
+
+            <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
+                {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton>
+
 
             <ShoppingListSelector recipeIds={[recipe.id]} />
 

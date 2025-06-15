@@ -7,13 +7,17 @@ import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import ShoppingListSelector from "../components/ShoppingListSelector";
-
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import IconButton from "@mui/material/IconButton";
+import { toggleMealPrepFavorite, isMealPrepFavorite } from "../api/favoriteApi";
 
 const MealPrepDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [mealPrep, setMealPrep] = useState<MealPrep | null>(null);
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState<number | null>(0);
+    const [isFav, setIsFav] = useState(false);
 
     const token = localStorage.getItem("token");
     const username = getUsernameFromToken(token);
@@ -21,8 +25,29 @@ const MealPrepDetail: React.FC = () => {
     useEffect(() => {
         if (id) {
             fetchMealPrep(Number(id)).then(setMealPrep);
+            checkFavorite();
         }
     }, [id]);
+
+    const checkFavorite = async () => {
+        if (!token || !id) return;
+        try {
+            const fav = await isMealPrepFavorite(Number(id));
+            setIsFav(fav);
+        } catch (err) {
+            console.error("Error verificando favorito", err);
+        }
+    };
+
+    const handleToggleFavorite = async () => {
+        if (!token || !id) return;
+        try {
+            await toggleMealPrepFavorite(Number(id));
+            setIsFav(prev => !prev);
+        } catch (err) {
+            console.error("Error al cambiar favorito", err);
+        }
+    };
 
     const handleReviewSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,6 +78,11 @@ const MealPrepDetail: React.FC = () => {
         <div style={{ padding: "1rem", maxWidth: "800px", margin: "auto" }}>
             <img src={mealPrep.image} alt={mealPrep.name} style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{mealPrep.name}</h1>
+
+            <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
+                {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            </IconButton>
+
             <p>{mealPrep.description}</p>
 
             <ShoppingListSelector mealPrepId={mealPrep.id} />
@@ -70,17 +100,16 @@ const MealPrepDetail: React.FC = () => {
                             id: recipe.id,
                             name: recipe.name,
                             image: recipe.image,
-                            description: "", // opcional
-                            difficulty: "",  // opcional
-                            category: "",    // opcional
-                            author: "",      // opcional
-                            userId: 0,       // opcional
+                            description: "",
+                            difficulty: "",
+                            category: "",
+                            author: "",
+                            userId: 0,
                             creatorUsername: "",
                             steps: [],
                             ingredients: [],
                         }}
                     />
-
                 ))}
             </div>
 
@@ -128,7 +157,6 @@ const MealPrepDetail: React.FC = () => {
     );
 };
 
-// Helper para leer username del token (igual que en RecipeDetail)
 function getUsernameFromToken(token: string | null): string | null {
     if (!token) return null;
     try {
