@@ -11,6 +11,9 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import IconButton from "@mui/material/IconButton";
 import { toggleMealPrepFavorite, isMealPrepFavorite } from "../api/favoriteApi";
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
+import CollectionSelector from "../components/CollectionSelector";
+
 
 const MealPrepDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -18,6 +21,8 @@ const MealPrepDetail: React.FC = () => {
     const [comment, setComment] = useState("");
     const [rating, setRating] = useState<number | null>(0);
     const [isFav, setIsFav] = useState(false);
+    const [showCollectionMenu, setShowCollectionMenu] = useState(false);
+
 
     const token = localStorage.getItem("token");
     const username = getUsernameFromToken(token);
@@ -79,9 +84,23 @@ const MealPrepDetail: React.FC = () => {
             <img src={mealPrep.image} alt={mealPrep.name} style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{mealPrep.name}</h1>
 
-            <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
-                {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-            </IconButton>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+                <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
+                    {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                </IconButton>
+
+                <div style={{ position: "relative" }}>
+                    <IconButton onClick={() => setShowCollectionMenu(prev => !prev)}>
+                        <CollectionsBookmarkIcon color="primary" />
+                    </IconButton>
+                    {showCollectionMenu && (
+                        <div style={{ position: "absolute", top: "120%", left: 0 }}>
+                            <CollectionSelector mealPrepId={mealPrep.id} />
+                        </div>
+                    )}
+                </div>
+            </div>
+
 
             <p>{mealPrep.description}</p>
 

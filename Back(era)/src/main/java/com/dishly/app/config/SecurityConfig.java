@@ -91,6 +91,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/shopping-lists/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/shopping-lists/*/add-recipes").authenticated()
                         .requestMatchers(HttpMethod.OPTIONS, "/api/shopping-lists/**").permitAll()
+                        //collections
+                        .requestMatchers(HttpMethod.GET, "/api/collections/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/collections/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/collections/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/collections/**").authenticated()
                         //catch-all
                         .anyRequest().denyAll()
                 )

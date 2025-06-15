@@ -25,6 +25,7 @@ import ShoppingListPage from "./pages/ShoppingListPage.tsx";
 import ShoppingListDetailPage from "./pages/ShoppingListDetailPage.tsx";
 import SearchPage from './pages/SearchPage';
 import FavoritesPage from './pages/FavoritesPage';
+import CollectionsPage from "./pages/CollectionsPage.tsx";
 
 
 
@@ -59,6 +60,7 @@ const App: React.FC = () => (
             <Route path="/shopping-list/:id" element={<ShoppingListDetailPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/collections" element={<CollectionsPage />} />
         </Route>
 
         {/* -------- Rutas públicas (visibles por todos) -------- */}
