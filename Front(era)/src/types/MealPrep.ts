@@ -9,6 +9,7 @@ export interface Review {
     comment: string;
     rating: number;
     username: string;
+    userId: number;
     userPhoto: string;
     createdAt: string;
 }
@@ -20,6 +21,7 @@ export interface MealPrep {
     image: string;
     author: string;
     authorPhoto: string;
+    creatorUsername: string;
     userId: number;
     publicMealPrep: boolean;
     recipes: RecipeSummary[];

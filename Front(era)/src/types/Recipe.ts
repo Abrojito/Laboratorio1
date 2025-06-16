@@ -8,6 +8,7 @@ export interface Review {
     comment: string;
     rating: number;
     username: string;
+    userId: number;
     userPhoto: string;
     createdAt: string;
 }

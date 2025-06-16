@@ -27,6 +27,9 @@ import SearchPage from './pages/SearchPage';
 import FavoritesPage from './pages/FavoritesPage';
 import CollectionsPage from "./pages/CollectionsPage.tsx";
 import UndesiredIngredients from "./pages/UndesiredIngredients.tsx";
+import FollowingLists from "./pages/FollowingLists.tsx";
+import UserSearch from "./pages/UserSearch.tsx";
+import UserPublicProfile from "./pages/UserPublicProfile.tsx";
 
 
 
@@ -63,6 +66,9 @@ const App: React.FC = () => (
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/me/undesired-ingredients" element={<UndesiredIngredients />} />
+            <Route path="/users/:id" element={<UserPublicProfile />} />
+            <Route path="/search/users" element={<UserSearch />} />
+            <Route path="/me/following" element={<FollowingLists />} />
         </Route>
 
         {/* -------- Rutas públicas (visibles por todos) -------- */}

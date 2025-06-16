@@ -45,6 +45,18 @@ public class UserModel implements UserDetails {
     )
     private List<IngredientModel> undesiredIngredients = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private List<UserModel> followers = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "followers")
+    private List<UserModel> following = new ArrayList<>();
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

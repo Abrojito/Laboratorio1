@@ -59,6 +59,9 @@ const Home: React.FC = () => {
         <div>
             <header style={styles.header}>
                 <h1 style={styles.logo}>D<span style={{ color: '#A6B240' }}>.</span></h1>
+                <button onClick={() => navigate('/search/users')} style={styles.searchButton}>
+                    🔍
+                </button>
             </header>
 
             <main style={styles.main}>
@@ -113,6 +116,13 @@ const styles: Record<string, React.CSSProperties> = {
     },
     logo: {
         fontFamily: 'Libre Caslon Text, serif', fontSize: '2.5rem'
+    },
+    searchButton: {
+        background: 'none',
+        border: 'none',
+        fontSize: '1.5rem',
+        color: '#ffffff',
+        cursor: 'pointer'
     },
     main: {
         padding: '2rem', maxWidth: '1200px', margin: '0 auto'

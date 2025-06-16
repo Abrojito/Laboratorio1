@@ -1,17 +1,21 @@
 package com.dishly.app.services;
 
+import com.dishly.app.dto.MealPrepResponseDTO;
+import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.UserProfileDTO;
-import com.dishly.app.dto.userdto.LoginRequest;
 import com.dishly.app.dto.userdto.RegisterRequest;
 import com.dishly.app.dto.userdto.UpdateRequest;
 import com.dishly.app.dto.userdto.UserUpdateResponseDTO;
 import com.dishly.app.models.IngredientModel;
 import com.dishly.app.models.UserModel;
+import com.dishly.app.dto.UserPublicDTO;
 import com.dishly.app.repositories.IngredientRepository;
+import com.dishly.app.repositories.MealPrepRepository;
+import com.dishly.app.repositories.RecipeRepository;
 import com.dishly.app.repositories.UserRepository;
 import com.dishly.app.security.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,6 +34,18 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private IngredientRepository ingredientRepository;
+
+    @Autowired
+    private RecipeRepository recipeRepo;
+
+    @Autowired
+    private RecipeService recipeService;
+
+    @Autowired
+    private MealPrepService mealPrepService;
+
+    @Autowired
+    private MealPrepRepository mealPrepRepo;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -204,25 +220,105 @@ public class UserService implements UserDetailsService {
     }
 
 
+    public void follow(String email, Long targetId) {
+        UserModel user = getByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
+        UserModel target = getById(targetId).orElseThrow();
+        if (!target.getFollowers().contains(user)) {
+            target.getFollowers().add(user);
+            repository.save(target);
+        }
+    }
+
+    public void unfollow(String email, Long targetId) {
+        UserModel user = getByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + email));
+        UserModel target = getById(targetId).orElseThrow();
+        target.getFollowers().remove(user);
+        repository.save(target);
+    }
+
+    public List<UserProfileDTO> getFollowers(Long userId, String requesterEmail) {
+        UserModel requester = getByEmail(requesterEmail).orElseThrow();
+        return repository.findById(userId)
+                .orElseThrow()
+                .getFollowers()
+                .stream()
+                .map(u -> toProfileDTO(u, requester))
+                .toList();
+    }
+
+    public List<UserProfileDTO> getFollowing(Long userId, String requesterEmail) {
+        UserModel requester = getByEmail(requesterEmail).orElseThrow();
+        return repository.findById(userId)
+                .orElseThrow()
+                .getFollowing()
+                .stream()
+                .map(u -> toProfileDTO(u, requester))
+                .toList();
+    }
+
+
+
+    public List<UserProfileDTO> searchUsers(String term, String requesterEmail) {
+        UserModel requester = getByEmail(requesterEmail).orElseThrow();
+        return repository.findAll().stream()
+                .filter(u -> u.getUsername().toLowerCase().contains(term.toLowerCase()))
+                .map(u -> toProfileDTO(u, requester))
+                .toList();
+    }
+
+
+    @Transactional
+    public UserPublicDTO getPublicProfile(Long userId, String myEmail) {
+        UserModel target = getById(userId).orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));;
+        UserModel me = getByEmail(myEmail).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + myEmail));
+
+        boolean followedByMe = target.getFollowers().contains(me);
+
+        List<RecipeResponseDTO> publicRecipes = recipeRepo.findByUserIdAndPublicRecipeTrue(userId)
+                .stream().map(recipeService::toDTO).toList();
+
+        List<MealPrepResponseDTO> publicMealPreps = mealPrepRepo.findByUserIdAndPublicMealPrepTrue(userId)
+                .stream().map(mealPrepService::toDTO).toList();
+
+        return new UserPublicDTO(
+                target.getId(),
+                target.getUsername(),
+                target.getFullName(),
+                target.getPhoto(),
+                target.getFollowers().size(),
+                target.getFollowing().size(),
+                publicRecipes,
+                publicMealPreps,
+                followedByMe
+        );
+    }
+
+    public UserProfileDTO toProfileDTO(UserModel user, UserModel me) {
+        boolean followed = me.getFollowing().contains(user);
+        return new UserProfileDTO(user.getId(), user.getUsername(), user.getFullName(), user.getPhoto(), followed,
+                user.getFollowers().size(), user.getFollowing().size());
+    }
+
+
 
 
     // ==== Helper para mapear a DTO ====
 
     private UserProfileDTO toProfileDTO(UserModel u) {
-
-        // ► alias “inteligente”
         String alias = u.getUsername();
         if (alias == null || alias.isBlank() || alias.contains("@")) {
             alias = u.getEmail().substring(0, u.getEmail().indexOf('@'));
         }
 
         return new UserProfileDTO(
-                u.getId(),          // id
-                alias,              // username  (alias)
-                u.getEmail(),       // email
-                u.getPassword(),    // password  (HASH, no plano)
-                u.getFullName(),    // fullName
-                u.getPhoto()        // photo
+                u.getId(),
+                alias,
+                u.getFullName(),
+                u.getPhoto(),
+                false,
+                u.getFollowers().size(),
+                u.getFollowing().size()
         );
     }
+
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {Link, useParams } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -188,7 +188,13 @@ const RecipeDetail: React.FC = () => {
                 <img src={recipe.authorPhoto || "/default-avatar.png"} alt="Foto de perfil"
                      style={{ width: "48px", height: "48px", borderRadius: "50%" }} />
                 <div>
-                    <p><strong>{recipe.author}</strong></p>
+                    <p>
+                        <strong>
+                            <Link to={`/users/${recipe.userId}`} style={{ textDecoration: "none", color: "#1976d2" }}>
+                                {recipe.author}
+                            </Link>
+                        </strong>
+                    </p>
                     <p>{new Date(recipe.time).toLocaleDateString()}</p>
                 </div>
             </div>
@@ -207,7 +213,14 @@ const RecipeDetail: React.FC = () => {
                             <img src={review.userPhoto || "/default-avatar.png"} alt="Foto"
                                  style={{ width: 40, height: 40, borderRadius: "50%" }} />
                             <div>
-                                <strong>{review.username}</strong>
+                                <Link
+                                    to={`/users/${review.userId}`}
+                                    style={{ textDecoration: "none", color: "#333" }}
+                                    onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
+                                    onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                                >
+                                    <strong>{review.username}</strong>
+                                </Link>
                                 <p style={{ fontSize: "0.8rem", margin: 0, color: "#888" }}>
                                     {new Date(review.createdAt).toLocaleDateString()}
                                 </p>

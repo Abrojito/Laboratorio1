@@ -8,4 +8,5 @@ import java.util.List;
 public interface MealPrepRepository extends JpaRepository<MealPrepModel, Long> {
     List<MealPrepModel> findByUserId(Long userId);
     List<MealPrepModel> findByPublicMealPrepTrue();
+    List<MealPrepModel> findByUserIdAndPublicMealPrepTrue(Long userId);
 }

@@ -44,6 +44,7 @@ public class ReviewService {
                 r.getComment(),
                 r.getRating(),
                 r.getUser().getUsername(),
+                r.getUser().getId(),
                 r.getUser().getPhoto(),
                 r.getCreatedAt().toString()
         )).toList();

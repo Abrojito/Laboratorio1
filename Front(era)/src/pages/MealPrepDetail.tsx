@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import {Link, useParams } from "react-router-dom";
 import { fetchMealPrep, createMealPrepReview } from "../api/mealPrepApi";
 import { MealPrep } from "../types/MealPrep";
 import RecipeCard from "../components/RecipeCard";
@@ -106,6 +106,15 @@ const MealPrepDetail: React.FC = () => {
 
             <ShoppingListSelector mealPrepId={mealPrep.id} />
 
+            <p style={{ marginTop: "-8px" }}>
+                <strong>
+                    <Link to={`/users/${mealPrep.userId}`} style={{ textDecoration: "none", color: "#1976d2" }}>
+                        {mealPrep.creatorUsername}
+                    </Link>
+                </strong>
+            </p>
+
+
             <h2>Recetas</h2>
             <div style={{
                 display: "grid",
@@ -146,7 +155,15 @@ const MealPrepDetail: React.FC = () => {
                             <img src={review.userPhoto || "/default-avatar.png"} alt="Foto"
                                  style={{ width: 40, height: 40, borderRadius: "50%" }} />
                             <div>
-                                <strong>{review.username}</strong>
+                                <Link
+                                    to={`/users/${review.userId}`}
+                                    style={{ textDecoration: "none", color: "#333" }}
+                                    onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
+                                    onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
+                                >
+                                    <strong>{review.username}</strong>
+                                </Link>
+
                                 <p style={{ fontSize: "0.8rem", margin: 0, color: "#888" }}>
                                     {new Date(review.createdAt).toLocaleDateString()}
                                 </p>

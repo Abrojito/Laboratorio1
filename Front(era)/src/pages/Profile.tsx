@@ -9,6 +9,8 @@ interface UserProfile {
     username: string;
     fullName: string;
     photo: string;
+    followersCount: number;
+    followingCount: number;
 }
 
 const Profile: React.FC = () => {
@@ -51,6 +53,17 @@ const Profile: React.FC = () => {
                 <img className="profile-pic" src={profile.photo || '/default-avatar.png'} alt="Profile" />
             </div>
             <h3 className="profile-name">@{profile.username}</h3>
+            <p
+                onClick={() => navigate('/me/following')}
+                style={{
+                    color: '#555',
+                    cursor: 'pointer',
+                    fontSize: '0.95rem',
+                    marginTop: '-0.25rem'
+                }}
+            >
+                {profile.followersCount} seguidores • {profile.followingCount} seguidos
+            </p>
 
             <div className="profile-options">
                 <button onClick={() => navigate('/me/update')}>Edit Profile</button>

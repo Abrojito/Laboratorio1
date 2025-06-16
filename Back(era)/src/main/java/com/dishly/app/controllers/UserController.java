@@ -1,20 +1,19 @@
 package com.dishly.app.controllers;
 
 import com.dishly.app.dto.userdto.UserUpdateResponseDTO;
+import com.dishly.app.dto.UserPublicDTO;
 import com.dishly.app.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import com.dishly.app.dto.PhotoDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.UserProfileDTO;
-import com.dishly.app.dto.userdto.LoginRequest;
 import com.dishly.app.dto.userdto.RegisterRequest;
 import com.dishly.app.dto.userdto.UpdateRequest;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.services.RecipeService;
 import com.dishly.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,5 +105,39 @@ public class UserController {
         UserUpdateResponseDTO response = service.updateProfile(auth.getName(), dto, jwtUtil);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{id}/follow")
+    public ResponseEntity<Void> follow(@PathVariable Long id, Authentication auth) {
+        service.follow(auth.getName(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/unfollow")
+    public ResponseEntity<Void> unfollow(@PathVariable Long id, Authentication auth) {
+        service.unfollow(auth.getName(), id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/followers")
+    public List<UserProfileDTO> getFollowers(@PathVariable Long id, Authentication auth) {
+        return service.getFollowers(id, auth.getName());
+    }
+
+    @GetMapping("/{id}/following")
+    public List<UserProfileDTO> getFollowing(@PathVariable Long id, Authentication auth) {
+        return service.getFollowing(id, auth.getName());
+    }
+
+    @GetMapping("/search")
+    public List<UserProfileDTO> searchUsers(@RequestParam String term, Authentication auth) {
+        return service.searchUsers(term, auth.getName());
+    }
+
+    @GetMapping("/{id}/public")
+    public ResponseEntity<UserPublicDTO> getPublicProfile(@PathVariable Long id, Authentication auth) {
+        UserPublicDTO dto = service.getPublicProfile(id, auth.getName());
+        return ResponseEntity.ok(dto);
+    }
+
 
 }
