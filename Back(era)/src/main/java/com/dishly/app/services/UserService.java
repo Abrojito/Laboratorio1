@@ -5,7 +5,9 @@ import com.dishly.app.dto.userdto.LoginRequest;
 import com.dishly.app.dto.userdto.RegisterRequest;
 import com.dishly.app.dto.userdto.UpdateRequest;
 import com.dishly.app.dto.userdto.UserUpdateResponseDTO;
+import com.dishly.app.models.IngredientModel;
 import com.dishly.app.models.UserModel;
+import com.dishly.app.repositories.IngredientRepository;
 import com.dishly.app.repositories.UserRepository;
 import com.dishly.app.security.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,6 +27,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
+
+    @Autowired
+    private IngredientRepository ingredientRepository;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -170,6 +175,34 @@ public class UserService implements UserDetailsService {
         String token = jwtUtil.generateToken(user.getEmail(), user.getUsername());
         return new UserUpdateResponseDTO(token);
     }
+
+
+    public List<IngredientModel> getUndesiredIngredients(String username) {
+        return repository.findByUsername(username)
+                .map(UserModel::getUndesiredIngredients)
+                .orElse(List.of());
+    }
+
+    public void addUndesiredIngredient(String username, Long ingredientId) {
+        UserModel user = repository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+
+        IngredientModel ingredient = ingredientRepository.findById(ingredientId)
+                .orElseThrow(() -> new IllegalArgumentException("Ingredient not found with ID: " + ingredientId));
+
+        if (!user.getUndesiredIngredients().contains(ingredient)) {
+            user.getUndesiredIngredients().add(ingredient);
+            repository.save(user);
+        }
+    }
+
+
+    public void removeUndesiredIngredient(String username, Long ingredientId) {
+        UserModel user = repository.findByUsername(username).orElseThrow();
+        user.getUndesiredIngredients().removeIf(i -> i.getId().equals(ingredientId));
+        repository.save(user);
+    }
+
 
 
 

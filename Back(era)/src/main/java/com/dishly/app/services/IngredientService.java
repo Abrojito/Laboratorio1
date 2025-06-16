@@ -24,7 +24,7 @@ public class IngredientService {
     }
 
     public List<IngredientModel> searchByName(String term) {
-        return null;
+        return repository.findByNameContainingIgnoreCase(term);
     }
 
     public IngredientModel save(IngredientModel ingredient) {

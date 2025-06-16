@@ -96,6 +96,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/collections/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/collections/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/collections/**").authenticated()
+                        //undesired ingredients
+                        .requestMatchers(HttpMethod.GET,"/api/undesired/**").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/undesired/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT,"/api/undesired/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE,"/api/undesired/**").authenticated()
+
                         //catch-all
                         .anyRequest().denyAll()
                 )

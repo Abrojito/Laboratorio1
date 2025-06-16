@@ -58,6 +58,7 @@ const Profile: React.FC = () => {
                 <button onClick={() => navigate('/me/my-mealpreps')}>My MealPreps</button>
                 <button onClick={() => navigate('/favorites')}>Favorites</button>
                 <button onClick={() => navigate('/collections')}>Collections</button>
+                <button onClick={() => navigate('/me/undesired-ingredients')}>Undesired Ingredients</button>
             </div>
 
             <button

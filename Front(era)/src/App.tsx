@@ -26,6 +26,7 @@ import ShoppingListDetailPage from "./pages/ShoppingListDetailPage.tsx";
 import SearchPage from './pages/SearchPage';
 import FavoritesPage from './pages/FavoritesPage';
 import CollectionsPage from "./pages/CollectionsPage.tsx";
+import UndesiredIngredients from "./pages/UndesiredIngredients.tsx";
 
 
 
@@ -61,6 +62,7 @@ const App: React.FC = () => (
             <Route path="/search" element={<SearchPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/collections" element={<CollectionsPage />} />
+            <Route path="/me/undesired-ingredients" element={<UndesiredIngredients />} />
         </Route>
 
         {/* -------- Rutas públicas (visibles por todos) -------- */}
