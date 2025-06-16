@@ -177,19 +177,19 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public List<IngredientModel> getUndesiredIngredients(String username) {
-        return repository.findByUsername(username)
+    public List<IngredientModel> getUndesiredIngredients(Long username) {
+        return repository.findById(username)
                 .map(UserModel::getUndesiredIngredients)
                 .orElse(List.of());
     }
 
-    public void addUndesiredIngredient(String username, Long ingredientId) {
-        UserModel user = repository.findByUsername(username)
+    public void addUndesiredIngredient(Long username, Long ingredientId) {
+        UserModel user = repository.findById(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
-
+        System.out.println("Adding ingredient ID: " + ingredientId + " to user: " + user);
         IngredientModel ingredient = ingredientRepository.findById(ingredientId)
                 .orElseThrow(() -> new IllegalArgumentException("Ingredient not found with ID: " + ingredientId));
-
+        System.out.println("Found ingredient: " + ingredient.getName());
         if (!user.getUndesiredIngredients().contains(ingredient)) {
             user.getUndesiredIngredients().add(ingredient);
             repository.save(user);
@@ -197,8 +197,8 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public void removeUndesiredIngredient(String username, Long ingredientId) {
-        UserModel user = repository.findByUsername(username).orElseThrow();
+    public void removeUndesiredIngredient(Long username, Long ingredientId) {
+        UserModel user = repository.findById(username).orElseThrow();
         user.getUndesiredIngredients().removeIf(i -> i.getId().equals(ingredientId));
         repository.save(user);
     }

@@ -17,17 +17,22 @@ public class UndesiredIngredientController {
 
     @GetMapping
     public List<IngredientModel> getUndesired(Authentication auth) {
-        return userService.getUndesiredIngredients(auth.getName());
+        Long uid = userService.getIdByEmail(auth.getName());
+        return userService.getUndesiredIngredients(uid);
     }
 
     @PostMapping("/{ingredientId}")
     public void addUndesired(@PathVariable Long ingredientId, Authentication auth) {
-        userService.addUndesiredIngredient(auth.getName(), ingredientId);
+        Long uid = userService.getIdByEmail(auth.getName());
+        System.out.println("Adding undesired ingredient: " + ingredientId + " for user: " + auth.getName());
+        userService.addUndesiredIngredient(uid, ingredientId);
     }
 
     @DeleteMapping("/{ingredientId}")
     public void removeUndesired(@PathVariable Long ingredientId, Authentication auth) {
-        userService.removeUndesiredIngredient(auth.getName(), ingredientId);
+        Long uid = userService.getIdByEmail(auth.getName());
+
+        userService.removeUndesiredIngredient(uid, ingredientId);
     }
 
     @GetMapping("/test")
