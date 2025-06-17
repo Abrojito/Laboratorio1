@@ -46,8 +46,23 @@ const MyMealPreps: React.FC = () => {
     };
 
     return (
-        <div>
-            <BackButton />
+        <>
+        <button
+            onClick={() => navigate('/profile')}
+            style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                color: 'black',
+                position: 'absolute',
+                top: '20px',
+                left: '20px',
+                zIndex: 999,
+            }}
+        >
+            ←
+        </button>
             <div style={styles.container}>
                 <h2 style={styles.title}>Mis Meal Preps</h2>
 
@@ -96,7 +111,7 @@ const MyMealPreps: React.FC = () => {
 
                 {error && <div style={styles.error}>{error}</div>}
             </div>
-        </div>
+        </>
     );
 };
 

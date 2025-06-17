@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
 import { Recipe } from '../api/recipeApi';
 import { MealPrep } from '../types/MealPrep';
 import MealPrepCard from "../components/MealPrepCard.tsx";
+import {useNavigate} from "react-router-dom";
 
 const FavoritesPage = () => {
     const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
     const [favoriteMealPreps, setFavoriteMealPreps] = useState<MealPrep[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -28,6 +30,23 @@ const FavoritesPage = () => {
     }, []);
 
     return (
+        <>
+            <button
+                onClick={() => navigate('/profile')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
         <div style={{
             padding: "1.5rem",
             maxWidth: "1200px",
@@ -37,6 +56,7 @@ const FavoritesPage = () => {
             <h1 style={{
                 fontSize: "2rem",
                 fontWeight: 700,
+                marginTop: "2.5rem",
                 marginBottom: "1.5rem",
                 color: "#333"
             }}>
@@ -89,6 +109,7 @@ const FavoritesPage = () => {
                 </>
             )}
         </div>
+       </>
     );
 };
 

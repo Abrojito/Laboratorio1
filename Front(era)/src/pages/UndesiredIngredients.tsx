@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import IngredientSearch from "../components/IngredientSearch";
+import {useNavigate} from "react-router-dom";
 
 interface Ingredient {
     id: number;
@@ -8,6 +9,7 @@ interface Ingredient {
 
 const UndesiredIngredients: React.FC = () => {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+    const navigate = useNavigate();
 
     const token = localStorage.getItem("token") || "";
 
@@ -46,7 +48,24 @@ const UndesiredIngredients: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: "1.5rem", maxWidth: "600px", margin: "auto" }}>
+        <>
+            <button
+                onClick={() => navigate('/profile')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
+        <div style={{ padding: "1.5rem", maxWidth: "600px", margin: "auto", marginTop: "2.5rem" }}>
             <h1>Ingredientes no deseados</h1>
             <IngredientSearch onIngredientAdded={handleAdd} />
 
@@ -61,6 +80,7 @@ const UndesiredIngredients: React.FC = () => {
                 ))}
             </ul>
         </div>
+      </>
     );
 };
 

@@ -70,8 +70,25 @@ const MyRecipes: React.FC = () => {
 
 
   return (
+      <>
+        <button
+            onClick={() => navigate('/profile')}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '2rem',
+              cursor: 'pointer',
+              color: '#A6B240',
+              position: 'absolute',
+              top: '20px',
+              left: '20px',
+              zIndex: 999,
+            }}
+        >
+          ←
+        </button>
+
       <div>
-        <BackButton />
       <div style={styles.container}>
         <h2 style={styles.title}>Mis Recetas</h2>
 
@@ -125,6 +142,7 @@ const MyRecipes: React.FC = () => {
         {error && <div style={styles.error}>{error}</div>}
       </div>
       </div>
+     </>
   );
 };
 

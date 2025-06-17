@@ -11,6 +11,8 @@ import IconButton from "@mui/material/IconButton";
 import { toggleFavorite, isFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
+import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -57,6 +59,8 @@ const RecipeDetail: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isFav, setIsFav] = useState(false);
     const [showCollectionMenu, setShowCollectionMenu] = useState(false);
+    const navigate = useNavigate();
+
 
 
     useEffect(() => {
@@ -137,7 +141,24 @@ const RecipeDetail: React.FC = () => {
     if (!recipe) return <p>Cargando receta...</p>;
 
     return (
-        <div style={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
+        <>
+        <button
+            onClick={() => navigate(-1)}
+            style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                color: 'black',
+                position: 'absolute',
+                top: '20px',
+                left: '20px',
+                zIndex: 999,
+            }}
+        >
+            ←
+        </button>
+    <div style={{ padding: "16px", maxWidth: "800px", margin: "auto" }}>
             <img src={recipe.image} alt="Imagen del plato" style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{recipe.name}</h1>
 
@@ -247,6 +268,7 @@ const RecipeDetail: React.FC = () => {
                 </form>
             </div>
         </div>
+      </>
     );
 };
 

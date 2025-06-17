@@ -31,8 +31,25 @@ const ShoppingListPage: React.FC = () => {
     };
 
     return (
+        <>
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
         <div style={{ padding: "1rem", maxWidth: "800px", margin: "auto" }}>
-            <h2 style={{ fontSize: "2rem", marginBottom: "1rem" }}>🛒 Shopping Lists</h2>
+            <h2 style={{ fontSize: "2rem", marginBottom: "1rem", marginTop: "2.5rem"  }}>🛒 Shopping Lists</h2>
 
             <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
                 <button
@@ -109,6 +126,7 @@ const ShoppingListPage: React.FC = () => {
             <FloatingMenu />
             <BottomNav />
         </div>
+      </>
     );
 };
 

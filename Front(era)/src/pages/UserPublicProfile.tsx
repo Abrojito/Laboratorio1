@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import {useParams, Link, useNavigate} from "react-router-dom";
 import RecipeCard from "../components/RecipeCard";
 import MealPrepCard from "../components/MealPrepCard";
 
@@ -46,6 +46,7 @@ const UserPublicProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [user, setUser] = useState<UserPublicDTO | null>(null);
     const token = localStorage.getItem("token") || "";
+    const navigate = useNavigate();
 
     const fetchUserProfile = async () => {
         const res = await fetch(`http://localhost:8080/api/users/${id}/public`, {
@@ -84,6 +85,23 @@ const UserPublicProfile: React.FC = () => {
     if (!user) return <p>Cargando...</p>;
 
     return (
+        <>
+            <button
+                onClick={() => navigate(-1)}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: 'black',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
         <div style={{ padding: "1.5rem" }}>
             <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
                 <img src={user.photo} alt="foto" style={{ width: 100, height: 100, borderRadius: "50%" }} />
@@ -139,6 +157,7 @@ const UserPublicProfile: React.FC = () => {
                 </div>
             </section>
         </div>
+      </>
     );
 };
 

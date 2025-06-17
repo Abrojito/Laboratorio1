@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Link, useParams } from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import { fetchMealPrep, createMealPrepReview } from "../api/mealPrepApi";
 import { MealPrep } from "../types/MealPrep";
 import RecipeCard from "../components/RecipeCard";
@@ -22,6 +22,7 @@ const MealPrepDetail: React.FC = () => {
     const [rating, setRating] = useState<number | null>(0);
     const [isFav, setIsFav] = useState(false);
     const [showCollectionMenu, setShowCollectionMenu] = useState(false);
+    const navigate = useNavigate();
 
 
     const token = localStorage.getItem("token");
@@ -80,7 +81,24 @@ const MealPrepDetail: React.FC = () => {
     if (!mealPrep) return <p>Cargando meal prep...</p>;
 
     return (
-        <div style={{ padding: "1rem", maxWidth: "800px", margin: "auto" }}>
+        <>
+            <button
+                onClick={() => navigate(-1)}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: 'black',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
+        <div style={{ padding: "1rem", maxWidth: "800px", margin: "auto", marginTop: "2.5rem"}}>
             <img src={mealPrep.image} alt={mealPrep.name} style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{mealPrep.name}</h1>
 
@@ -102,11 +120,11 @@ const MealPrepDetail: React.FC = () => {
             </div>
 
 
-            <p>{mealPrep.description}</p>
+            <p style={{ marginBottom: "2rem"}} >{mealPrep.description}</p>
 
             <ShoppingListSelector mealPrepId={mealPrep.id} />
 
-            <p style={{ marginTop: "-8px" }}>
+            <p style={{ marginTop: "8px" }}>
                 <strong>
                     <Link to={`/users/${mealPrep.userId}`} style={{ textDecoration: "none", color: "#1976d2" }}>
                         {mealPrep.creatorUsername}
@@ -190,6 +208,7 @@ const MealPrepDetail: React.FC = () => {
                 </form>
             </div>
         </div>
+      </>
     );
 };
 

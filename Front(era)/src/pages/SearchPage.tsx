@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { searchMealPreps } from "../api/mealPrepApi.ts";
 import { searchRecipes } from "../api/recipeApi.ts";
@@ -10,6 +9,10 @@ import RecipeSearchCard from "../components/RecipeSearchCard";
 import BottomNav from "../components/BottomNav.tsx";
 import FloatingMenu from "../components/FloatingMenu.tsx";
 
+interface Ingredient {
+    id: number;
+    name: string;
+}
 
 const SearchPage: React.FC = () => {
     const [searchType, setSearchType] = useState<"recipes" | "mealpreps">("recipes");
@@ -20,6 +23,9 @@ const SearchPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const navigate = useNavigate();
+    const [filterUndesired, setFilterUndesired] = useState(true);
+    const [undesiredIngredients, setUndesiredIngredients] = useState<Ingredient[]>([]);
+
 
     const handleSearch = async () => {
 
@@ -29,10 +35,33 @@ const SearchPage: React.FC = () => {
 
         setLoading(true);
         setHasSearched(true);
+
+        const token = localStorage.getItem("token") || "";
+
+        if (filterUndesired){
+            const undesired = async () => {
+                try {
+                    const res = await fetch("http://localhost:8080/api/undesired", {
+                        headers: {Authorization: `Bearer ${token}`},
+                    });
+                    if (!res.ok) throw new Error("Error al cargar lista");
+                    const data = await res.json();
+                    setUndesiredIngredients(data);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            await undesired();
+        }
         try {
             if (searchType === "recipes") {
                 const data: Recipe[] = await searchRecipes({ name, ingredient, author });
-                setResults(data);
+                const bannedIds = new Set(undesiredIngredients.map(ing => ing.id));
+                const allowedRecipes = data.filter(recipe => {
+                    return recipe.ingredients.every(i=> !bannedIds.has(i.ingredientId));
+                })
+                setResults(allowedRecipes as RecipeSearchResult[]);
+
             } else {
                 const data: MealPrep[] = await searchMealPreps({ name, ingredient, author });
                 setResults(data);
@@ -50,8 +79,25 @@ const SearchPage: React.FC = () => {
     }, [searchType]);
 
     return (
+        <>
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
         <div style={{ padding: "1rem", maxWidth: "800px", margin: "auto" }}>
-            <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}>
+            <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem", marginTop: "2.5rem" }}>
                 🔍 Buscador
             </h1>
 
@@ -188,6 +234,7 @@ const SearchPage: React.FC = () => {
             <BottomNav />
 
         </div>
+       </>
     );
 };
 

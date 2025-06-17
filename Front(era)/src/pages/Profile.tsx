@@ -30,6 +30,7 @@ const Profile: React.FC = () => {
 
     if (!profile) return <div className="loading">Loading…</div>;
 
+
     return (
         <div className="profile-container">
             <button

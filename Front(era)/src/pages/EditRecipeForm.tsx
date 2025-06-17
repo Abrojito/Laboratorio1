@@ -181,7 +181,7 @@ const EditRecipeForm: React.FC = () => {
                 <button
                     type="button"
                     className="back-button"
-                    onClick={() => navigate('/home')}
+                    onClick={() => navigate('/me/myrecipes')}
                 >
                     ×
                 </button>

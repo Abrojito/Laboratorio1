@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 interface UserProfileDTO {
     id: number;
@@ -13,6 +13,7 @@ const UserSearch: React.FC = () => {
     const [term, setTerm] = useState("");
     const [results, setResults] = useState<UserProfileDTO[]>([]);
     const token = localStorage.getItem("token") || "";
+    const navigate = useNavigate();
 
     const handleSearch = async () => {
         const res = await fetch(`http://localhost:8080/api/users/search?term=${encodeURIComponent(term)}`, {
@@ -35,9 +36,26 @@ const UserSearch: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: "1.5rem" }}>
+        <>
+            <button
+                onClick={() => navigate('/home')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
+        <div style={{ padding: "1.5rem", marginTop: "2.5rem" }}>
             <h2>Buscar usuarios</h2>
-            <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+            <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem"}}>
                 <input
                     type="text"
                     placeholder="Buscar por username"
@@ -96,6 +114,7 @@ const UserSearch: React.FC = () => {
                 ))}
             </ul>
         </div>
+      </>
     );
 };
 

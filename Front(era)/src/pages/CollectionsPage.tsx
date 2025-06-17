@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchCollections } from "../api/collectionApi";
 import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
@@ -12,6 +12,7 @@ import {
     Typography,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {useNavigate} from "react-router-dom";
 
 interface Collection {
     id: number;
@@ -22,6 +23,7 @@ interface Collection {
 
 const CollectionsPage = () => {
     const [collections, setCollections] = useState<Collection[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("token") || "";
@@ -29,8 +31,25 @@ const CollectionsPage = () => {
     }, []);
 
     return (
+        <>
+            <button
+                onClick={() => navigate('/profile')}
+                style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#A6B240',
+                    position: 'absolute',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 999,
+                }}
+            >
+                ←
+            </button>
         <div style={{ padding: "2rem", maxWidth: "900px", margin: "auto" }}>
-            <h1 style={{ marginBottom: "1.5rem" }}>Tus colecciones</h1>
+            <h1 style={{ marginBottom: "1.5rem", marginTop: "2.5rem" }}>Tus colecciones</h1>
 
             {collections.length === 0 ? (
                 <p>No tenés colecciones guardadas.</p>
@@ -62,6 +81,7 @@ const CollectionsPage = () => {
                 ))
             )}
         </div>
+       </>
     );
 };
 
