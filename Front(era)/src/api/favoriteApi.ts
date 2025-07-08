@@ -1,7 +1,7 @@
 // src/api/favoriteApi.ts
 
 import { authFetch } from "./config";
-import { Recipe } from "./recipeApi";
+import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
 
 /* ================== RECETAS ================== */

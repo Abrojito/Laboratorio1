@@ -20,12 +20,14 @@ export interface MealPrep {
     description: string;
     image: string;
     author: string;
-    authorPhoto: string;
-    creatorUsername: string;
+    authorPhoto?: string;
+    creatorUsername?: string;
     userId: number;
     publicMealPrep: boolean;
     recipes: RecipeSummary[];
     reviews: Review[];
+    avgRating: number;
+    reviewCount: number;
 }
 
 export interface MealPrepRequestDTO {

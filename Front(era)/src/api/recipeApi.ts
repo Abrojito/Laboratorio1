@@ -1,18 +1,4 @@
-export interface Recipe {
-    id: number;
-    name: string;
-    description: string;
-    image: string | null;
-    category: string;
-    author: string;
-    userId: number;
-    difficulty: string;
-    creatorUsername: string;
-    steps: string[];
-    ingredients: {
-        ingredientId: number;
-        quantity: string;} [];
-}
+import { Recipe } from "../types/Recipe";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 

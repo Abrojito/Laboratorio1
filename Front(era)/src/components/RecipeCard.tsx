@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Recipe } from '../api/recipeApi';
+import { Recipe } from '../types/Recipe';
+import Rating from "@mui/material/Rating";
 
 interface Props {
     recipe: Recipe;
@@ -66,6 +67,18 @@ const RecipeCard: React.FC<Props> = ({ recipe }) => {
                 style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px' }}
             />
             <h3 style={{ marginTop: '0.5rem' }}>{recipe.name}</h3>
+            <Rating
+                name={`rating-${recipe.id}`}
+                value={recipe.avgRating ?? 0}
+                precision={0.1}
+                readOnly
+                size="small"
+                sx={{ mb: 0.5 }}
+            />
+            <small style={{ color:"#666" }}>
+                ({recipe.reviewCount})
+            </small>
+
             <p>{recipe.description}</p>
             <small>
                 {recipe.difficulty} · {recipe.category}

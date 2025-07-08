@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
-import { Recipe } from '../api/recipeApi';
+import { Recipe } from '../types/Recipe';
 import { MealPrep } from '../types/MealPrep';
 import MealPrepCard from "../components/MealPrepCard.tsx";
 import {useNavigate} from "react-router-dom";

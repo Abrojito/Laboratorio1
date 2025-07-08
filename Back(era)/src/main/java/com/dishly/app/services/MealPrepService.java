@@ -2,6 +2,7 @@ package com.dishly.app.services;
 
 import com.dishly.app.dto.*;
 import com.dishly.app.models.*;
+import com.dishly.app.projection.RatingSummary;
 import com.dishly.app.repositories.MealPrepRepository;
 import com.dishly.app.repositories.MealPrepReviewRepository;
 import com.dishly.app.repositories.RecipeRepository;
@@ -158,6 +159,10 @@ public class MealPrepService {
                 })
                 .toList();
 
+        RatingSummary summary = reviewRepo.getSummaryByMealPrepId(m.getId());
+        Double avgRating = summary.getAvgRating()  != null ? summary.getAvgRating()  : 0d;
+        Long   reviewCnt = summary.getReviewCount() != null ? summary.getReviewCount() : 0L;
+
 
         return new MealPrepResponseDTO(
                 m.getId(),
@@ -169,7 +174,9 @@ public class MealPrepService {
                 m.getUserId(),
                 m.isPublicMealPrep(),
                 recipeDTOs,
-                reviewDTOs
+                reviewDTOs,
+                avgRating,
+                reviewCnt
         );
     }
 

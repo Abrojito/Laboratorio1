@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createMealPrep } from "../api/mealPrepApi";
 import { fetchRecipes } from "../api/recipeApi";
-import { Recipe } from "../api/recipeApi";
+import { Recipe } from "../types/Recipe";
 import { MealPrepRequestDTO } from "../types/MealPrep";
 import StyledTextField from "../components/StyledTextField";
 

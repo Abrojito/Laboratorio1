@@ -13,6 +13,8 @@ public record MealPrepResponseDTO(
         Long userId,
         Boolean publicMealPrep,
         List<RecipeSummaryDTO> recipes,
-        List<MealPrepReviewDTO> reviews
+        List<MealPrepReviewDTO> reviews,
+        Double avgRating,
+        Long   reviewCount
 ) {}
 

@@ -15,5 +15,7 @@ public record RecipeResponseDTO(
         List<IngredientQuantityDTO> ingredients,
         List<String> steps,
         Boolean publicRecipe,
-        List<ReviewDTO> reviews
+        List<ReviewDTO> reviews,
+        Double avgRating,
+        Long   reviewCount
 ) {}

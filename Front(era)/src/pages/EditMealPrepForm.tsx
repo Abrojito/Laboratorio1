@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { fetchRecipes } from "../api/recipeApi";
 import { fetchMealPrep } from "../api/mealPrepApi";
 import { MealPrepRequestDTO } from "../types/MealPrep";
-import { Recipe } from "../api/recipeApi";
+import { Recipe } from "../types/Recipe";
 import StyledTextField from "../components/StyledTextField";
 
 const EditMealPrepForm: React.FC = () => {

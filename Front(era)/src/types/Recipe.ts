@@ -17,15 +17,19 @@ export interface Recipe {
     id: number;
     name: string;
     description: string;
-    image: string;
+    image: string | null;
     category: string;
     author: string;
-    authorPhoto: string;
+    authorPhoto?: string;
     userId: number;
-    time: string;
-    ingredients: IngredientWithQuantity[];
-    steps: string[];
-    reviews: Review[];
+    time?: string;
+    difficulty?: string;
+    creatorUsername?: string;
+    steps?: string[];
+    ingredients: { ingredientId: number; quantity: string }[];
+    reviews?: Review[];
+    avgRating: number;
+    reviewCount: number;
 }
 
 export interface RecipeSearchResult {

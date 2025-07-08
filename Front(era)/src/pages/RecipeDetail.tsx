@@ -3,7 +3,6 @@ import {Link, useParams } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { Review } from "../types/Recipe.ts";
 import ShoppingListSelector from "../components/ShoppingListSelector.tsx";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -12,29 +11,11 @@ import { toggleFavorite, isFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
 import { useNavigate } from "react-router-dom";
+import { Recipe } from "../types/Recipe.ts"
 
 
 
 
-interface IngredientWithQuantity {
-    ingredientId: number;
-    quantity: string;
-}
-
-interface Recipe {
-    id: number;
-    name: string;
-    description: string;
-    image: string;
-    author: string;
-    authorPhoto: string;
-    category: string;
-    userId: number;
-    time: string;
-    ingredients: IngredientWithQuantity[];
-    steps: string[];
-    reviews: Review[];
-}
 
 
 function getUsernameFromToken(token: string | null): string | null {
@@ -162,7 +143,19 @@ const RecipeDetail: React.FC = () => {
             <img src={recipe.image} alt="Imagen del plato" style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{recipe.name}</h1>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"6px", margin:"8px 0" }}>
+            <Rating
+                value={recipe.avgRating ?? 0}
+                precision={0.1}
+                readOnly
+            />
+            <span style={{ fontSize:"0.9rem", color:"#666" }}>
+                {recipe.reviewCount} {recipe.reviewCount === 1 ? "reseña" : "reseñas"}
+            </span>
+        </div>
+
+
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
                 <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
                     {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                 </IconButton>
@@ -194,7 +187,7 @@ const RecipeDetail: React.FC = () => {
 
             <h2>Pasos</h2>
             <ol style={{ paddingLeft: "1.2rem" }}>
-                {recipe.steps.map((step, idx) => (
+                { (recipe.steps ?? []).map((step, idx) => (
                     <li key={idx} style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
                         <div style={{
                             width: "24px", height: "24px", borderRadius: "50%", backgroundColor: "#ccc",
@@ -216,7 +209,7 @@ const RecipeDetail: React.FC = () => {
                             </Link>
                         </strong>
                     </p>
-                    <p>{new Date(recipe.time).toLocaleDateString()}</p>
+                    {recipe.time && <p>{new Date(recipe.time).toLocaleDateString()}</p>}
                 </div>
             </div>
 

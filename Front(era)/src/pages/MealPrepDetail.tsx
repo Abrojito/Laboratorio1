@@ -102,6 +102,18 @@ const MealPrepDetail: React.FC = () => {
             <img src={mealPrep.image} alt={mealPrep.name} style={{ width: "100%", borderRadius: "12px" }} />
             <h1>{mealPrep.name}</h1>
 
+            <div style={{ display:"flex", alignItems:"center", gap:"6px", margin:"8px 0" }}>
+                <Rating
+                    value={mealPrep.avgRating ?? 0}
+                    precision={0.1}
+                    readOnly
+                />
+                <span style={{ fontSize:"0.9rem", color:"#666" }}>
+                    {mealPrep.reviewCount} {mealPrep.reviewCount === 1 ? "reseña" : "reseñas"}
+                </span>
+            </div>
+
+
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
                 <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
                     {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
@@ -154,6 +166,8 @@ const MealPrepDetail: React.FC = () => {
                             creatorUsername: "",
                             steps: [],
                             ingredients: [],
+                            avgRating: 0,
+                            reviewCount: 0,
                         }}
                     />
                 ))}

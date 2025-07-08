@@ -5,6 +5,7 @@ import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.ReviewDTO;
 import com.dishly.app.models.*;
+import com.dishly.app.projection.RatingSummary;
 import com.dishly.app.repositories.IngredientRepository;
 import com.dishly.app.repositories.RecipeRepository;
 import com.dishly.app.repositories.ReviewRepository;
@@ -198,6 +199,10 @@ public class RecipeService {
                 ))
                 .toList();
 
+        RatingSummary summary = reviewRepo.getSummaryByRecipeId(m.getId());
+        Double avgRating  = summary.getAvgRating()  != null ? summary.getAvgRating()  : 0d;
+        Long   reviewCnt  = summary.getReviewCount() != null ? summary.getReviewCount() : 0L;
+
 
         return new RecipeResponseDTO(
                 m.getId(),
@@ -212,8 +217,9 @@ public class RecipeService {
                 ingredients,
                 m.getSteps(),
                 m.isPublicRecipe(),
-                reviewDTOs
-
+                reviewDTOs,
+                avgRating,
+                reviewCnt
         );
     }
 

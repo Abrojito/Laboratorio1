@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { MealPrep } from '../types/MealPrep';
+import Rating from "@mui/material/Rating";
 
 interface Props {
     mealPrep: MealPrep;
@@ -50,6 +51,16 @@ const MealPrepCard: React.FC<Props> = ({ mealPrep }) => {
 
             {/* Name */}
             <h3 style={{ marginTop: '0.5rem' }}>{mealPrep.name}</h3>
+
+            <Rating
+                name={`rating-mp-${mealPrep.id}`}
+                value={mealPrep.avgRating ?? 0}
+                precision={0.1}
+                readOnly
+                size="small"
+            />
+            <small style={{ color:"#666" }}>({mealPrep.reviewCount})</small>
+
 
             {/* Description */}
             <p>{mealPrep.description}</p>
