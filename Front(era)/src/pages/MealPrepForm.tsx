@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createMealPrep } from "../api/mealPrepApi";
-import { fetchRecipes } from "../api/recipeApi";
+import {fetchRecipesPage} from "../api/recipeApi";
 import { Recipe } from "../types/Recipe";
 import { MealPrepRequestDTO } from "../types/MealPrep";
 import StyledTextField from "../components/StyledTextField";
@@ -18,7 +18,9 @@ const MealPrepForm: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        fetchRecipes().then(setRecipes);
+        fetchRecipesPage(0, 200)           // trae hasta 200 recetas públicas
+            .then(page => setRecipes(page.content))
+            .catch(() => console.error("No se pudieron cargar las recetas"));
     }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {

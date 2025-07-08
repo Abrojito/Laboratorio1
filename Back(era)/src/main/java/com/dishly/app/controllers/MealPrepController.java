@@ -5,6 +5,8 @@ import com.dishly.app.dto.MealPrepResponseDTO;
 import com.dishly.app.services.MealPrepService;
 import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +26,14 @@ public class MealPrepController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public List<MealPrepResponseDTO> getAllPublic() {
-        return mealPrepService.getPublic();
+//    @GetMapping
+//    public List<MealPrepResponseDTO> getAllPublic() {
+//        return mealPrepService.getPublic();
+//    }
+
+    @GetMapping           // /api/mealpreps?page=&size=
+    public Page<MealPrepResponseDTO> getAllPublic(Pageable pageable) {
+        return mealPrepService.getPublic(pageable);
     }
 
     @GetMapping("{id}")

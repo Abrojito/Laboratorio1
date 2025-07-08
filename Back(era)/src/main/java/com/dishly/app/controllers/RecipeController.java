@@ -5,6 +5,8 @@ import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.services.RecipeService;
 import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;   // <-- importa esto
@@ -29,9 +31,14 @@ public class RecipeController {
 
     /* ---------- GETs ---------- */
 
-    @GetMapping            //  /api/recipes
-    public List<RecipeResponseDTO> getAllPublic() {
-        return recipeService.getPublic();      // nuevo wrapper
+//    @GetMapping            //  /api/recipes
+//    public List<RecipeResponseDTO> getAllPublic() {
+//        return recipeService.getPublic();      // nuevo wrapper
+//    }
+
+    @GetMapping           // /api/recipes?page=&size=
+    public Page<RecipeResponseDTO> getAllPublic(Pageable pageable) {
+        return recipeService.getPublic(pageable);
     }
 
     @GetMapping("{id}")

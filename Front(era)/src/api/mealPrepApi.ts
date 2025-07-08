@@ -1,6 +1,7 @@
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
 import { MealPrep, MealPrepRequestDTO } from "../types/MealPrep";
+import { Page } from "../types/Page";
 
 export async function fetchMealPreps(): Promise<MealPrep[]> {
     const res = await fetch(`${BASE_URL}/api/mealpreps`);
@@ -11,6 +12,12 @@ export async function fetchMealPreps(): Promise<MealPrep[]> {
 export async function fetchMealPrep(id: number): Promise<MealPrep> {
     const res = await fetch(`${BASE_URL}/api/mealpreps/${id}`);
     if (!res.ok) throw new Error('Error fetching mealprep');
+    return res.json();
+}
+
+export async function fetchMealPrepsPage(page = 0, size = 3): Promise<Page<MealPrep>> {
+    const res = await fetch(`${BASE_URL}/api/mealpreps?page=${page}&size=${size}`);
+    if (!res.ok) throw new Error("Error fetch meal preps");
     return res.json();
 }
 
