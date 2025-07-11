@@ -30,6 +30,7 @@ export interface Recipe {
     reviews?: Review[];
     avgRating: number;
     reviewCount: number;
+    publicRecipe: boolean;
 }
 
 export interface RecipeSearchResult {

@@ -63,6 +63,11 @@ public class MealPrepService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Page<MealPrepResponseDTO> getMealPrepsByUser(Long userId, Pageable pageable) {
+        return mealPrepRepo.findByUserId(userId, pageable).map(this::toDTO);
+    }
+
 
     @Transactional
     public MealPrepResponseDTO create(MealPrepRequestDTO dto, String email) {

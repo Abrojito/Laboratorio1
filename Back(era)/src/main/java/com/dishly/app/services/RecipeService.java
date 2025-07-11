@@ -232,6 +232,12 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
+    public Page<RecipeResponseDTO> getAllByUser(Long userId, Pageable pageable) {
+        return recipeRepo.findByUserId(userId, pageable)
+                .map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
     public List<RecipeResponseDTO> getPublic() {
         return recipeRepo.findByPublicRecipeTrue()
                 .stream().map(this::toDTO).toList();

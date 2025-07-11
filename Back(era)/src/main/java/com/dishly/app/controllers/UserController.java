@@ -4,6 +4,8 @@ import com.dishly.app.dto.userdto.UserUpdateResponseDTO;
 import com.dishly.app.dto.UserPublicDTO;
 import com.dishly.app.security.JwtUtil;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import com.dishly.app.dto.PhotoDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
@@ -90,12 +92,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // 4) Listar solo mis recetas
-    @GetMapping("/me/recipes")
-    public ResponseEntity<List<RecipeResponseDTO>> getMyRecipes(Authentication auth) {
+    @GetMapping("/me/recipes")      //  /api/users/me/recipes?page=&size=
+    public Page<RecipeResponseDTO> getMyRecipes(Authentication auth,
+                                                Pageable pageable) {
         Long userId = service.getIdByEmail(auth.getName());
-        List<RecipeResponseDTO> mine = recipeService.getAllByUser(userId);
-        return ResponseEntity.ok(mine);
+        return recipeService.getAllByUser(userId, pageable);
     }
 
     @PutMapping("/me/update")

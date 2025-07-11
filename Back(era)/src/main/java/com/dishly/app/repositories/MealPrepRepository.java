@@ -12,4 +12,5 @@ public interface MealPrepRepository extends JpaRepository<MealPrepModel, Long> {
     List<MealPrepModel> findByPublicMealPrepTrue();
     List<MealPrepModel> findByUserIdAndPublicMealPrepTrue(Long userId);
     Page<MealPrepModel> findByPublicMealPrepTrue(Pageable pageable);
+    Page<MealPrepModel> findByUserId(Long userId, Pageable pageable);
 }

@@ -22,6 +22,20 @@ export async function fetchRecipesPage(page = 0, size = 3): Promise<Page<Recipe>
     return res.json();
 }
 
+export async function fetchMyRecipesPage(
+    page = 0,
+    size = 6,
+    token: string
+): Promise<Page<Recipe>> {
+    const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+    const res = await fetch(
+        `${BASE_URL}/api/users/me/recipes?page=${page}&size=${size}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("Error fetch my recipes");
+    return res.json();
+}
+
 export async function searchRecipes(filters: {
     name?: string;
     ingredient?: string;

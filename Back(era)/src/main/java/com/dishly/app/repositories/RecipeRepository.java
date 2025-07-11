@@ -20,6 +20,8 @@ public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     // Búsqueda por usuario/autor
     List<RecipeModel> findByUserId(Long userId);
 
+    Page<RecipeModel> findByUserId(Long userId, Pageable pageable);
+
     boolean existsByName(String name);
 
     List<RecipeModel> findByPublicRecipeTrue();

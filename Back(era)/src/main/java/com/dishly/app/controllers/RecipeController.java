@@ -31,10 +31,6 @@ public class RecipeController {
 
     /* ---------- GETs ---------- */
 
-//    @GetMapping            //  /api/recipes
-//    public List<RecipeResponseDTO> getAllPublic() {
-//        return recipeService.getPublic();      // nuevo wrapper
-//    }
 
     @GetMapping           // /api/recipes?page=&size=
     public Page<RecipeResponseDTO> getAllPublic(Pageable pageable) {

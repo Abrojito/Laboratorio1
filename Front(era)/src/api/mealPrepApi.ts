@@ -80,3 +80,19 @@ export async function searchMealPreps(filters: {
     return await res.json();
 }
 
+export async function fetchMyMealPrepsPage(
+    page = 0,
+    size = 6,
+    token: string
+): Promise<Page<MealPrep>> {
+    const BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+    const res = await fetch(
+        `${BASE_URL}/api/users/me/mealpreps?page=${page}&size=${size}`,
+        {
+            headers: { Authorization: `Bearer ${token}` },
+        }
+    );
+    if (!res.ok) throw new Error("Error fetch my meal preps");
+    return res.json();
+}
+

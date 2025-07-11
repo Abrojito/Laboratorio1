@@ -3,6 +3,8 @@ package com.dishly.app.controllers;
 import com.dishly.app.dto.MealPrepResponseDTO;
 import com.dishly.app.services.MealPrepService;
 import com.dishly.app.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,9 +25,9 @@ public class UserMealPrepController {
     }
 
     @GetMapping("/mealpreps")
-    public List<MealPrepResponseDTO> getMealPrepsForUser(Authentication auth) {
+    public Page<MealPrepResponseDTO> getMealPrepsForUser(Authentication auth, Pageable pageable) {
         Long uid = userService.getIdByEmail(auth.getName());
-        return mealPrepService.getMealPrepsByUser(uid);
+        return mealPrepService.getMealPrepsByUser(uid, pageable);
     }
 }
 
