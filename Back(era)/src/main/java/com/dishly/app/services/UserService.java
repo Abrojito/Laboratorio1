@@ -15,6 +15,9 @@ import com.dishly.app.repositories.RecipeRepository;
 import com.dishly.app.repositories.UserRepository;
 import com.dishly.app.security.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -193,10 +196,18 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public List<IngredientModel> getUndesiredIngredients(Long username) {
-        return repository.findById(username)
+    @Transactional(readOnly = true)
+    public Page<IngredientModel> getUndesiredIngredients(Long userId, Pageable pageable) {
+        List<IngredientModel> all = repository.findById(userId)
                 .map(UserModel::getUndesiredIngredients)
                 .orElse(List.of());
+
+        int start = (int) pageable.getOffset();
+        int end   = Math.min(start + pageable.getPageSize(), all.size());
+
+        List<IngredientModel> sub = (start >= all.size()) ? List.of() : all.subList(start, end);
+
+        return new PageImpl<>(sub, pageable, all.size());
     }
 
     public void addUndesiredIngredient(Long username, Long ingredientId) {

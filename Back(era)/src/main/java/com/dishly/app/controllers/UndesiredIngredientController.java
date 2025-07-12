@@ -3,6 +3,8 @@ package com.dishly.app.controllers;
 import com.dishly.app.models.IngredientModel;
 import com.dishly.app.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,10 @@ public class UndesiredIngredientController {
     private final UserService userService;
 
     @GetMapping
-    public List<IngredientModel> getUndesired(Authentication auth) {
+    public Page<IngredientModel> getUndesired(Authentication auth,
+                                              Pageable pageable) {
         Long uid = userService.getIdByEmail(auth.getName());
-        return userService.getUndesiredIngredients(uid);
+        return userService.getUndesiredIngredients(uid, pageable);
     }
 
     @PostMapping("/{ingredientId}")
