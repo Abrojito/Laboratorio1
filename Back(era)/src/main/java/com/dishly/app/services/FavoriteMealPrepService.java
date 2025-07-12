@@ -9,6 +9,8 @@ import com.dishly.app.repositories.MealPrepRepository;
 import com.dishly.app.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,5 +56,12 @@ public class FavoriteMealPrepService {
         MealPrepModel mp = mealPrepRepo.findById(mealPrepId)
                 .orElseThrow(() -> new RuntimeException("MealPrep no encontrado"));
         return favoriteRepo.existsByUserAndMealPrep(user, mp);
+    }
+
+
+    @Transactional
+    public Page<MealPrepResponseDTO> getFavMealPreps(Long userId, Pageable pageable) {
+        return favoriteRepo.findByUserId(userId, pageable)
+                .map(fmp -> mealPrepService.toDTO(fmp.getMealPrep()));
     }
 }

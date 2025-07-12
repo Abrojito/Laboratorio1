@@ -3,6 +3,7 @@
 import { authFetch } from "./config";
 import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
+import { Page } from "../types/Page";
 
 /* ================== RECETAS ================== */
 
@@ -45,3 +46,31 @@ export const getMealPrepFavorites = async (): Promise<MealPrep[]> => {
     if (!res.ok) throw new Error("Error cargando meal preps favoritos");
     return await res.json();
 };
+
+
+export async function fetchFavRecipesPage(
+    page = 0,
+    size = 6,
+    token: string
+): Promise<Page<Recipe>> {
+    const res = await authFetch(
+        `/favorites/recipes?page=${page}&size=${size}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("fetch fav recipes");
+    return res.json();
+}
+
+/* meal-preps favoritas paginadas */
+export async function fetchFavMealPrepsPage(
+    page = 0,
+    size = 6,
+    token: string
+): Promise<Page<MealPrep>> {
+    const res = await authFetch(
+        `/favorites/mealpreps?page=${page}&size=${size}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("fetch fav mealpreps");
+    return res.json();
+}

@@ -3,7 +3,11 @@ package com.dishly.app.controllers;
 import com.dishly.app.dto.MealPrepResponseDTO;
 import com.dishly.app.security.JwtUtil;
 import com.dishly.app.services.FavoriteMealPrepService;
+import com.dishly.app.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +19,7 @@ public class FavoriteMealPrepController {
 
     private final FavoriteMealPrepService favoriteService;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     @PostMapping("/{mealPrepId}")
     public void toggleFavorite(@PathVariable Long mealPrepId,
@@ -23,10 +28,11 @@ public class FavoriteMealPrepController {
         favoriteService.toggleFavorite(email, mealPrepId);
     }
 
-    @GetMapping
-    public List<MealPrepResponseDTO> getFavorites(@RequestHeader("Authorization") String token) {
-        String email = jwtUtil.getEmailFromHeader(token);
-        return favoriteService.getFavorites(email);
+    @GetMapping            //  /api/favorites/mealpreps?page=0&size=6
+    public Page<MealPrepResponseDTO> getMyFavMealPreps(Authentication auth,
+                                                       Pageable pageable) {
+        Long uid = userService.getIdByEmail(auth.getName());
+        return favoriteService.getFavMealPreps(uid, pageable);
     }
 
     @GetMapping("/{mealPrepId}/check")

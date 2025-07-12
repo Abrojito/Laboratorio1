@@ -3,6 +3,8 @@ package com.dishly.app.repositories;
 import com.dishly.app.models.FavoriteMealPrepModel;
 import com.dishly.app.models.MealPrepModel;
 import com.dishly.app.models.UserModel;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,5 +15,6 @@ public interface FavoriteMealPrepRepository extends JpaRepository<FavoriteMealPr
     boolean existsByUserAndMealPrep(UserModel user, MealPrepModel mealPrep);
     void deleteByUserAndMealPrep(UserModel user, MealPrepModel mealPrep);
     List<FavoriteMealPrepModel> findByUser(UserModel user);
+    Page<FavoriteMealPrepModel> findByUserId(Long userId, Pageable pageable);
 }
 

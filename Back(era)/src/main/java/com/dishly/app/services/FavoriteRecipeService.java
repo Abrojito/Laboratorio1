@@ -9,6 +9,8 @@ import com.dishly.app.repositories.RecipeRepository;
 import com.dishly.app.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +57,12 @@ public class FavoriteRecipeService {
         RecipeModel recipe = recipeRepo.findById(recipeId)
                 .orElseThrow(() -> new RuntimeException("Receta no encontrada"));
         return favoriteRepo.existsByUserAndRecipe(user, recipe);
+    }
+
+    @Transactional
+    public Page<RecipeResponseDTO> getFavRecipes(Long userId, Pageable pageable) {
+        return favoriteRepo.findByUserId(userId, pageable)
+                .map(fr -> recipeService.toDTO(fr.getRecipe()));
     }
 }
 
