@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {useParams, Link, useNavigate} from "react-router-dom";
 import RecipeCard from "../components/RecipeCard";
 import MealPrepCard from "../components/MealPrepCard";
+import { useCursorPagination } from "../hooks/useCursorPagination";
 
 interface Recipe {
     id: number;
@@ -37,8 +38,6 @@ interface UserPublicDTO {
     photo: string;
     followersCount: number;
     followingCount: number;
-    publicRecipes: Recipe[];
-    publicMealPreps: MealPrep[];
     followedByMe: boolean;
 }
 
@@ -47,6 +46,43 @@ const UserPublicProfile: React.FC = () => {
     const [user, setUser] = useState<UserPublicDTO | null>(null);
     const token = localStorage.getItem("token") || "";
     const navigate = useNavigate();
+    const hasInitializedCursorLists = useRef(false);
+
+    const {
+        items: publicRecipes,
+        loadMore: loadMoreRecipes,
+        isLoading: recipesLoading,
+        hasNext: hasMoreRecipes,
+        error: recipesError,
+        reset: resetRecipes,
+    } = useCursorPagination<Recipe>(async (cursor) => {
+        if (!id) return { items: [], nextCursor: null, hasNext: false };
+        const params = new URLSearchParams({ limit: "6" });
+        if (cursor !== null) params.set("cursor", cursor);
+        const res = await fetch(`http://localhost:8080/api/users/${id}/public/recipes/cursor?${params.toString()}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Error cargando recetas públicas");
+        return res.json();
+    });
+
+    const {
+        items: publicMealPreps,
+        loadMore: loadMoreMealPreps,
+        isLoading: mealPrepsLoading,
+        hasNext: hasMoreMealPreps,
+        error: mealPrepsError,
+        reset: resetMealPreps,
+    } = useCursorPagination<MealPrep>(async (cursor) => {
+        if (!id) return { items: [], nextCursor: null, hasNext: false };
+        const params = new URLSearchParams({ limit: "6" });
+        if (cursor !== null) params.set("cursor", cursor);
+        const res = await fetch(`http://localhost:8080/api/users/${id}/public/mealpreps/cursor?${params.toString()}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Error cargando meal preps públicos");
+        return res.json();
+    });
 
     const fetchUserProfile = async () => {
         const res = await fetch(`http://localhost:8080/api/users/${id}/public`, {
@@ -59,6 +95,16 @@ const UserPublicProfile: React.FC = () => {
     useEffect(() => {
         if (token && id) fetchUserProfile();
     }, [id, token]);
+
+    useEffect(() => {
+        if (!id) return;
+        if (!hasInitializedCursorLists.current) {
+            hasInitializedCursorLists.current = true;
+            return;
+        }
+        resetRecipes();
+        resetMealPreps();
+    }, [id, resetRecipes, resetMealPreps]);
 
     const toggleFollow = async () => {
         if (!user) return;
@@ -131,30 +177,66 @@ const UserPublicProfile: React.FC = () => {
 
             <section style={{ marginTop: "2rem" }}>
                 <h3>Recetas públicas</h3>
+                {recipesError && <p>{recipesError}</p>}
                 <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
                     gap: "1.5rem",
                     paddingTop: "1rem"
                 }}>
-                    {user.publicRecipes.map(recipe => (
+                    {publicRecipes.map(recipe => (
                         <RecipeCard key={recipe.id} recipe={recipe} />
                     ))}
                 </div>
+                {hasMoreRecipes && (
+                    <button
+                        onClick={loadMoreRecipes}
+                        disabled={recipesLoading}
+                        style={{
+                            marginTop: "1rem",
+                            padding: "0.6rem 1rem",
+                            border: "none",
+                            borderRadius: "8px",
+                            backgroundColor: "#A6B240",
+                            color: "white",
+                            cursor: "pointer"
+                        }}
+                    >
+                        {recipesLoading ? "Cargando..." : "Cargar más"}
+                    </button>
+                )}
             </section>
 
             <section style={{ marginTop: "2rem" }}>
                 <h3>Meal preps públicos</h3>
+                {mealPrepsError && <p>{mealPrepsError}</p>}
                 <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
                     gap: "1.5rem",
                     paddingTop: "1rem"
                 }}>
-                    {user.publicMealPreps.map(mp => (
+                    {publicMealPreps.map(mp => (
                         <MealPrepCard key={mp.id} mealPrep={mp} />
                     ))}
                 </div>
+                {hasMoreMealPreps && (
+                    <button
+                        onClick={loadMoreMealPreps}
+                        disabled={mealPrepsLoading}
+                        style={{
+                            marginTop: "1rem",
+                            padding: "0.6rem 1rem",
+                            border: "none",
+                            borderRadius: "8px",
+                            backgroundColor: "#A6B240",
+                            color: "white",
+                            cursor: "pointer"
+                        }}
+                    >
+                        {mealPrepsLoading ? "Cargando..." : "Cargar más"}
+                    </button>
+                )}
             </section>
         </div>
       </>

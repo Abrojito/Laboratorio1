@@ -1,7 +1,7 @@
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
 import { MealPrep, MealPrepRequestDTO } from "../types/MealPrep";
-import { Page } from "../types/Page";
+import { Page, PagedResponse } from "../types/Page";
 
 export async function fetchMealPreps(): Promise<MealPrep[]> {
     const res = await fetch(`${BASE_URL}/api/mealpreps`);
@@ -18,6 +18,18 @@ export async function fetchMealPrep(id: number): Promise<MealPrep> {
 export async function fetchMealPrepsPage(page = 0, size = 3): Promise<Page<MealPrep>> {
     const res = await fetch(`${BASE_URL}/api/mealpreps?page=${page}&size=${size}`);
     if (!res.ok) throw new Error("Error fetch meal preps");
+    return res.json();
+}
+
+export async function fetchMealPrepsCursorPage(
+    cursor: string | null,
+    limit = 3
+): Promise<PagedResponse<MealPrep>> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) params.set("cursor", cursor);
+
+    const res = await fetch(`${BASE_URL}/api/mealpreps/cursor?${params.toString()}`);
+    if (!res.ok) throw new Error("Error fetch meal preps cursor");
     return res.json();
 }
 
@@ -80,6 +92,23 @@ export async function searchMealPreps(filters: {
     return await res.json();
 }
 
+export async function searchMealPrepsCursor(
+    filters: { name?: string; ingredient?: string; author?: string },
+    cursor: string | null,
+    limit = 6
+): Promise<PagedResponse<MealPrep>> {
+    const params = new URLSearchParams();
+    if (filters.name) params.set("name", filters.name);
+    if (filters.ingredient) params.set("ingredient", filters.ingredient);
+    if (filters.author) params.set("author", filters.author);
+    params.set("limit", String(limit));
+    if (cursor !== null) params.set("cursor", cursor);
+
+    const res = await fetch(`${BASE_URL}/api/mealpreps/search/cursor?${params.toString()}`);
+    if (!res.ok) throw new Error("Error search meal preps cursor");
+    return res.json();
+}
+
 export async function fetchMyMealPrepsPage(
     page = 0,
     size = 6,
@@ -95,4 +124,3 @@ export async function fetchMyMealPrepsPage(
     if (!res.ok) throw new Error("Error fetch my meal preps");
     return res.json();
 }
-

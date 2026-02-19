@@ -16,6 +16,6 @@ public record RecipeResponseDTO(
         List<String> steps,
         Boolean publicRecipe,
         List<ReviewDTO> reviews,
-        Double avgRating,
-        Long   reviewCount
+        Double averageRating,
+        int    ratingCount
 ) {}

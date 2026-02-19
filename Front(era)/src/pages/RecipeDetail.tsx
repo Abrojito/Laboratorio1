@@ -7,7 +7,7 @@ import ShoppingListSelector from "../components/ShoppingListSelector.tsx";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import IconButton from "@mui/material/IconButton";
-import { toggleFavorite, isFavorite } from "../api/favoriteApi";
+import { toggleFavorite, isFavorite, removeFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
 import { useNavigate } from "react-router-dom";
@@ -112,8 +112,18 @@ const RecipeDetail: React.FC = () => {
 
     const handleToggleFavorite = async () => {
         if (!token || !id) return;
-        await toggleFavorite(Number(id));
-        setIsFav(prev => !prev);
+        try {
+            if (isFav) {
+                await removeFavorite(Number(id));
+                setIsFav(false);
+                return;
+            }
+
+            await toggleFavorite(Number(id));
+            setIsFav(true);
+        } catch (err) {
+            console.error("Error al cambiar favorito", err);
+        }
     };
 
 
@@ -144,13 +154,8 @@ const RecipeDetail: React.FC = () => {
             <h1>{recipe.name}</h1>
 
         <div style={{ display:"flex", alignItems:"center", gap:"6px", margin:"8px 0" }}>
-            <Rating
-                value={recipe.avgRating ?? 0}
-                precision={0.1}
-                readOnly
-            />
             <span style={{ fontSize:"0.9rem", color:"#666" }}>
-                {recipe.reviewCount} {recipe.reviewCount === 1 ? "reseña" : "reseñas"}
+                ⭐ {(recipe.averageRating ?? 0).toFixed(1)} ({recipe.ratingCount ?? 0})
             </span>
         </div>
 

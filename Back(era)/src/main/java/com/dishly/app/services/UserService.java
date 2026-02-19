@@ -1,6 +1,7 @@
 package com.dishly.app.services;
 
 import com.dishly.app.dto.MealPrepResponseDTO;
+import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.UserProfileDTO;
 import com.dishly.app.dto.userdto.RegisterRequest;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Comparator;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -277,6 +279,154 @@ public class UserService implements UserDetailsService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> getPublicRecipesByUsernameCursor(String username, String cursor, int limit) {
+        UserModel target = repository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
+
+        List<com.dishly.app.models.RecipeModel> models;
+        if (cursor == null || cursor.isBlank()) {
+            models = recipeRepo.findByUserIdAndPublicRecipeTrueOrderByIdDesc(target.getId(), pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            models = recipeRepo.findByUserIdAndPublicRecipeTrueAndIdLessThanOrderByIdDesc(target.getId(), cursorId, pageable);
+        }
+
+        boolean hasNext = models.size() > safeLimit;
+        List<com.dishly.app.models.RecipeModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
+
+        List<RecipeResponseDTO> items = pageModels.stream().map(recipeService::toDTO).toList();
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUsernameCursor(String username, String cursor, int limit) {
+        UserModel target = repository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
+
+        List<com.dishly.app.models.MealPrepModel> models;
+        if (cursor == null || cursor.isBlank()) {
+            models = mealPrepRepo.findByUserIdAndPublicMealPrepTrueOrderByIdDesc(target.getId(), pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            models = mealPrepRepo.findByUserIdAndPublicMealPrepTrueAndIdLessThanOrderByIdDesc(target.getId(), cursorId, pageable);
+        }
+
+        boolean hasNext = models.size() > safeLimit;
+        List<com.dishly.app.models.MealPrepModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
+
+        List<MealPrepResponseDTO> items = pageModels.stream().map(mealPrepService::toDTO).toList();
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> getPublicRecipesByUserIdCursor(Long userId, String cursor, int limit) {
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
+
+        List<com.dishly.app.models.RecipeModel> models;
+        if (cursor == null || cursor.isBlank()) {
+            models = recipeRepo.findByUserIdAndPublicRecipeTrueOrderByIdDesc(userId, pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            models = recipeRepo.findByUserIdAndPublicRecipeTrueAndIdLessThanOrderByIdDesc(userId, cursorId, pageable);
+        }
+
+        boolean hasNext = models.size() > safeLimit;
+        List<com.dishly.app.models.RecipeModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
+
+        List<RecipeResponseDTO> items = pageModels.stream().map(recipeService::toDTO).toList();
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUserIdCursor(Long userId, String cursor, int limit) {
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
+
+        List<com.dishly.app.models.MealPrepModel> models;
+        if (cursor == null || cursor.isBlank()) {
+            models = mealPrepRepo.findByUserIdAndPublicMealPrepTrueOrderByIdDesc(userId, pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            models = mealPrepRepo.findByUserIdAndPublicMealPrepTrueAndIdLessThanOrderByIdDesc(userId, cursorId, pageable);
+        }
+
+        boolean hasNext = models.size() > safeLimit;
+        List<com.dishly.app.models.MealPrepModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
+
+        List<MealPrepResponseDTO> items = pageModels.stream().map(mealPrepService::toDTO).toList();
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<UserProfileDTO> getMyFollowersByCursor(String myEmail, String cursor, int limit) {
+        UserModel me = getByEmail(myEmail).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + myEmail));
+        Long cursorId = (cursor == null || cursor.isBlank()) ? null : Long.parseLong(cursor);
+        int safeLimit = limit > 0 ? limit : 10;
+
+        List<UserModel> filtered = me.getFollowers().stream()
+                .filter(u -> cursorId == null || u.getId() < cursorId)
+                .sorted(Comparator.comparing(UserModel::getId).reversed())
+                .limit((long) safeLimit + 1)
+                .toList();
+
+        boolean hasNext = filtered.size() > safeLimit;
+        List<UserModel> pageModels = hasNext ? filtered.subList(0, safeLimit) : filtered;
+        List<UserProfileDTO> items = pageModels.stream().map(u -> toProfileDTO(u, me)).toList();
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<UserProfileDTO> getMyFollowingByCursor(String myEmail, String cursor, int limit) {
+        UserModel me = getByEmail(myEmail).orElseThrow(() -> new EntityNotFoundException("User not found with email: " + myEmail));
+        Long cursorId = (cursor == null || cursor.isBlank()) ? null : Long.parseLong(cursor);
+        int safeLimit = limit > 0 ? limit : 10;
+
+        List<UserModel> filtered = me.getFollowing().stream()
+                .filter(u -> cursorId == null || u.getId() < cursorId)
+                .sorted(Comparator.comparing(UserModel::getId).reversed())
+                .limit((long) safeLimit + 1)
+                .toList();
+
+        boolean hasNext = filtered.size() > safeLimit;
+        List<UserModel> pageModels = hasNext ? filtered.subList(0, safeLimit) : filtered;
+        List<UserProfileDTO> items = pageModels.stream().map(u -> toProfileDTO(u, me)).toList();
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
 
     @Transactional
     public UserPublicDTO getPublicProfile(Long userId, String myEmail) {
@@ -285,11 +435,9 @@ public class UserService implements UserDetailsService {
 
         boolean followedByMe = target.getFollowers().contains(me);
 
-        List<RecipeResponseDTO> publicRecipes = recipeRepo.findByUserIdAndPublicRecipeTrue(userId)
-                .stream().map(recipeService::toDTO).toList();
+        List<RecipeResponseDTO> publicRecipes = List.of();
 
-        List<MealPrepResponseDTO> publicMealPreps = mealPrepRepo.findByUserIdAndPublicMealPrepTrue(userId)
-                .stream().map(mealPrepService::toDTO).toList();
+        List<MealPrepResponseDTO> publicMealPreps = List.of();
 
         return new UserPublicDTO(
                 target.getId(),

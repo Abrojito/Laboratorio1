@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { searchMealPreps } from "../api/mealPrepApi.ts";
-import { searchRecipes } from "../api/recipeApi.ts";
+import { searchMealPrepsCursor } from "../api/mealPrepApi.ts";
+import { searchRecipesCursor } from "../api/recipeApi.ts";
 import { useNavigate } from "react-router-dom";
-import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
 import { RecipeSearchResult } from "../types/Recipe";
 import RecipeSearchCard from "../components/RecipeSearchCard";
 import BottomNav from "../components/BottomNav.tsx";
 import FloatingMenu from "../components/FloatingMenu.tsx";
+import { useCursorPagination } from "../hooks/useCursorPagination.ts";
 
 interface Ingredient {
     id: number;
@@ -19,13 +19,70 @@ const SearchPage: React.FC = () => {
     const [name, setName] = useState("");
     const [ingredient, setIngredient] = useState("");
     const [author, setAuthor] = useState("");
-    const [results, setResults] = useState<(RecipeSearchResult | MealPrep)[]>([]);
-    const [loading, setLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const navigate = useNavigate();
-    const [filterUndesired, setFilterUndesired] = useState(true);
-    const [undesiredIngredients, setUndesiredIngredients] = useState<Ingredient[]>([]);
+    const filterUndesired = true;
+    const [activeSearch, setActiveSearch] = useState<{
+        enabled: boolean;
+        type: "recipes" | "mealpreps";
+        name: string;
+        ingredient: string;
+        author: string;
+        bannedIds: number[];
+    }>({
+        enabled: false,
+        type: "recipes",
+        name: "",
+        ingredient: "",
+        author: "",
+        bannedIds: [],
+    });
 
+    const {
+        items: recipeResults,
+        loadMore: loadMoreRecipes,
+        isLoading: recipesLoading,
+        hasNext: hasMoreRecipes,
+        error: recipesError,
+        reset: resetRecipes,
+    } = useCursorPagination<RecipeSearchResult>(async (cursor) => {
+        if (!activeSearch.enabled || activeSearch.type !== "recipes") {
+            return { items: [], nextCursor: null, hasNext: false };
+        }
+
+        const page = await searchRecipesCursor(
+            { name: activeSearch.name, ingredient: activeSearch.ingredient, author: activeSearch.author },
+            cursor,
+            6
+        );
+        const filtered = page.items.filter(recipe =>
+            recipe.ingredients.every(i => !activeSearch.bannedIds.includes(i.ingredientId))
+        );
+
+        return {
+            ...page,
+            items: filtered as RecipeSearchResult[],
+        };
+    });
+
+    const {
+        items: mealPrepResults,
+        loadMore: loadMoreMealPreps,
+        isLoading: mealPrepsLoading,
+        hasNext: hasMoreMealPreps,
+        error: mealPrepsError,
+        reset: resetMealPreps,
+    } = useCursorPagination<MealPrep>(async (cursor) => {
+        if (!activeSearch.enabled || activeSearch.type !== "mealpreps") {
+            return { items: [], nextCursor: null, hasNext: false };
+        }
+
+        return searchMealPrepsCursor(
+            { name: activeSearch.name, ingredient: activeSearch.ingredient, author: activeSearch.author },
+            cursor,
+            6
+        );
+    });
 
     const handleSearch = async () => {
 
@@ -33,50 +90,45 @@ const SearchPage: React.FC = () => {
             return;
         }
 
-        setLoading(true);
         setHasSearched(true);
 
         const token = localStorage.getItem("token") || "";
+        let bannedIds: number[] = [];
 
         if (filterUndesired){
-            const undesired = async () => {
-                try {
-                    const res = await fetch("http://localhost:8080/api/undesired", {
-                        headers: {Authorization: `Bearer ${token}`},
-                    });
-                    if (!res.ok) throw new Error("Error al cargar lista");
-                    const data = await res.json();
-                    setUndesiredIngredients(data);
-                } catch (err) {
-                    console.error(err);
-                }
+            try {
+                const res = await fetch("http://localhost:8080/api/undesired", {
+                    headers: {Authorization: `Bearer ${token}`},
+                });
+                if (!res.ok) throw new Error("Error al cargar lista");
+                const data: Ingredient[] = await res.json();
+                bannedIds = data.map(ing => ing.id);
+            } catch (err) {
+                console.error(err);
             }
-            await undesired();
         }
-        try {
-            if (searchType === "recipes") {
-                const data: Recipe[] = await searchRecipes({ name, ingredient, author });
-                const bannedIds = new Set(undesiredIngredients.map(ing => ing.id));
-                const allowedRecipes = data.filter(recipe => {
-                    return recipe.ingredients.every(i=> !bannedIds.has(i.ingredientId));
-                })
-                setResults(allowedRecipes as RecipeSearchResult[]);
 
-            } else {
-                const data: MealPrep[] = await searchMealPreps({ name, ingredient, author });
-                setResults(data);
-            }
-        } catch (err) {
-            console.error("Error al buscar:", err);
-        } finally {
-            setLoading(false);
-        }
+        setActiveSearch({
+            enabled: true,
+            type: searchType,
+            name,
+            ingredient,
+            author,
+            bannedIds,
+        });
     };
 
 
     useEffect(() => {
+        if (!hasSearched) return;
         handleSearch();
     }, [searchType]);
+
+    useEffect(() => {
+        if (!activeSearch.enabled) return;
+        resetRecipes();
+        resetMealPreps();
+    }, [activeSearch, resetRecipes, resetMealPreps]);
 
     return (
         <>
@@ -187,13 +239,19 @@ const SearchPage: React.FC = () => {
             </div>
 
             {hasSearched && (
-                loading ? (
-                    <p>Cargando resultados...</p>
-                ) : (
-                    <>
-                        {results.length === 0 ? (
-                            <p>No se encontraron resultados.</p>
-                        ) : (
+                (() => {
+                    const results = searchType === "recipes" ? recipeResults : mealPrepResults;
+                    const loading = searchType === "recipes" ? recipesLoading : mealPrepsLoading;
+                    const error = searchType === "recipes" ? recipesError : mealPrepsError;
+                    const hasMore = searchType === "recipes" ? hasMoreRecipes : hasMoreMealPreps;
+                    const loadMore = searchType === "recipes" ? loadMoreRecipes : loadMoreMealPreps;
+
+                    if (loading && results.length === 0) return <p>Cargando resultados...</p>;
+                    if (error) return <p>{error}</p>;
+                    if (results.length === 0) return <p>No se encontraron resultados.</p>;
+
+                    return (
+                        <>
                             <div style={{
                                 display: "grid",
                                 gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
@@ -226,9 +284,26 @@ const SearchPage: React.FC = () => {
                                     )
                                 )}
                             </div>
-                        )}
-                    </>
-                )
+                            {hasMore && (
+                                <button
+                                    onClick={loadMore}
+                                    disabled={loading}
+                                    style={{
+                                        marginTop: "1rem",
+                                        padding: "0.6rem 1rem",
+                                        backgroundColor: "#A6B240",
+                                        color: "white",
+                                        border: "none",
+                                        borderRadius: "5px",
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    {loading ? "Cargando..." : "Cargar más"}
+                                </button>
+                            )}
+                        </>
+                    );
+                })()
             )}
             <FloatingMenu />
             <BottomNav />

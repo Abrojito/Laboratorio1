@@ -14,7 +14,6 @@ public record MealPrepResponseDTO(
         Boolean publicMealPrep,
         List<RecipeSummaryDTO> recipes,
         List<MealPrepReviewDTO> reviews,
-        Double avgRating,
-        Long   reviewCount
+        Double averageRating,
+        int    ratingCount
 ) {}
-

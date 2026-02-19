@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import IconButton from "@mui/material/IconButton";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 
-import { fetchFavRecipesPage, fetchFavMealPrepsPage } from "../api/favoriteApi";
+import {
+    fetchFavRecipesCursorPage,
+    fetchFavMealPrepsCursorPage,
+    removeFavorite,
+    removeMealPrepFavorite
+} from "../api/favoriteApi";
 import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
+import { useCursorPagination } from "../hooks/useCursorPagination";
 
 import RecipeCard from "../components/RecipeCard";
 import MealPrepCard from "../components/MealPrepCard";
@@ -13,44 +21,62 @@ const FavoritesPage: React.FC = () => {
     const token = localStorage.getItem("token") || "";
 
     /* ---------- Recetas favoritas ---------- */
-    const [favRecipes, setFavRecipes] = useState<Recipe[]>([]);
-    const [pageR, setPageR] = useState(0);
-    const [hasMoreR, setHasMoreR] = useState(true);
+    const {
+        items: favRecipes,
+        loadMore: loadMoreRecipes,
+        isLoading: recipesLoading,
+        hasNext: hasMoreR,
+        error: recipesError,
+    } = useCursorPagination<Recipe>((cursor) =>
+        token
+            ? fetchFavRecipesCursorPage(cursor, 4, token)
+            : Promise.resolve({ items: [], nextCursor: null, hasNext: false })
+    );
 
     /* ---------- Meal-preps favoritas ---------- */
-    const [favMPs, setFavMPs] = useState<MealPrep[]>([]);
-    const [pageMP, setPageMP] = useState(0);
-    const [hasMoreMP, setHasMoreMP] = useState(true);
+    const {
+        items: favMPs,
+        loadMore: loadMoreMealPreps,
+        isLoading: mealPrepsLoading,
+        hasNext: hasMoreMP,
+        error: mealPrepsError,
+    } = useCursorPagination<MealPrep>((cursor) =>
+        token
+            ? fetchFavMealPrepsCursorPage(cursor, 4, token)
+            : Promise.resolve({ items: [], nextCursor: null, hasNext: false })
+    );
 
-    const [loading, setLoading]   = useState(true);
-    const [error, setError]       = useState<string | null>(null);
+    const [removedRecipeIds, setRemovedRecipeIds] = useState<number[]>([]);
+    const [removedMealPrepIds, setRemovedMealPrepIds] = useState<number[]>([]);
+
+    const visibleRecipes = favRecipes.filter(r => !removedRecipeIds.includes(r.id));
+    const visibleMealPreps = favMPs.filter(mp => !removedMealPrepIds.includes(mp.id));
+
+    const loading =
+        (recipesLoading && favRecipes.length === 0) ||
+        (mealPrepsLoading && favMPs.length === 0);
+    const error = recipesError || mealPrepsError;
+
+    const handleRemoveRecipe = async (recipeId: number) => {
+        try {
+            await removeFavorite(recipeId);
+            setRemovedRecipeIds(prev => (prev.includes(recipeId) ? prev : [...prev, recipeId]));
+        } catch (err) {
+            console.error("Error quitando receta de favoritos", err);
+        }
+    };
+
+    const handleRemoveMealPrep = async (mealPrepId: number) => {
+        try {
+            await removeMealPrepFavorite(mealPrepId);
+            setRemovedMealPrepIds(prev => (prev.includes(mealPrepId) ? prev : [...prev, mealPrepId]));
+        } catch (err) {
+            console.error("Error quitando meal prep de favoritos", err);
+        }
+    };
 
     /* redirect si no hay token */
     useEffect(() => { if (!token) navigate("/start"); }, [token, navigate]);
-
-    /* === recetas === */
-    useEffect(() => {
-        if (!token) return;
-        fetchFavRecipesPage(pageR, 6, token)
-            .then(p => {
-                setFavRecipes(prev => pageR === 0 ? p.content : [...prev, ...p.content]);
-                setHasMoreR(pageR + 1 < p.totalPages);
-            })
-            .catch(() => setError("Error cargando favoritos."))
-            .finally(() => setLoading(false));
-    }, [pageR, token]);
-
-    /* === meal-preps === */
-    useEffect(() => {
-        if (!token) return;
-        fetchFavMealPrepsPage(pageMP, 6, token)
-            .then(p => {
-                setFavMPs(prev => pageMP === 0 ? p.content : [...prev, ...p.content]);
-                setHasMoreMP(pageMP + 1 < p.totalPages);
-            })
-            .catch(() => setError("Error cargando favoritos."))
-            .finally(() => setLoading(false));
-    }, [pageMP, token]);
 
     if (loading) return <p style={{ padding: "2rem" }}>Cargando…</p>;
     if (error)   return <p style={{ padding: "2rem" }}>{error}</p>;
@@ -63,36 +89,62 @@ const FavoritesPage: React.FC = () => {
                 <h1 style={styles.title}>Mis favoritos</h1>
 
                 {/* recetas */}
-                {favRecipes.length > 0 && (
+                {visibleRecipes.length > 0 && (
                     <>
                         <h2 style={styles.subTitle}>Recetas</h2>
                         <div style={styles.grid}>
-                            {favRecipes.map(r => <RecipeCard key={`r-${r.id}`} recipe={r} />)}
+                            {visibleRecipes.map(r => (
+                                <div key={`r-${r.id}`} style={styles.cardWrap}>
+                                    <IconButton
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoveRecipe(r.id);
+                                        }}
+                                        style={styles.removeBtn}
+                                    >
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                    <RecipeCard recipe={r} />
+                                </div>
+                            ))}
                         </div>
                         {hasMoreR && (
-                            <button style={styles.loadBtn} onClick={() => setPageR(p => p + 1)}>
-                                Ver más recetas
+                            <button style={styles.loadBtn} onClick={loadMoreRecipes} disabled={recipesLoading}>
+                                {recipesLoading ? "Cargando..." : "Cargar más"}
                             </button>
                         )}
                     </>
                 )}
 
                 {/* meal-preps */}
-                {favMPs.length > 0 && (
+                {visibleMealPreps.length > 0 && (
                     <>
                         <h2 style={styles.subTitle}>Meal Preps</h2>
                         <div style={styles.grid}>
-                            {favMPs.map(mp => <MealPrepCard key={`mp-${mp.id}`} mealPrep={mp} />)}
+                            {visibleMealPreps.map(mp => (
+                                <div key={`mp-${mp.id}`} style={styles.cardWrap}>
+                                    <IconButton
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoveMealPrep(mp.id);
+                                        }}
+                                        style={styles.removeBtn}
+                                    >
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                    <MealPrepCard mealPrep={mp} />
+                                </div>
+                            ))}
                         </div>
                         {hasMoreMP && (
-                            <button style={styles.loadBtn} onClick={() => setPageMP(p => p + 1)}>
-                                Ver más meal preps
+                            <button style={styles.loadBtn} onClick={loadMoreMealPreps} disabled={mealPrepsLoading}>
+                                {mealPrepsLoading ? "Cargando..." : "Cargar más"}
                             </button>
                         )}
                     </>
                 )}
 
-                {favRecipes.length === 0 && favMPs.length === 0 && (
+                {visibleRecipes.length === 0 && visibleMealPreps.length === 0 && !loading && (
                     <p>No tenés favoritos todavía.</p>
                 )}
             </div>
@@ -111,6 +163,17 @@ const styles: Record<string, React.CSSProperties> = {
     subTitle: { fontSize: "1.4rem", margin: "2rem 0 1rem" },
     grid: {
         display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px,1fr))", gap: "1.5rem",
+    },
+    cardWrap: {
+        position: "relative",
+    },
+    removeBtn: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        zIndex: 3,
+        color: "#d32f2f",
+        backgroundColor: "rgba(255,255,255,0.9)",
     },
     loadBtn: {
         margin: "1.5rem auto", display: "block",

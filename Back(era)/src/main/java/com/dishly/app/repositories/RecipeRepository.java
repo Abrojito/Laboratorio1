@@ -29,4 +29,12 @@ public interface RecipeRepository extends JpaRepository<RecipeModel, Long> {
     List<RecipeModel> findByUserIdAndPublicRecipeTrue(Long userId);
 
     Page<RecipeModel> findByPublicRecipeTrue(Pageable pageable);
+
+    List<RecipeModel> findByPublicRecipeTrueOrderByIdDesc(Pageable pageable);
+
+    List<RecipeModel> findByPublicRecipeTrueAndIdLessThanOrderByIdDesc(Long cursorId, Pageable pageable);
+
+    List<RecipeModel> findByUserIdAndPublicRecipeTrueOrderByIdDesc(Long userId, Pageable pageable);
+
+    List<RecipeModel> findByUserIdAndPublicRecipeTrueAndIdLessThanOrderByIdDesc(Long userId, Long cursorId, Pageable pageable);
 }

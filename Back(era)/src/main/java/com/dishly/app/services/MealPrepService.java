@@ -9,11 +9,13 @@ import com.dishly.app.repositories.RecipeRepository;
 import com.dishly.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -43,6 +45,36 @@ public class MealPrepService {
     public Page<MealPrepResponseDTO> getPublic(Pageable pageable) {
         return mealPrepRepo.findByPublicMealPrepTrue(pageable)
                 .map(this::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<MealPrepResponseDTO> getPublicByCursor(String cursor, int limit) {
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = PageRequest.of(0, safeLimit + 1);
+
+        List<MealPrepModel> mealPrepModels;
+        if (cursor == null || cursor.isBlank()) {
+            mealPrepModels = mealPrepRepo.findByPublicMealPrepTrueOrderByIdDesc(pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            mealPrepModels = mealPrepRepo.findByPublicMealPrepTrueAndIdLessThanOrderByIdDesc(cursorId, pageable);
+        }
+
+        boolean hasNext = mealPrepModels.size() > safeLimit;
+
+        List<MealPrepModel> pageModels = hasNext
+                ? mealPrepModels.subList(0, safeLimit)
+                : mealPrepModels;
+
+        List<MealPrepResponseDTO> items = pageModels.stream()
+                .map(this::toDTO)
+                .toList();
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
     }
 
     @Transactional(readOnly = true)
@@ -129,6 +161,37 @@ public class MealPrepService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public PagedResponse<MealPrepResponseDTO> searchByCursor(String name, String ingredient, String author, String cursor, int limit) {
+        int safeLimit = limit > 0 ? limit : 10;
+        Long cursorId = (cursor == null || cursor.isBlank()) ? null : Long.parseLong(cursor);
+
+        List<MealPrepModel> filtered = mealPrepRepo.findAll().stream()
+                .filter(MealPrepModel::isPublicMealPrep)
+                .filter(mp -> cursorId == null || mp.getId() < cursorId)
+                .filter(mp -> name == null || mp.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(mp -> author == null || mp.getAuthor().toLowerCase().contains(author.toLowerCase()))
+                .filter(mp -> ingredient == null || mp.getRecipes().stream()
+                        .flatMap(r -> r.getIngredients().stream())
+                        .anyMatch(i -> i.getIngredient().getName().toLowerCase().contains(ingredient.toLowerCase())))
+                .sorted(Comparator.comparing(MealPrepModel::getId).reversed())
+                .limit((long) safeLimit + 1)
+                .toList();
+
+        boolean hasNext = filtered.size() > safeLimit;
+        List<MealPrepModel> pageModels = hasNext ? filtered.subList(0, safeLimit) : filtered;
+
+        List<MealPrepResponseDTO> items = pageModels.stream()
+                .map(this::toDTO)
+                .toList();
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
 
     private void updateModel(MealPrepModel m, MealPrepRequestDTO dto, UserModel user) {
         m.setName(dto.name());
@@ -173,8 +236,10 @@ public class MealPrepService {
                 .toList();
 
         RatingSummary summary = reviewRepo.getSummaryByMealPrepId(m.getId());
-        Double avgRating = summary.getAvgRating()  != null ? summary.getAvgRating()  : 0d;
-        Long   reviewCnt = summary.getReviewCount() != null ? summary.getReviewCount() : 0L;
+        Double averageRating = (summary == null || summary.getAvgRating() == null) ? 0d : summary.getAvgRating();
+        int ratingCount = (summary == null || summary.getReviewCount() == null)
+                ? 0
+                : Math.toIntExact(summary.getReviewCount());
 
 
         return new MealPrepResponseDTO(
@@ -188,8 +253,8 @@ public class MealPrepService {
                 m.isPublicMealPrep(),
                 recipeDTOs,
                 reviewDTOs,
-                avgRating,
-                reviewCnt
+                averageRating,
+                ratingCount
         );
     }
 

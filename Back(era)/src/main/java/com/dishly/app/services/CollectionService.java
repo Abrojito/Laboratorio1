@@ -5,6 +5,8 @@ import com.dishly.app.models.*;
 import com.dishly.app.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,10 +69,90 @@ public class CollectionService {
     }
 
     @Transactional
+    public void removeRecipeFromCollection(String email, Long collectionId, Long recipeId) {
+        UserModel user = userRepository.findByEmail(email).orElseThrow();
+        CollectionModel collection = collectionRepository.findByIdAndUser(collectionId, user).orElseThrow();
+        collection.getRecipes().removeIf(r -> r.getId().equals(recipeId));
+        collectionRepository.save(collection);
+    }
+
+    @Transactional
+    public void removeMealPrepFromCollection(String email, Long collectionId, Long mealPrepId) {
+        UserModel user = userRepository.findByEmail(email).orElseThrow();
+        CollectionModel collection = collectionRepository.findByIdAndUser(collectionId, user).orElseThrow();
+        collection.getMealPreps().removeIf(mp -> mp.getId().equals(mealPrepId));
+        collectionRepository.save(collection);
+    }
+
+    @Transactional
     public void deleteCollection(Long id, String email) {
         UserModel user = userRepository.findByEmail(email).orElseThrow();
         CollectionModel collection = collectionRepository.findByIdAndUser(id, user).orElseThrow();
         collectionRepository.delete(collection);
+    }
+
+    @Transactional
+    public PagedResponse<RecipeSummaryDTO> getCollectionRecipesByCursor(String email, Long collectionId, String cursor, int limit) {
+        UserModel user = userRepository.findByEmail(email).orElseThrow();
+        collectionRepository.findByIdAndUser(collectionId, user).orElseThrow();
+
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = PageRequest.of(0, safeLimit + 1);
+
+        List<RecipeModel> recipeModels;
+        if (cursor == null || cursor.isBlank()) {
+            recipeModels = collectionRepository.findRecipesByCollectionAndUserOrderByIdDesc(collectionId, user.getId(), pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            recipeModels = collectionRepository.findRecipesByCollectionAndUserAndCursorOrderByIdDesc(
+                    collectionId, user.getId(), cursorId, pageable
+            );
+        }
+
+        boolean hasNext = recipeModels.size() > safeLimit;
+        List<RecipeModel> pageModels = hasNext ? recipeModels.subList(0, safeLimit) : recipeModels;
+
+        List<RecipeSummaryDTO> items = pageModels.stream()
+                .map(r -> new RecipeSummaryDTO(r.getId(), r.getName(), r.getImage()))
+                .collect(Collectors.toList());
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    @Transactional
+    public PagedResponse<MealPrepSummaryDTO> getCollectionMealPrepsByCursor(String email, Long collectionId, String cursor, int limit) {
+        UserModel user = userRepository.findByEmail(email).orElseThrow();
+        collectionRepository.findByIdAndUser(collectionId, user).orElseThrow();
+
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = PageRequest.of(0, safeLimit + 1);
+
+        List<MealPrepModel> mealPrepModels;
+        if (cursor == null || cursor.isBlank()) {
+            mealPrepModels = collectionRepository.findMealPrepsByCollectionAndUserOrderByIdDesc(collectionId, user.getId(), pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            mealPrepModels = collectionRepository.findMealPrepsByCollectionAndUserAndCursorOrderByIdDesc(
+                    collectionId, user.getId(), cursorId, pageable
+            );
+        }
+
+        boolean hasNext = mealPrepModels.size() > safeLimit;
+        List<MealPrepModel> pageModels = hasNext ? mealPrepModels.subList(0, safeLimit) : mealPrepModels;
+
+        List<MealPrepSummaryDTO> items = pageModels.stream()
+                .map(m -> new MealPrepSummaryDTO(m.getId(), m.getName(), m.getImage()))
+                .collect(Collectors.toList());
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).getId())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
     }
 
 

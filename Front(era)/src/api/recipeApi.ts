@@ -1,5 +1,5 @@
 import { Recipe } from "../types/Recipe";
-import { Page } from "../types/Page";
+import { Page, PagedResponse } from "../types/Page";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
@@ -19,6 +19,21 @@ export async function fetchRecipes(token?: string): Promise<Recipe[]> {
 export async function fetchRecipesPage(page = 0, size = 3): Promise<Page<Recipe>> {
     const res = await fetch(`${BASE_URL}/api/recipes?page=${page}&size=${size}`);
     if (!res.ok) throw new Error("Error fetch recipes");
+    return res.json();
+}
+
+export async function fetchRecipesCursorPage(
+    cursor: string | null,
+    limit = 3
+): Promise<PagedResponse<Recipe>> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) params.set("cursor", cursor);
+
+    const res = await fetch(`${BASE_URL}/api/recipes/cursor?${params.toString()}`);
+    if (res.status === 404) {
+        throw new Error("Endpoint /api/recipes/cursor no encontrado (ver backend)");
+    }
+    if (!res.ok) throw new Error("Error fetch recipes cursor");
     return res.json();
 }
 
@@ -46,3 +61,19 @@ export async function searchRecipes(filters: {
     return await res.json();
 }
 
+export async function searchRecipesCursor(
+    filters: { name?: string; ingredient?: string; author?: string },
+    cursor: string | null,
+    limit = 6
+): Promise<PagedResponse<Recipe>> {
+    const params = new URLSearchParams();
+    if (filters.name) params.set("name", filters.name);
+    if (filters.ingredient) params.set("ingredient", filters.ingredient);
+    if (filters.author) params.set("author", filters.author);
+    params.set("limit", String(limit));
+    if (cursor !== null) params.set("cursor", cursor);
+
+    const res = await fetch(`${BASE_URL}/api/recipes/search/cursor?${params.toString()}`);
+    if (!res.ok) throw new Error("Error search recipes cursor");
+    return res.json();
+}

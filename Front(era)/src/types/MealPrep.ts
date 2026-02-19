@@ -26,8 +26,8 @@ export interface MealPrep {
     publicMealPrep: boolean;
     recipes: RecipeSummary[];
     reviews: Review[];
-    avgRating: number;
-    reviewCount: number;
+    averageRating?: number;
+    ratingCount?: number;
 }
 
 export interface MealPrepRequestDTO {

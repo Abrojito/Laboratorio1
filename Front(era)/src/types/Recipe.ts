@@ -28,8 +28,8 @@ export interface Recipe {
     steps?: string[];
     ingredients: { ingredientId: number; quantity: string }[];
     reviews?: Review[];
-    avgRating: number;
-    reviewCount: number;
+    averageRating?: number;
+    ratingCount?: number;
     publicRecipe: boolean;
 }
 

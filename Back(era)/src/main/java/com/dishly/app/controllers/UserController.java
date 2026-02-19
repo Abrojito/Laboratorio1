@@ -2,12 +2,14 @@ package com.dishly.app.controllers;
 
 import com.dishly.app.dto.userdto.UserUpdateResponseDTO;
 import com.dishly.app.dto.UserPublicDTO;
+import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import com.dishly.app.dto.PhotoDTO;
+import com.dishly.app.dto.MealPrepResponseDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.UserProfileDTO;
 import com.dishly.app.dto.userdto.RegisterRequest;
@@ -129,6 +131,22 @@ public class UserController {
         return service.getFollowing(id, auth.getName());
     }
 
+    @GetMapping("/me/followers/cursor")
+    public PagedResponse<UserProfileDTO> getMyFollowersByCursor(
+            Authentication auth,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return service.getMyFollowersByCursor(auth.getName(), cursor, limit);
+    }
+
+    @GetMapping("/me/following/cursor")
+    public PagedResponse<UserProfileDTO> getMyFollowingByCursor(
+            Authentication auth,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return service.getMyFollowingByCursor(auth.getName(), cursor, limit);
+    }
+
     @GetMapping("/search")
     public List<UserProfileDTO> searchUsers(@RequestParam String term, Authentication auth) {
         return service.searchUsers(term, auth.getName());
@@ -138,6 +156,38 @@ public class UserController {
     public ResponseEntity<UserPublicDTO> getPublicProfile(@PathVariable Long id, Authentication auth) {
         UserPublicDTO dto = service.getPublicProfile(id, auth.getName());
         return ResponseEntity.ok(dto);
+    }
+
+    @GetMapping("/{userId}/public/recipes/cursor")
+    public PagedResponse<RecipeResponseDTO> getPublicRecipesByUserIdCursor(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return service.getPublicRecipesByUserIdCursor(userId, cursor, limit);
+    }
+
+    @GetMapping("/{userId}/public/mealpreps/cursor")
+    public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUserIdCursor(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return service.getPublicMealPrepsByUserIdCursor(userId, cursor, limit);
+    }
+
+    @GetMapping("/{username}/recipes/cursor")
+    public PagedResponse<RecipeResponseDTO> getPublicRecipesByUsernameCursor(
+            @PathVariable String username,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return service.getPublicRecipesByUsernameCursor(username, cursor, limit);
+    }
+
+    @GetMapping("/{username}/mealpreps/cursor")
+    public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUsernameCursor(
+            @PathVariable String username,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return service.getPublicMealPrepsByUsernameCursor(username, cursor, limit);
     }
 
 

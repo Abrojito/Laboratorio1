@@ -2,6 +2,7 @@ package com.dishly.app.controllers;
 
 import com.dishly.app.dto.MealPrepRequestDTO;
 import com.dishly.app.dto.MealPrepResponseDTO;
+import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.services.MealPrepService;
 import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
@@ -36,6 +37,13 @@ public class MealPrepController {
         return mealPrepService.getPublic(pageable);
     }
 
+    @GetMapping("/cursor")
+    public PagedResponse<MealPrepResponseDTO> getAllPublicByCursor(
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return mealPrepService.getPublicByCursor(cursor, limit);
+    }
+
     @GetMapping("{id}")
     public MealPrepResponseDTO getById(@PathVariable Long id) {
         return mealPrepService.getById(id);
@@ -48,6 +56,17 @@ public class MealPrepController {
             @RequestParam(required = false) String author
     ) {
         return mealPrepService.search(name, ingredient, author);
+    }
+
+    @GetMapping("/search/cursor")
+    public PagedResponse<MealPrepResponseDTO> searchMealPrepsByCursor(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String ingredient,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return mealPrepService.searchByCursor(name, ingredient, author, cursor, limit);
     }
 
 

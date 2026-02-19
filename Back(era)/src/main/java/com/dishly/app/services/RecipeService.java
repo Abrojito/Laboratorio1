@@ -1,6 +1,7 @@
 package com.dishly.app.services;
 
 import com.dishly.app.dto.IngredientQuantityDTO;
+import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.ReviewDTO;
@@ -12,12 +13,14 @@ import com.dishly.app.repositories.ReviewRepository;
 import com.dishly.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -129,6 +132,38 @@ public class RecipeService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> searchByCursor(String name, String ingredient, String author, String cursor, int limit) {
+        int safeLimit = limit > 0 ? limit : 10;
+        Long cursorId = (cursor == null || cursor.isBlank()) ? null : Long.parseLong(cursor);
+
+        List<RecipeModel> filtered = recipeRepo.findAll().stream()
+                .filter(RecipeModel::isPublicRecipe)
+                .filter(r -> cursorId == null || r.getId() < cursorId)
+                .filter(r -> name == null || r.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(r -> author == null || Optional.ofNullable(r.getAuthor())
+                        .map(a -> a.toLowerCase().contains(author.toLowerCase()))
+                        .orElse(false))
+                .filter(r -> ingredient == null || r.getIngredients().stream()
+                        .anyMatch(i -> i.getIngredient().getName().toLowerCase().contains(ingredient.toLowerCase())))
+                .sorted(Comparator.comparing(RecipeModel::getId).reversed())
+                .limit((long) safeLimit + 1)
+                .toList();
+
+        boolean hasNext = filtered.size() > safeLimit;
+        List<RecipeModel> pageModels = hasNext ? filtered.subList(0, safeLimit) : filtered;
+
+        List<RecipeResponseDTO> items = pageModels.stream()
+                .map(this::toDTO)
+                .toList();
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
 
     /* ---------- Helpers ---------- */
 
@@ -202,8 +237,10 @@ public class RecipeService {
                 .toList();
 
         RatingSummary summary = reviewRepo.getSummaryByRecipeId(m.getId());
-        Double avgRating  = summary.getAvgRating()  != null ? summary.getAvgRating()  : 0d;
-        Long   reviewCnt  = summary.getReviewCount() != null ? summary.getReviewCount() : 0L;
+        Double averageRating = (summary == null || summary.getAvgRating() == null) ? 0d : summary.getAvgRating();
+        int ratingCount = (summary == null || summary.getReviewCount() == null)
+                ? 0
+                : Math.toIntExact(summary.getReviewCount());
 
 
         return new RecipeResponseDTO(
@@ -220,8 +257,8 @@ public class RecipeService {
                 m.getSteps(),
                 m.isPublicRecipe(),
                 reviewDTOs,
-                avgRating,
-                reviewCnt
+                averageRating,
+                ratingCount
         );
     }
 
@@ -248,6 +285,36 @@ public class RecipeService {
     public Page<RecipeResponseDTO> getPublic(Pageable pageable) {
         return recipeRepo.findByPublicRecipeTrue(pageable)   // repo paginado
                 .map(this::toDTO);                  // convierte cada entidad
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> getPublicByCursor(String cursor, int limit) {
+        int safeLimit = limit > 0 ? limit : 10;
+        Pageable pageable = PageRequest.of(0, safeLimit + 1);
+
+        List<RecipeModel> recipeModels;
+        if (cursor == null || cursor.isBlank()) {
+            recipeModels = recipeRepo.findByPublicRecipeTrueOrderByIdDesc(pageable);
+        } else {
+            Long cursorId = Long.parseLong(cursor);
+            recipeModels = recipeRepo.findByPublicRecipeTrueAndIdLessThanOrderByIdDesc(cursorId, pageable);
+        }
+
+        boolean hasNext = recipeModels.size() > safeLimit;
+
+        List<RecipeModel> pageModels = hasNext
+                ? recipeModels.subList(0, safeLimit)
+                : recipeModels;
+
+        List<RecipeResponseDTO> items = pageModels.stream()
+                .map(this::toDTO)
+                .toList();
+
+        String nextCursor = hasNext && !items.isEmpty()
+                ? String.valueOf(items.get(items.size() - 1).id())
+                : null;
+
+        return new PagedResponse<>(items, nextCursor, hasNext);
     }
 
     @Transactional

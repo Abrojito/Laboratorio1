@@ -3,7 +3,7 @@
 import { authFetch } from "./config";
 import { Recipe } from "../types/Recipe";
 import { MealPrep } from "../types/MealPrep";
-import { Page } from "../types/Page";
+import { Page, PagedResponse } from "../types/Page";
 
 /* ================== RECETAS ================== */
 
@@ -12,6 +12,13 @@ export const toggleFavorite = async (recipeId: number) => {
         method: 'POST',
     });
     if (!res.ok) throw new Error("No se pudo cambiar el estado de favorito de la receta");
+};
+
+export const removeFavorite = async (recipeId: number) => {
+    const res = await authFetch(`/favorites/recipes/${recipeId}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("No se pudo quitar la receta de favoritos");
 };
 
 export const isFavorite = async (recipeId: number): Promise<boolean> => {
@@ -33,6 +40,13 @@ export const toggleMealPrepFavorite = async (mealPrepId: number) => {
         method: 'POST',
     });
     if (!res.ok) throw new Error("No se pudo cambiar el estado de favorito del meal prep");
+};
+
+export const removeMealPrepFavorite = async (mealPrepId: number) => {
+    const res = await authFetch(`/favorites/mealpreps/${mealPrepId}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) throw new Error("No se pudo quitar el meal prep de favoritos");
 };
 
 export const isMealPrepFavorite = async (mealPrepId: number): Promise<boolean> => {
@@ -72,5 +86,37 @@ export async function fetchFavMealPrepsPage(
         { headers: { Authorization: `Bearer ${token}` } }
     );
     if (!res.ok) throw new Error("fetch fav mealpreps");
+    return res.json();
+}
+
+export async function fetchFavRecipesCursorPage(
+    cursor: string | null,
+    limit = 6,
+    token: string
+): Promise<PagedResponse<Recipe>> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) params.set("cursor", cursor);
+
+    const res = await authFetch(
+        `/favorites/recipes/cursor?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("fetch fav recipes cursor");
+    return res.json();
+}
+
+export async function fetchFavMealPrepsCursorPage(
+    cursor: string | null,
+    limit = 6,
+    token: string
+): Promise<PagedResponse<MealPrep>> {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) params.set("cursor", cursor);
+
+    const res = await authFetch(
+        `/favorites/mealpreps/cursor?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) throw new Error("fetch fav mealpreps cursor");
     return res.json();
 }

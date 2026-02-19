@@ -10,7 +10,7 @@ import ShoppingListSelector from "../components/ShoppingListSelector";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import IconButton from "@mui/material/IconButton";
-import { toggleMealPrepFavorite, isMealPrepFavorite } from "../api/favoriteApi";
+import { toggleMealPrepFavorite, isMealPrepFavorite, removeMealPrepFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
 
@@ -48,8 +48,14 @@ const MealPrepDetail: React.FC = () => {
     const handleToggleFavorite = async () => {
         if (!token || !id) return;
         try {
+            if (isFav) {
+                await removeMealPrepFavorite(Number(id));
+                setIsFav(false);
+                return;
+            }
+
             await toggleMealPrepFavorite(Number(id));
-            setIsFav(prev => !prev);
+            setIsFav(true);
         } catch (err) {
             console.error("Error al cambiar favorito", err);
         }
@@ -103,13 +109,8 @@ const MealPrepDetail: React.FC = () => {
             <h1>{mealPrep.name}</h1>
 
             <div style={{ display:"flex", alignItems:"center", gap:"6px", margin:"8px 0" }}>
-                <Rating
-                    value={mealPrep.avgRating ?? 0}
-                    precision={0.1}
-                    readOnly
-                />
                 <span style={{ fontSize:"0.9rem", color:"#666" }}>
-                    {mealPrep.reviewCount} {mealPrep.reviewCount === 1 ? "reseña" : "reseñas"}
+                    ⭐ {(mealPrep.averageRating ?? 0).toFixed(1)} ({mealPrep.ratingCount ?? 0})
                 </span>
             </div>
 
@@ -166,8 +167,9 @@ const MealPrepDetail: React.FC = () => {
                             creatorUsername: "",
                             steps: [],
                             ingredients: [],
-                            avgRating: 0,
-                            reviewCount: 0,
+                            publicRecipe: false,
+                            averageRating: 0,
+                            ratingCount: 0,
                         }}
                     />
                 ))}

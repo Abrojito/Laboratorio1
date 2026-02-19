@@ -4,3 +4,9 @@ export interface Page<T> {
     totalPages: number;
     totalElements: number;
 }
+
+export type PagedResponse<T> = {
+    items: T[];
+    nextCursor: string | null;
+    hasNext: boolean;
+};

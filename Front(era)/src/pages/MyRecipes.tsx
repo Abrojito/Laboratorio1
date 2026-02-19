@@ -20,8 +20,8 @@ function toFullRecipe(r: any): Recipe {
     difficulty:  r.difficulty   ?? "",
     steps:       r.steps        ?? [],
     ingredients: r.ingredients  ?? [],
-    avgRating:   r.avgRating    ?? 0,
-    reviewCount: r.reviewCount  ?? 0,
+    averageRating: r.averageRating ?? 0,
+    ratingCount:   r.ratingCount   ?? 0,
   };
 }
 

@@ -2,6 +2,9 @@ package com.dishly.app.controllers;
 
 import com.dishly.app.dto.CollectionRequestDTO;
 import com.dishly.app.dto.CollectionResponseDTO;
+import com.dishly.app.dto.MealPrepSummaryDTO;
+import com.dishly.app.dto.PagedResponse;
+import com.dishly.app.dto.RecipeSummaryDTO;
 import com.dishly.app.security.JwtUtil;
 import com.dishly.app.services.CollectionService;
 import lombok.RequiredArgsConstructor;
@@ -58,5 +61,45 @@ public class CollectionController {
         String email = jwtUtil.getEmailFromHeader(token);
         collectionService.deleteCollection(id, email);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{collectionId}/recipes/{recipeId}")
+    public ResponseEntity<Void> removeRecipe(
+            @PathVariable Long collectionId,
+            @PathVariable Long recipeId,
+            @RequestHeader("Authorization") String token) {
+        String email = jwtUtil.getEmailFromHeader(token);
+        collectionService.removeRecipeFromCollection(email, collectionId, recipeId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{collectionId}/mealpreps/{mealPrepId}")
+    public ResponseEntity<Void> removeMealPrep(
+            @PathVariable Long collectionId,
+            @PathVariable Long mealPrepId,
+            @RequestHeader("Authorization") String token) {
+        String email = jwtUtil.getEmailFromHeader(token);
+        collectionService.removeMealPrepFromCollection(email, collectionId, mealPrepId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{collectionId}/recipes/cursor")
+    public ResponseEntity<PagedResponse<RecipeSummaryDTO>> getCollectionRecipesByCursor(
+            @PathVariable Long collectionId,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestHeader("Authorization") String token) {
+        String email = jwtUtil.getEmailFromHeader(token);
+        return ResponseEntity.ok(collectionService.getCollectionRecipesByCursor(email, collectionId, cursor, limit));
+    }
+
+    @GetMapping("/{collectionId}/mealpreps/cursor")
+    public ResponseEntity<PagedResponse<MealPrepSummaryDTO>> getCollectionMealPrepsByCursor(
+            @PathVariable Long collectionId,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestHeader("Authorization") String token) {
+        String email = jwtUtil.getEmailFromHeader(token);
+        return ResponseEntity.ok(collectionService.getCollectionMealPrepsByCursor(email, collectionId, cursor, limit));
     }
 }

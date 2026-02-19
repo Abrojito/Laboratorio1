@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import { fetchRecipesPage } from "../api/recipeApi";
-import { fetchMealPrepsPage } from "../api/mealPrepApi";
+import { fetchRecipesCursorPage } from "../api/recipeApi";
+import { fetchMealPrepsCursorPage } from "../api/mealPrepApi";
 import { MealPrep } from "../types/MealPrep";
 import { Recipe } from "../types/Recipe";
+import { useCursorPagination } from "../hooks/useCursorPagination";
 
 import RecipeCard from "../components/RecipeCard";
 import MealPrepCard from "../components/MealPrepCard";
@@ -14,55 +15,27 @@ import FloatingMenu from "../components/FloatingMenu";
 import "../App.css";
 
 const Home: React.FC = () => {
-    /* ---------- recetas paginadas ---------- */
-    const [recipes, setRecipes] = useState<Recipe[]>([]);
-    const [pageR, setPageR] = useState(0);
-    const [hasMoreR, setHasMoreR] = useState(true);
+    /* ---------- recetas con cursor ---------- */
+    const {
+        items: recipes,
+        loadMore: loadMoreRecipes,
+        isLoading: recipesLoading,
+        hasNext: hasMoreR,
+        error: recipesError,
+    } = useCursorPagination<Recipe>((cursor) => fetchRecipesCursorPage(cursor, 3));
 
-    /* ---------- meal-preps paginadas ---------- */
-    const [mealPreps, setMealPreps] = useState<MealPrep[]>([]);
-    const [pageMP, setPageMP] = useState(0);
-    const [hasMoreMP, setHasMoreMP] = useState(true);
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    /* ---------- meal-preps con cursor ---------- */
+    const {
+        items: mealPreps,
+        loadMore: loadMoreMealPreps,
+        isLoading: mealPrepsLoading,
+        hasNext: hasMoreMP,
+        error: mealPrepsError,
+    } = useCursorPagination<MealPrep>((cursor) => fetchMealPrepsCursorPage(cursor, 3));
 
     const navigate = useNavigate();
-
-    /* ---------- Recetas paginadas ---------- */
-    useEffect(() => {
-        fetchRecipesPage(pageR)            // size = 3
-            .then(p => {
-                setRecipes(prev =>
-                    pageR === 0 ? p.content : [...prev, ...p.content]
-                );
-                setHasMoreR(pageR + 1 < p.totalPages);
-            })
-            .catch(() => setError("Error cargando recetas"))
-            .finally(() => {
-                // solo apagamos el spinner cuando cargó la primera tanda
-                if (pageR === 0) setLoading(false);
-            });
-    }, [pageR]);
-
-    /* ---------- Meal-preps paginadas ---------- */
-    useEffect(() => {
-        fetchMealPrepsPage(pageMP)         // size = 3
-            .then(p => {
-                setMealPreps(prev =>
-                    pageMP === 0 ? p.content : [...prev, ...p.content]
-                );
-                setHasMoreMP(pageMP + 1 < p.totalPages);
-            })
-            .catch(() => setError("Error cargando meal preps"))
-            .finally(() => {
-                if (pageMP === 0) setLoading(false);
-            });
-    }, [pageMP]);
-
-
-    if (loading) return <p style={{ padding: "2rem" }}>Cargando…</p>;
-    if (error)   return <p style={{ padding: "2rem" }}>{error}</p>;
+    const loading = (recipesLoading && recipes.length === 0) || (mealPrepsLoading && mealPreps.length === 0);
+    const error = recipesError || mealPrepsError;
 
     return (
         <div>
@@ -81,46 +54,57 @@ const Home: React.FC = () => {
 
             {/* ------------- Main ------------- */}
             <main style={styles.main}>
-                {/* === Recetas === */}
-                <h2>Recetas</h2>
-                {recipes.length === 0 ? (
-                    <p>No hay recetas todavía.</p>
-                ) : (
+                {loading || error ? (
                     <>
-                        <div style={styles.grid}>
-                            {recipes.map((r) => (
-                                <RecipeCard key={r.id} recipe={r} />
-                            ))}
-                        </div>
-                        {hasMoreR && (
-                            <button
-                                style={styles.loadBtn}
-                                onClick={() => setPageR((p) => p + 1)}
-                            >
-                                Ver más recetas
-                            </button>
-                        )}
+                        {loading && <p style={{ padding: "2rem" }}>Cargando…</p>}
+                        {error && <p style={{ padding: "2rem" }}>{error}</p>}
                     </>
-                )}
-
-                {/* === Meal Preps === */}
-                <h2 style={{ marginTop: "3rem" }}>Meal Preps</h2>
-                {mealPreps.length === 0 ? (
-                    <p>No hay meal preps todavía.</p>
                 ) : (
                     <>
-                        <div style={styles.grid}>
-                            {mealPreps.map((mp) => (
-                                <MealPrepCard key={mp.id} mealPrep={mp} />
-                            ))}
-                        </div>
-                        {hasMoreMP && (
-                            <button
-                                style={styles.loadBtn}
-                                onClick={() => setPageMP((p) => p + 1)}
-                            >
-                                Ver más meal preps
-                            </button>
+                        {/* === Recetas === */}
+                        <h2>Recetas</h2>
+                        {recipes.length === 0 ? (
+                            recipesLoading ? <p>Cargando recetas...</p> : <p>No hay recetas todavía.</p>
+                        ) : (
+                            <>
+                                <div style={styles.grid}>
+                                    {recipes.map((r) => (
+                                        <RecipeCard key={r.id} recipe={r} />
+                                    ))}
+                                </div>
+                                {hasMoreR && (
+                                    <button
+                                        style={styles.loadBtn}
+                                        onClick={loadMoreRecipes}
+                                        disabled={recipesLoading}
+                                    >
+                                        {recipesLoading ? "Cargando..." : "Cargar más"}
+                                    </button>
+                                )}
+                            </>
+                        )}
+
+                        {/* === Meal Preps === */}
+                        <h2 style={{ marginTop: "3rem" }}>Meal Preps</h2>
+                        {mealPreps.length === 0 ? (
+                            <p>No hay meal preps todavía.</p>
+                        ) : (
+                            <>
+                                <div style={styles.grid}>
+                                    {mealPreps.map((mp) => (
+                                        <MealPrepCard key={mp.id} mealPrep={mp} />
+                                    ))}
+                                </div>
+                                {hasMoreMP && (
+                                    <button
+                                        style={styles.loadBtn}
+                                        onClick={loadMoreMealPreps}
+                                        disabled={mealPrepsLoading}
+                                    >
+                                        {mealPrepsLoading ? "Cargando..." : "Cargar más"}
+                                    </button>
+                                )}
+                            </>
                         )}
                     </>
                 )}

@@ -2,6 +2,7 @@ package com.dishly.app.controllers;
 
 import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
+import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.services.RecipeService;
 import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
@@ -37,7 +38,14 @@ public class RecipeController {
         return recipeService.getPublic(pageable);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/cursor")
+    public PagedResponse<RecipeResponseDTO> getAllPublicByCursor(
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit) {
+        return recipeService.getPublicByCursor(cursor, limit);
+    }
+
+    @GetMapping("/{id:\\d+}")
     public RecipeResponseDTO getById(@PathVariable Long id) {
         return recipeService.getById(id);
     }
@@ -49,6 +57,17 @@ public class RecipeController {
             @RequestParam(required = false) String author
     ) {
         return recipeService.search(name, ingredient, author);
+    }
+
+    @GetMapping("/search/cursor")
+    public PagedResponse<RecipeResponseDTO> searchRecipesByCursor(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String ingredient,
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return recipeService.searchByCursor(name, ingredient, author, cursor, limit);
     }
 
 
