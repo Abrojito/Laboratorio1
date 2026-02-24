@@ -7,12 +7,15 @@ import ShoppingListSelector from "../components/ShoppingListSelector.tsx";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import IconButton from "@mui/material/IconButton";
+import ShareIcon from "@mui/icons-material/Share";
 import { toggleFavorite, isFavorite, removeFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
+import ShareModal from "../components/ShareModal";
 import { useNavigate } from "react-router-dom";
 import { Recipe } from "../types/Recipe.ts"
 import { useModal } from "../context/ModalContext";
+import { downloadRecipePdf } from "../api/recipeApi";
 
 
 
@@ -41,6 +44,7 @@ const RecipeDetail: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isFav, setIsFav] = useState(false);
     const [showCollectionMenu, setShowCollectionMenu] = useState(false);
+    const [shareOpen, setShareOpen] = useState(false);
     const navigate = useNavigate();
     const { confirm, alert } = useModal();
 
@@ -135,6 +139,37 @@ const RecipeDetail: React.FC = () => {
         }
     };
 
+    const downloadBlobFile = (blob: Blob, fileName: string) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExportPdf = async () => {
+        if (!id) return;
+        try {
+            const blob = await downloadRecipePdf(Number(id));
+            downloadBlobFile(blob, `recipe-${id}.pdf`);
+        } catch {
+            await alert({ title: "PDF", message: "No se pudo exportar el PDF de la receta." });
+        }
+    };
+
+    const handleCopyLink = async () => {
+        const url = window.location.href;
+        try {
+            await navigator.clipboard.writeText(url);
+            await alert({ title: "Compartir", message: "Link copiado al portapapeles" });
+        } catch {
+            await alert({ title: "Compartir", message: "No se pudo copiar el link." });
+        }
+    };
+
 
 
     if (error) return <p>{error}</p>;
@@ -184,7 +219,22 @@ const RecipeDetail: React.FC = () => {
                         </div>
                     )}
                 </div>
+                <Button variant="outlined" size="small" onClick={handleExportPdf}>
+                    Exportar PDF
+                </Button>
+                <IconButton onClick={() => setShareOpen(true)} title="Compartir">
+                    <ShareIcon />
+                </IconButton>
             </div>
+
+            <ShareModal
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+                title={recipe.name}
+                text={`Mirá esto en Dishly: ${recipe.name}`}
+                url={window.location.href}
+                onCopyLink={handleCopyLink}
+            />
 
 
 

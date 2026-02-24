@@ -137,3 +137,11 @@ export async function fetchMyMealPrepsPage(
     if (!res.ok) throw new Error("Error fetch my meal preps");
     return res.json();
 }
+
+export async function downloadMealPrepPdf(id: number): Promise<Blob> {
+    const res = await fetch(`${BASE_URL}/api/mealpreps/${id}/pdf`, {
+        headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error("No se pudo exportar el PDF del meal prep");
+    return res.blob();
+}

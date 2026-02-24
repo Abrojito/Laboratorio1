@@ -72,6 +72,7 @@ public class SecurityConfig {
                         //mealpreps
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/mealpreps/*/pdf").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/mealpreps/user/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/mealpreps").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/mealpreps/*").authenticated()

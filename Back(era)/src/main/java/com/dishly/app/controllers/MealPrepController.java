@@ -4,13 +4,17 @@ import com.dishly.app.dto.MealPrepRequestDTO;
 import com.dishly.app.dto.MealPrepResponseDTO;
 import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.services.MealPrepService;
+import com.dishly.app.services.PdfExportService;
 import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
@@ -21,10 +25,12 @@ public class MealPrepController {
 
     private final MealPrepService mealPrepService;
     private final UserService userService;
+    private final PdfExportService pdfExportService;
 
-    public MealPrepController(MealPrepService mealPrepService, UserService userService) {
+    public MealPrepController(MealPrepService mealPrepService, UserService userService, PdfExportService pdfExportService) {
         this.mealPrepService = mealPrepService;
         this.userService = userService;
+        this.pdfExportService = pdfExportService;
     }
 
 //    @GetMapping
@@ -50,6 +56,15 @@ public class MealPrepController {
     @GetMapping("{id}")
     public MealPrepResponseDTO getById(@PathVariable Long id) {
         return mealPrepService.getById(id);
+    }
+
+    @GetMapping("{id}/pdf")
+    public ResponseEntity<byte[]> exportMealPrepPdf(@PathVariable Long id) {
+        byte[] pdf = pdfExportService.mealPrepToPdf(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"mealprep-" + id + ".pdf\"")
+                .body(pdf);
     }
 
     @GetMapping("/search")

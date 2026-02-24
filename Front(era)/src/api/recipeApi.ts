@@ -90,3 +90,11 @@ export async function searchRecipesCursor(
     if (!res.ok) throw new Error("Error search recipes cursor");
     return res.json();
 }
+
+export async function downloadRecipePdf(id: number): Promise<Blob> {
+    const res = await fetch(`${BASE_URL}/api/recipes/${id}/pdf`, {
+        headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error("No se pudo exportar el PDF de la receta");
+    return res.blob();
+}

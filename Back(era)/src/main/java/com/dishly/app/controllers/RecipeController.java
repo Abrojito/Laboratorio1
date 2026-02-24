@@ -3,12 +3,15 @@ package com.dishly.app.controllers;
 import com.dishly.app.dto.RecipeRequestDTO;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.dto.PagedResponse;
+import com.dishly.app.services.PdfExportService;
 import com.dishly.app.services.RecipeService;
 import com.dishly.app.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;   // <-- importa esto
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +26,14 @@ public class RecipeController {
     /* === inyecciones ============================ */
     private final RecipeService recipeService;
     private final UserService   userService;
+    private final PdfExportService pdfExportService;
 
     public RecipeController(RecipeService recipeService,
-                            UserService   userService) {
+                            UserService   userService,
+                            PdfExportService pdfExportService) {
         this.recipeService = recipeService;
         this.userService   = userService;
+        this.pdfExportService = pdfExportService;
     }
 
     /* ---------- GETs ---------- */
@@ -51,6 +57,15 @@ public class RecipeController {
     @GetMapping("/{id:\\d+}")
     public RecipeResponseDTO getById(@PathVariable Long id) {
         return recipeService.getById(id);
+    }
+
+    @GetMapping("/{id:\\d+}/pdf")
+    public ResponseEntity<byte[]> exportRecipePdf(@PathVariable Long id) {
+        byte[] pdf = pdfExportService.recipeToPdf(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"recipe-" + id + ".pdf\"")
+                .body(pdf);
     }
 
     @GetMapping("/search")

@@ -21,6 +21,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("com.github.librepdf:openpdf:1.3.43")
 	implementation("org.postgresql:postgresql:42.7.3")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
@@ -57,4 +58,3 @@ tasks.register<Copy>("copyHsqldbJar") {
 	from(hsqldbJar)
 	into("$buildDir/hsqldb")
 }
-

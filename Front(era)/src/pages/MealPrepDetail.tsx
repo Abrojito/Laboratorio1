@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import { fetchMealPrep, createMealPrepReview } from "../api/mealPrepApi";
+import { fetchMealPrep, createMealPrepReview, downloadMealPrepPdf } from "../api/mealPrepApi";
 import { MealPrep } from "../types/MealPrep";
 import RecipeCard from "../components/RecipeCard";
 import Rating from "@mui/material/Rating";
@@ -10,9 +10,11 @@ import ShoppingListSelector from "../components/ShoppingListSelector";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import IconButton from "@mui/material/IconButton";
+import ShareIcon from "@mui/icons-material/Share";
 import { toggleMealPrepFavorite, isMealPrepFavorite, removeMealPrepFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
+import ShareModal from "../components/ShareModal";
 import { useModal } from "../context/ModalContext";
 
 
@@ -23,6 +25,7 @@ const MealPrepDetail: React.FC = () => {
     const [rating, setRating] = useState<number | null>(0);
     const [isFav, setIsFav] = useState(false);
     const [showCollectionMenu, setShowCollectionMenu] = useState(false);
+    const [shareOpen, setShareOpen] = useState(false);
     const navigate = useNavigate();
     const { confirm, alert } = useModal();
 
@@ -93,6 +96,37 @@ const MealPrepDetail: React.FC = () => {
         }
     };
 
+    const downloadBlobFile = (blob: Blob, fileName: string) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleExportPdf = async () => {
+        if (!id) return;
+        try {
+            const blob = await downloadMealPrepPdf(Number(id));
+            downloadBlobFile(blob, `mealprep-${id}.pdf`);
+        } catch {
+            await alert({ title: "PDF", message: "No se pudo exportar el PDF del meal prep." });
+        }
+    };
+
+    const handleCopyLink = async () => {
+        const url = window.location.href;
+        try {
+            await navigator.clipboard.writeText(url);
+            await alert({ title: "Compartir", message: "Link copiado al portapapeles" });
+        } catch {
+            await alert({ title: "Compartir", message: "No se pudo copiar el link." });
+        }
+    };
+
     if (!mealPrep) return <p>Cargando meal prep...</p>;
 
     return (
@@ -139,7 +173,22 @@ const MealPrepDetail: React.FC = () => {
                         </div>
                     )}
                 </div>
+                <Button variant="outlined" size="small" onClick={handleExportPdf}>
+                    Exportar PDF
+                </Button>
+                <IconButton onClick={() => setShareOpen(true)} title="Compartir">
+                    <ShareIcon />
+                </IconButton>
             </div>
+
+            <ShareModal
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+                title={mealPrep.name}
+                text={`Mirá esto en Dishly: ${mealPrep.name}`}
+                url={window.location.href}
+                onCopyLink={handleCopyLink}
+            />
 
 
             <p style={{ marginBottom: "2rem"}} >{mealPrep.description}</p>
