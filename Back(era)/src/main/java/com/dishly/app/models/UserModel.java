@@ -28,6 +28,9 @@ public class UserModel implements UserDetails {
     @Column(unique=true)
     private String email;
 
+    @Column(nullable = true)
+    private String googleId;
+
     @Setter
     @Getter
     private String fullName;

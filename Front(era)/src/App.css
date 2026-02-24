@@ -76,3 +76,59 @@
   background-color: var(--primary-color);
   color: var(--text-color);
 }
+
+.btn-google {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.btn-google:hover {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.btn-google:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.btn-google:active {
+  transform: translateY(1px);
+}
+
+.btn-google:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-google-icon {
+  position: absolute;
+  left: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.btn-google-text {
+  width: 100%;
+  text-align: center;
+}
+
+.google-signin-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

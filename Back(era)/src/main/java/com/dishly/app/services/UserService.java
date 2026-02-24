@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Comparator;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -71,6 +72,41 @@ public class UserService implements UserDetailsService {
         return repository.save(user);
     }
 
+    public UserModel resolveOrCreateGoogleUser(String email, String name, String googleId) {
+        Optional<UserModel> byEmail = repository.findByEmail(email);
+        if (byEmail.isPresent()) {
+            UserModel user = byEmail.get();
+            if (user.getGoogleId() == null || user.getGoogleId().isBlank()) {
+                user.setGoogleId(googleId);
+                repository.save(user);
+            }
+            return user;
+        }
+
+        Optional<UserModel> byGoogleId = repository.findByGoogleId(googleId);
+        if (byGoogleId.isPresent()) {
+            UserModel user = byGoogleId.get();
+            if (user.getEmail() == null || user.getEmail().isBlank()) {
+                user.setEmail(email);
+            }
+            if ((user.getUsername() == null || user.getUsername().isBlank()) && email != null) {
+                user.setUsername(generateAvailableUsername(email));
+            }
+            repository.save(user);
+            return user;
+        }
+
+        UserModel user = new UserModel();
+        user.setEmail(email);
+        user.setUsername(generateAvailableUsername(email));
+        user.setPassword(encoder.encode(UUID.randomUUID().toString()));
+        user.setGoogleId(googleId);
+        if (name != null && !name.isBlank()) {
+            user.setFullName(name);
+        }
+        return repository.save(user);
+    }
+
     public List<UserModel> getAll() {
         return repository.findAll();
     }
@@ -81,6 +117,25 @@ public class UserService implements UserDetailsService {
 
     public Optional<UserModel> getByEmail(String email) {
         return repository.findByEmail(email);
+    }
+
+    private String generateAvailableUsername(String email) {
+        String base = email;
+        int at = email.indexOf('@');
+        if (at > 0) {
+            base = email.substring(0, at);
+        }
+        if (base.isBlank()) {
+            base = "user";
+        }
+
+        String candidate = base;
+        int suffix = 1;
+        while (repository.existsByUsername(candidate)) {
+            candidate = base + suffix;
+            suffix++;
+        }
+        return candidate;
     }
 
     public UserModel update(Long id, UpdateRequest req) {

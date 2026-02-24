@@ -104,6 +104,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/undesired/**").authenticated()
                         .requestMatchers(HttpMethod.PUT,"/api/undesired/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE,"/api/undesired/**").authenticated()
+                        //notifications
+                        .requestMatchers(HttpMethod.POST, "/api/notifications/test").authenticated()
 
                         //catch-all
                         .anyRequest().denyAll()

@@ -2,6 +2,7 @@ package com.dishly.app.repositories;
 
 import com.dishly.app.models.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
@@ -10,4 +11,8 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     Optional<UserModel> findByUsername(String username);
+    Optional<UserModel> findByGoogleId(String googleId);
+
+    @Query("select distinct u from UserModel u left join fetch u.followers where u.id = :id")
+    Optional<UserModel> findByIdWithFollowers(Long id);
 }

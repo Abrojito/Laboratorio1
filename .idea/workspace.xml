@@ -4,17 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b74629-485f-483f-b124-382f0adef368" name="Changes" comment="undesired y seguidos reflejados + solucion de modals y z-index">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="06b74629-485f-483f-b124-382f0adef368" name="Changes" comment="exportar pdf + compartir en redes 2">
+      <change afterPath="$PROJECT_DIR$/Back(era)/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Front(era)/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Back(era)/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/DishlyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/DishlyApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/MealPrepController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/MealPrepController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/RecipeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/RecipeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Front(era)/src/api/mealPrepApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/api/mealPrepApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Front(era)/src/api/recipeApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/api/recipeApi.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/MealPrepDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/MealPrepDetail.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/RecipeDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/RecipeDetail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/models/UserModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/models/UserModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/repositories/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/MealPrepService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/MealPrepService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/RecipeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/RecipeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/auth/Login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/auth/Login.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +155,7 @@
       <workItem from="1744400718110" duration="757000" />
       <workItem from="1744401482387" duration="37000" />
       <workItem from="1744401601985" duration="114000" />
-      <workItem from="1771537912007" duration="4269000" />
+      <workItem from="1771537912007" duration="4969000" />
     </task>
     <task id="LOCAL-00001" summary="paginado + avg rating + borrar coleccion y favs">
       <option name="closed" value="true" />
@@ -167,7 +173,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771901603146</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="exportar pdf + compartir en redes">
+      <option name="closed" value="true" />
+      <created>1771965174614</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1771965174614</updated>
+    </task>
+    <task id="LOCAL-00004" summary="exportar pdf + compartir en redes 2">
+      <option name="closed" value="true" />
+      <created>1771965206369</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1771965206369</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,7 +209,9 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="paginado + avg rating + borrar coleccion y favs" />
     <MESSAGE value="undesired y seguidos reflejados + solucion de modals y z-index" />
-    <option name="LAST_COMMIT_MESSAGE" value="undesired y seguidos reflejados + solucion de modals y z-index" />
+    <MESSAGE value="exportar pdf + compartir en redes" />
+    <MESSAGE value="exportar pdf + compartir en redes 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="exportar pdf + compartir en redes 2" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

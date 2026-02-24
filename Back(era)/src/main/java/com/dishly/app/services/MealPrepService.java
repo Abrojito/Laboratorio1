@@ -30,13 +30,16 @@ public class MealPrepService {
     private final MealPrepReviewRepository reviewRepo;
     private final RecipeRepository recipeRepo;
     private final UserRepository userRepo;
+    private final NotificationEmailService notificationEmailService;
 
     public MealPrepService(MealPrepRepository mealPrepRepo, MealPrepReviewRepository reviewRepo,
-                           RecipeRepository recipeRepo, UserRepository userRepo) {
+                           RecipeRepository recipeRepo, UserRepository userRepo,
+                           NotificationEmailService notificationEmailService) {
         this.mealPrepRepo = mealPrepRepo;
         this.reviewRepo = reviewRepo;
         this.recipeRepo = recipeRepo;
         this.userRepo = userRepo;
+        this.notificationEmailService = notificationEmailService;
     }
 
     @Transactional(readOnly = true)
@@ -131,19 +134,34 @@ public class MealPrepService {
     @Transactional
     public MealPrepResponseDTO create(MealPrepRequestDTO dto, String email) {
         UserModel user = userRepo.findByEmail(email)
+                .or(() -> userRepo.findByUsername(email))
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         MealPrepModel m = new MealPrepModel();
         updateModel(m, dto, user);
-        return toDTO(mealPrepRepo.save(m));
+        MealPrepModel saved = mealPrepRepo.save(m);
+
+        if (saved.isPublicMealPrep()) {
+            try {
+                log.info("Triggering followers notification for public mealprep. mealPrepId={}, authorId={}",
+                        saved.getId(), user.getId());
+                notificationEmailService.sendNewMealPrepToFollowers(user, saved);
+            } catch (Exception e) {
+                log.warn("Notification trigger skipped for mealPrepId={}: {}", saved.getId(), e.getMessage());
+            }
+        }
+
+        return toDTO(saved);
     }
 
     @Transactional
     public MealPrepResponseDTO update(Long id, MealPrepRequestDTO dto, String email) throws AccessDeniedException {
         MealPrepModel m = mealPrepRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("MealPrep no encontrado"));
+        boolean wasPublic = m.isPublicMealPrep();
 
         UserModel user = userRepo.findByEmail(email)
+                .or(() -> userRepo.findByUsername(email))
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         if (!m.getUserId().equals(user.getId())) {
@@ -151,7 +169,17 @@ public class MealPrepService {
         }
 
         updateModel(m, dto, user);
-        return toDTO(mealPrepRepo.save(m));
+        MealPrepModel saved = mealPrepRepo.save(m);
+        if (!wasPublic && saved.isPublicMealPrep()) {
+            try {
+                log.info("Triggering followers notification for mealprep public transition. mealPrepId={}, authorId={}",
+                        saved.getId(), user.getId());
+                notificationEmailService.sendNewMealPrepToFollowers(user, saved);
+            } catch (Exception e) {
+                log.warn("Notification trigger skipped for mealPrepId={}: {}", saved.getId(), e.getMessage());
+            }
+        }
+        return toDTO(saved);
     }
 
     @Transactional

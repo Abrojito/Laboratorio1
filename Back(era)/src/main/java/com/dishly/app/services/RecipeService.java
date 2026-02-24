@@ -37,13 +37,16 @@ public class RecipeService {
     private final IngredientRepository ingRepo;
     private final UserRepository userRepo;
     private final ReviewRepository reviewRepo;
+    private final NotificationEmailService notificationEmailService;
 
     public RecipeService(RecipeRepository recipeRepo,
-                         IngredientRepository ingRepo, UserRepository userRepo, ReviewRepository reviewRepo) {
+                         IngredientRepository ingRepo, UserRepository userRepo, ReviewRepository reviewRepo,
+                         NotificationEmailService notificationEmailService) {
         this.recipeRepo = recipeRepo;
         this.ingRepo = ingRepo;
         this.userRepo = userRepo;
         this.reviewRepo = reviewRepo;
+        this.notificationEmailService = notificationEmailService;
     }
 
     /* ---------- Lectura ---------- */
@@ -69,11 +72,24 @@ public class RecipeService {
             throw new IllegalArgumentException("Ya existe una receta con ese nombre");
 
         UserModel user = userRepo.findByEmail(email)
+                .or(() -> userRepo.findByUsername(email))
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         RecipeModel model = new RecipeModel();
         updateModel(model, dto, user.getId());
-        return toDTO(recipeRepo.save(model));
+        RecipeModel saved = recipeRepo.save(model);
+
+        if (saved.isPublicRecipe()) {
+            try {
+                log.info("Triggering followers notification for public recipe. recipeId={}, authorId={}",
+                        saved.getId(), user.getId());
+                notificationEmailService.sendNewRecipeToFollowers(user, saved);
+            } catch (Exception e) {
+                log.warn("Notification trigger skipped for recipeId={}: {}", saved.getId(), e.getMessage());
+            }
+        }
+
+        return toDTO(saved);
     }
 
     /* ---------- Actualización ---------- */
@@ -82,8 +98,10 @@ public class RecipeService {
     public RecipeResponseDTO update(Long id, RecipeRequestDTO dto, String email) throws AccessDeniedException {
         RecipeModel recipe = recipeRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Receta no encontrada: " + id));
+        boolean wasPublic = recipe.isPublicRecipe();
 
         UserModel user = userRepo.findByEmail(email)
+                .or(() -> userRepo.findByUsername(email))
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         if (!recipe.getUserId().equals(user.getId())) {
@@ -91,7 +109,17 @@ public class RecipeService {
         }
 
         updateModel(recipe, dto, user.getId());
-        return toDTO(recipeRepo.save(recipe));
+        RecipeModel saved = recipeRepo.save(recipe);
+        if (!wasPublic && saved.isPublicRecipe()) {
+            try {
+                log.info("Triggering followers notification for recipe public transition. recipeId={}, authorId={}",
+                        saved.getId(), user.getId());
+                notificationEmailService.sendNewRecipeToFollowers(user, saved);
+            } catch (Exception e) {
+                log.warn("Notification trigger skipped for recipeId={}: {}", saved.getId(), e.getMessage());
+            }
+        }
+        return toDTO(saved);
     }
 
 
@@ -115,8 +143,21 @@ public class RecipeService {
         updateModel(model, dto, userId);
         model.setUserId(userId);
         model.setSteps(dto.steps());
-        model.setAuthor(userRepo.findById(userId).orElseThrow().getUsername());
-        return toDTO(recipeRepo.save(model));
+        UserModel user = userRepo.findById(userId).orElseThrow();
+        model.setAuthor(user.getUsername());
+        RecipeModel saved = recipeRepo.save(model);
+
+        if (saved.isPublicRecipe()) {
+            try {
+                log.info("Triggering followers notification for public recipe. recipeId={}, authorId={}",
+                        saved.getId(), user.getId());
+                notificationEmailService.sendNewRecipeToFollowers(user, saved);
+            } catch (Exception e) {
+                log.warn("Notification trigger skipped for recipeId={}: {}", saved.getId(), e.getMessage());
+            }
+        }
+
+        return toDTO(saved);
     }
 
 
