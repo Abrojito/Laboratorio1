@@ -4,22 +4,54 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="06b74629-485f-483f-b124-382f0adef368" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/AuthController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/dto/userdto/LoginResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/security/JwtAuthenticationFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/security/JwtUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="06b74629-485f-483f-b124-382f0adef368" name="Changes" comment="paginado + avg rating + borrar coleccion y favs">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/MealPrepController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/MealPrepController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/RecipeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/RecipeController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/UserMealPrepController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/controllers/UserMealPrepController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/dto/MealPrepResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/dto/MealPrepResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/dto/RecipeResponseDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/dto/RecipeResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/FavoriteMealPrepService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/FavoriteMealPrepService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/FavoriteRecipeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/FavoriteRecipeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/MealPrepService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/MealPrepService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/RecipeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/RecipeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Back(era)/src/main/java/com/dishly/app/services/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/api/config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/api/config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/api/mealPrepApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/api/mealPrepApi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/api/recipeApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/api/recipeApi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/BottomNav.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/BottomNav.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/CollectionSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/CollectionSelector.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/DeleteAccount.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/DeleteAccount.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/FloatingMenu.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/FloatingMenu.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/IngredientSearch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/IngredientSearch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/MealPrepCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/MealPrepCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/RecipeCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/RecipeCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/components/ShoppingListSelector.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/components/ShoppingListSelector.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/main.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/main.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/CollectionsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/CollectionsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/FavoritesPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/FavoritesPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/Home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/Home.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/MealPrepDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/MealPrepDetail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/MyMealPreps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/MyMealPreps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/MyRecipes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/MyRecipes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/Profile.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/Profile.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/RecipeDetail.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/RecipeDetail.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/RecipeForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/RecipeForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/SearchPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/SearchPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/pages/ShoppingListDetailPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/pages/ShoppingListDetailPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/types/MealPrep.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/types/MealPrep.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Front(era)/src/types/Recipe.ts" beforeDir="false" afterPath="$PROJECT_DIR$/Front(era)/src/types/Recipe.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$/Back(era)">
@@ -65,8 +97,13 @@
     &quot;accountId&quot;: &quot;918b7238-8e6c-4c26-82b8-9b857d137189&quot;
   }
 }</component>
+  <component name="GradleScriptDefinitionsStorage" workingDir="$PROJECT_DIR$/Back(era)" gradleHome="$USER_HOME$/.gradle/wrapper/dists/gradle-8.13-bin/5xuhj0ry160q40clulazy9h7d/gradle-8.13" javaHome="/opt/homebrew/Cellar/openjdk/23.0.2/libexec/openjdk.jdk/Contents/Home" gradleVersion="8.13" />
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -86,15 +123,17 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Spring Boot.DishlyApplication.executor": "Run",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/abrilbrieva/projects/Laboratorio1",
+    "last_opened_file_path": "/Users/toto/faculty/lab1/Laboratorio1",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -119,8 +158,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.26053.27" />
-        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.26053.27" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
       </set>
     </attachedChunks>
   </component>
@@ -139,7 +178,17 @@
       <workItem from="1744400718110" duration="757000" />
       <workItem from="1744401482387" duration="37000" />
       <workItem from="1744401601985" duration="114000" />
+      <workItem from="1771537912007" duration="2039000" />
     </task>
+    <task id="LOCAL-00001" summary="paginado + avg rating + borrar coleccion y favs">
+      <option name="closed" value="true" />
+      <created>1771537995037</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1771537995037</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -155,5 +204,17 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="paginado + avg rating + borrar coleccion y favs" />
+    <option name="LAST_COMMIT_MESSAGE" value="paginado + avg rating + borrar coleccion y favs" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

@@ -4,6 +4,7 @@ import { fetchProfile, deleteAccount } from '../api/userApi';
 import '../styles/Profile.css';
 import FloatingMenu from "../components/FloatingMenu.tsx";
 import BottomNav from "../components/BottomNav.tsx";
+import { useModal } from "../context/ModalContext";
 
 interface UserProfile {
     username: string;
@@ -17,6 +18,7 @@ const Profile: React.FC = () => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
+    const { alert } = useModal();
 
     useEffect(() => {
         if (!token) {
@@ -105,7 +107,7 @@ const Profile: React.FC = () => {
                         localStorage.removeItem("token");
                         navigate("/start");
                     } catch (error) {
-                        alert("Error al eliminar cuenta. Intentalo más tarde.");
+                        await alert({ title: "Cuenta", message: "Error al eliminar cuenta. Intentalo más tarde." });
                         console.error(error);
                     }
                 }}

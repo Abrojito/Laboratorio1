@@ -7,6 +7,7 @@ interface Props {
 
 const MealPrepCard: React.FC<Props> = ({ mealPrep }) => {
     const navigate = useNavigate();
+    const hasUndesired = mealPrep.hasUndesiredIngredients ?? false;
 
     return (
         <div
@@ -24,18 +25,35 @@ const MealPrepCard: React.FC<Props> = ({ mealPrep }) => {
             onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
             onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         >
+            {hasUndesired && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        width: '12px',
+                        height: '12px',
+                        borderRadius: '50%',
+                        backgroundColor: 'red',
+                        boxShadow: '0 0 5px rgba(0,0,0,0.2)',
+                        zIndex: 5,
+                    }}
+                />
+            )}
+
             {/* Public/Private tag */}
             <span
                 style={{
                     position: 'absolute',
                     top: '10px',
-                    right: '10px',
+                    right: '30px',
                     backgroundColor: mealPrep.publicMealPrep ? '#4caf50' : '#f44336',
                     color: 'white',
                     padding: '2px 8px',
                     borderRadius: '12px',
                     fontSize: '0.75rem',
                     fontWeight: 600,
+                    zIndex: 3,
                 }}
             >
                 {mealPrep.publicMealPrep ? 'Public' : 'Private'}

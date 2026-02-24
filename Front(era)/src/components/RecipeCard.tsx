@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Recipe } from '../types/Recipe';
 
@@ -8,27 +7,7 @@ interface Props {
 
 const RecipeCard: React.FC<Props> = ({ recipe }) => {
     const navigate = useNavigate();
-    const [hasUndesired, setHasUndesired] = useState(false);
-
-    useEffect(() => {
-        const token = localStorage.getItem('token') || '';
-        fetch('http://localhost:8080/api/undesired', {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                const ids = data.map((ing: any) => ing.id);
-
-                // Verificar si la receta tiene alguno de los ingredientes no deseados
-                const found = recipe.ingredients.some((ing) =>
-                    ids.includes(ing.ingredientId)
-                );
-                setHasUndesired(found);
-            })
-            .catch((err) =>
-                console.error('Error al cargar ingredientes no deseados', err)
-            );
-    }, [recipe.ingredients]);
+    const hasUndesired = recipe.hasUndesiredIngredients ?? false;
 
     return (
         <div
@@ -57,6 +36,7 @@ const RecipeCard: React.FC<Props> = ({ recipe }) => {
                         borderRadius: '50%',
                         backgroundColor: 'red',
                         boxShadow: '0 0 5px rgba(0,0,0,0.2)',
+                        zIndex: 5,
                     }}
                 />
             )}

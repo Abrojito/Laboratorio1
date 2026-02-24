@@ -33,15 +33,18 @@ public class MealPrepController {
 //    }
 
     @GetMapping           // /api/mealpreps?page=&size=
-    public Page<MealPrepResponseDTO> getAllPublic(Pageable pageable) {
-        return mealPrepService.getPublic(pageable);
+    public Page<MealPrepResponseDTO> getAllPublic(Pageable pageable, Authentication auth) {
+        String email = auth != null ? auth.getName() : null;
+        return mealPrepService.getPublic(pageable, email);
     }
 
     @GetMapping("/cursor")
     public PagedResponse<MealPrepResponseDTO> getAllPublicByCursor(
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit) {
-        return mealPrepService.getPublicByCursor(cursor, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication auth) {
+        String email = auth != null ? auth.getName() : null;
+        return mealPrepService.getPublicByCursor(cursor, limit, email);
     }
 
     @GetMapping("{id}")
@@ -53,9 +56,11 @@ public class MealPrepController {
     public List<MealPrepResponseDTO> searchMealPreps(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String ingredient,
-            @RequestParam(required = false) String author
+            @RequestParam(required = false) String author,
+            Authentication auth
     ) {
-        return mealPrepService.search(name, ingredient, author);
+        String email = auth != null ? auth.getName() : null;
+        return mealPrepService.search(name, ingredient, author, email);
     }
 
     @GetMapping("/search/cursor")
@@ -64,9 +69,13 @@ public class MealPrepController {
             @RequestParam(required = false) String ingredient,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "false") boolean onlyFollowing,
+            @RequestParam(defaultValue = "false") boolean excludeUndesired,
+            Authentication auth
     ) {
-        return mealPrepService.searchByCursor(name, ingredient, author, cursor, limit);
+        String email = auth != null ? auth.getName() : null;
+        return mealPrepService.searchByCursor(name, ingredient, author, cursor, limit, email, onlyFollowing, excludeUndesired);
     }
 
 
@@ -88,7 +97,8 @@ public class MealPrepController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<MealPrepResponseDTO> getByUser(@PathVariable Long userId) {
-        return mealPrepService.getAllByUser(userId);
+    public List<MealPrepResponseDTO> getByUser(@PathVariable Long userId, Authentication auth) {
+        String email = auth != null ? auth.getName() : null;
+        return mealPrepService.getAllByUser(userId, email);
     }
 }

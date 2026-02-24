@@ -12,6 +12,8 @@ import com.dishly.app.repositories.RecipeRepository;
 import com.dishly.app.repositories.ReviewRepository;
 import com.dishly.app.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +26,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
+    private static final Logger log = LoggerFactory.getLogger(RecipeService.class);
 
     private final RecipeRepository recipeRepo;
     private final IngredientRepository ingRepo;
@@ -120,6 +124,12 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public List<RecipeResponseDTO> search(String name, String ingredient, String author) {
+        return search(name, ingredient, author, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RecipeResponseDTO> search(String name, String ingredient, String author, String email) {
+        Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(email);
         return recipeRepo.findAll().stream()
                 .filter(r -> name == null || r.getName().toLowerCase().contains(name.toLowerCase()))
                 .filter(r -> author == null || Optional.ofNullable(r.getAuthor())
@@ -128,14 +138,35 @@ public class RecipeService {
 
                 .filter(r -> ingredient == null || r.getIngredients().stream()
                         .anyMatch(i -> i.getIngredient().getName().toLowerCase().contains(ingredient.toLowerCase())))
-                .map(this::toDTO)
+                .map(r -> toDTO(r, undesiredIngredientIds))
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public PagedResponse<RecipeResponseDTO> searchByCursor(String name, String ingredient, String author, String cursor, int limit) {
+        return searchByCursor(name, ingredient, author, cursor, limit, null, false, false);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> searchByCursor(String name, String ingredient, String author, String cursor, int limit,
+                                                           String email, boolean onlyFollowing, boolean excludeUndesired) {
         int safeLimit = limit > 0 ? limit : 10;
         Long cursorId = (cursor == null || cursor.isBlank()) ? null : Long.parseLong(cursor);
+        boolean hasAuthUser = email != null && !email.isBlank();
+
+        Set<Long> followingIdsTmp = Set.of();
+        Set<Long> undesiredIngredientIdsTmp = getUndesiredIngredientIds(email);
+
+        if (hasAuthUser && onlyFollowing) {
+            UserModel me = userRepo.findByEmail(email).orElse(null);
+            if (me != null) {
+                followingIdsTmp = me.getFollowing().stream()
+                        .map(UserModel::getId)
+                        .collect(Collectors.toSet());
+            }
+        }
+        final Set<Long> followingIds = followingIdsTmp;
+        final Set<Long> undesiredIngredientIds = undesiredIngredientIdsTmp;
 
         List<RecipeModel> filtered = recipeRepo.findAll().stream()
                 .filter(RecipeModel::isPublicRecipe)
@@ -144,8 +175,11 @@ public class RecipeService {
                 .filter(r -> author == null || Optional.ofNullable(r.getAuthor())
                         .map(a -> a.toLowerCase().contains(author.toLowerCase()))
                         .orElse(false))
+                .filter(r -> !hasAuthUser || !onlyFollowing || followingIds.contains(r.getUserId()))
                 .filter(r -> ingredient == null || r.getIngredients().stream()
                         .anyMatch(i -> i.getIngredient().getName().toLowerCase().contains(ingredient.toLowerCase())))
+                .filter(r -> !hasAuthUser || !excludeUndesired || r.getIngredients().stream()
+                        .noneMatch(i -> undesiredIngredientIds.contains(i.getIngredient().getId())))
                 .sorted(Comparator.comparing(RecipeModel::getId).reversed())
                 .limit((long) safeLimit + 1)
                 .toList();
@@ -154,12 +188,16 @@ public class RecipeService {
         List<RecipeModel> pageModels = hasNext ? filtered.subList(0, safeLimit) : filtered;
 
         List<RecipeResponseDTO> items = pageModels.stream()
-                .map(this::toDTO)
+                .map(r -> toDTO(r, undesiredIngredientIds))
                 .toList();
+        long flaggedCount = items.stream().filter(RecipeResponseDTO::hasUndesiredIngredients).count();
 
         String nextCursor = hasNext && !items.isEmpty()
                 ? String.valueOf(items.get(items.size() - 1).id())
                 : null;
+
+        log.debug("Recipe search cursor principal={} undesiredCount={} flaggedItems={}",
+                email, undesiredIngredientIds.size(), flaggedCount);
 
         return new PagedResponse<>(items, nextCursor, hasNext);
     }
@@ -209,6 +247,10 @@ public class RecipeService {
 
 
     public RecipeResponseDTO toDTO(RecipeModel m) {
+        return toDTO(m, Set.of());
+    }
+
+    public RecipeResponseDTO toDTO(RecipeModel m, Set<Long> undesiredIngredientIds) {
         List<IngredientQuantityDTO> ingredients = Optional.ofNullable(m.getIngredients())
                 .orElse(List.of())
                 .stream()
@@ -241,6 +283,8 @@ public class RecipeService {
         int ratingCount = (summary == null || summary.getReviewCount() == null)
                 ? 0
                 : Math.toIntExact(summary.getReviewCount());
+        boolean hasUndesiredIngredients = !undesiredIngredientIds.isEmpty() && m.getIngredients().stream()
+                .anyMatch(link -> undesiredIngredientIds.contains(link.getIngredient().getId()));
 
 
         return new RecipeResponseDTO(
@@ -258,7 +302,8 @@ public class RecipeService {
                 m.isPublicRecipe(),
                 reviewDTOs,
                 averageRating,
-                ratingCount
+                ratingCount,
+                hasUndesiredIngredients
         );
     }
 
@@ -270,8 +315,14 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public Page<RecipeResponseDTO> getAllByUser(Long userId, Pageable pageable) {
+        return getAllByUser(userId, pageable, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RecipeResponseDTO> getAllByUser(Long userId, Pageable pageable, String email) {
+        Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(email);
         return recipeRepo.findByUserId(userId, pageable)
-                .map(this::toDTO);
+                .map(r -> toDTO(r, undesiredIngredientIds));
     }
 
     @Transactional(readOnly = true)
@@ -283,14 +334,26 @@ public class RecipeService {
 
     @Transactional(readOnly = true)
     public Page<RecipeResponseDTO> getPublic(Pageable pageable) {
+        return getPublic(pageable, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RecipeResponseDTO> getPublic(Pageable pageable, String email) {
+        Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(email);
         return recipeRepo.findByPublicRecipeTrue(pageable)   // repo paginado
-                .map(this::toDTO);                  // convierte cada entidad
+                .map(r -> toDTO(r, undesiredIngredientIds));                  // convierte cada entidad
     }
 
     @Transactional(readOnly = true)
     public PagedResponse<RecipeResponseDTO> getPublicByCursor(String cursor, int limit) {
+        return getPublicByCursor(cursor, limit, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> getPublicByCursor(String cursor, int limit, String email) {
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = PageRequest.of(0, safeLimit + 1);
+        Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(email);
 
         List<RecipeModel> recipeModels;
         if (cursor == null || cursor.isBlank()) {
@@ -307,14 +370,27 @@ public class RecipeService {
                 : recipeModels;
 
         List<RecipeResponseDTO> items = pageModels.stream()
-                .map(this::toDTO)
+                .map(r -> toDTO(r, undesiredIngredientIds))
                 .toList();
+        long flaggedCount = items.stream().filter(RecipeResponseDTO::hasUndesiredIngredients).count();
 
         String nextCursor = hasNext && !items.isEmpty()
                 ? String.valueOf(items.get(items.size() - 1).id())
                 : null;
 
+        log.debug("Recipe home cursor principal={} undesiredCount={} flaggedItems={}",
+                email, undesiredIngredientIds.size(), flaggedCount);
+
         return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    private Set<Long> getUndesiredIngredientIds(String email) {
+        if (email == null || email.isBlank()) return Set.of();
+        return userRepo.findByEmail(email)
+                .map(u -> u.getUndesiredIngredients().stream()
+                        .map(IngredientModel::getId)
+                        .collect(Collectors.toSet()))
+                .orElse(Set.of());
     }
 
     @Transactional

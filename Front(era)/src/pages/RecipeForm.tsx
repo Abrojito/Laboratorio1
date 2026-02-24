@@ -2,6 +2,7 @@ import '../styles/RecipeForm.css';
 import React, { useState, FormEvent, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StyledTextField from "../components/StyledTextField";
+import { useModal } from "../context/ModalContext";
 
 
 interface RecipeRequestDTO {
@@ -19,6 +20,7 @@ interface RecipeRequestDTO {
 
 const NewRecipeForm: React.FC  = () => {
     const navigate = useNavigate();
+    const { alert } = useModal();
     const [recipe, setRecipe] = useState<RecipeRequestDTO>({
         name: '',
         description: '',
@@ -88,7 +90,7 @@ const NewRecipeForm: React.FC  = () => {
 
     const handleAddIngredient = async () => {
         if (!newIngredient || newIngredient.trim() === '') {
-            alert('Ingredient name cannot be empty');
+            await alert({ title: "Recetas", message: "Ingredient name cannot be empty" });
             return;
         }
 
@@ -139,7 +141,7 @@ const NewRecipeForm: React.FC  = () => {
             setNewIngredientQuantity('0g');
         } catch (error) {
             console.error('Error al añadir ingrediente:', error);
-            alert('No se pudo añadir el ingrediente. Inténtalo de nuevo.');
+            await alert({ title: "Recetas", message: "No se pudo añadir el ingrediente. Inténtalo de nuevo." });
         }
     };
 
@@ -187,7 +189,7 @@ const NewRecipeForm: React.FC  = () => {
             navigate('/home');
 
         } catch (err: any) {
-            alert('Error creando receta: ' + err.message);
+            await alert({ title: "Recetas", message: 'Error creando receta: ' + err.message });
         }
     };
 

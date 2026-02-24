@@ -98,7 +98,7 @@ public class UserController {
     public Page<RecipeResponseDTO> getMyRecipes(Authentication auth,
                                                 Pageable pageable) {
         Long userId = service.getIdByEmail(auth.getName());
-        return recipeService.getAllByUser(userId, pageable);
+        return recipeService.getAllByUser(userId, pageable, auth.getName());
     }
 
     @PutMapping("/me/update")
@@ -162,32 +162,36 @@ public class UserController {
     public PagedResponse<RecipeResponseDTO> getPublicRecipesByUserIdCursor(
             @PathVariable Long userId,
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit) {
-        return service.getPublicRecipesByUserIdCursor(userId, cursor, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication auth) {
+        return service.getPublicRecipesByUserIdCursor(userId, cursor, limit, auth != null ? auth.getName() : null);
     }
 
     @GetMapping("/{userId}/public/mealpreps/cursor")
     public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUserIdCursor(
             @PathVariable Long userId,
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit) {
-        return service.getPublicMealPrepsByUserIdCursor(userId, cursor, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication auth) {
+        return service.getPublicMealPrepsByUserIdCursor(userId, cursor, limit, auth != null ? auth.getName() : null);
     }
 
     @GetMapping("/{username}/recipes/cursor")
     public PagedResponse<RecipeResponseDTO> getPublicRecipesByUsernameCursor(
             @PathVariable String username,
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit) {
-        return service.getPublicRecipesByUsernameCursor(username, cursor, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication auth) {
+        return service.getPublicRecipesByUsernameCursor(username, cursor, limit, auth != null ? auth.getName() : null);
     }
 
     @GetMapping("/{username}/mealpreps/cursor")
     public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUsernameCursor(
             @PathVariable String username,
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit) {
-        return service.getPublicMealPrepsByUsernameCursor(username, cursor, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication auth) {
+        return service.getPublicMealPrepsByUsernameCursor(username, cursor, limit, auth != null ? auth.getName() : null);
     }
 
 

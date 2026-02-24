@@ -12,6 +12,7 @@ import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
 import { useNavigate } from "react-router-dom";
 import { Recipe } from "../types/Recipe.ts"
+import { useModal } from "../context/ModalContext";
 
 
 
@@ -41,6 +42,7 @@ const RecipeDetail: React.FC = () => {
     const [isFav, setIsFav] = useState(false);
     const [showCollectionMenu, setShowCollectionMenu] = useState(false);
     const navigate = useNavigate();
+    const { confirm, alert } = useModal();
 
 
 
@@ -79,7 +81,7 @@ const RecipeDetail: React.FC = () => {
         e.preventDefault();
 
         if (!token || !username) {
-            alert("Tenés que estar logueado para comentar.");
+            await alert({ title: "Reseñas", message: "Tenés que estar logueado para comentar." });
             return;
         }
 
@@ -114,6 +116,13 @@ const RecipeDetail: React.FC = () => {
         if (!token || !id) return;
         try {
             if (isFav) {
+                const ok = await confirm({
+                    title: "Quitar de favoritos",
+                    message: "¿Querés quitar esta receta de favoritos?",
+                    confirmText: "Quitar",
+                    cancelText: "Cancelar",
+                });
+                if (!ok) return;
                 await removeFavorite(Number(id));
                 setIsFav(false);
                 return;
@@ -160,7 +169,7 @@ const RecipeDetail: React.FC = () => {
         </div>
 
 
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", position: "relative", zIndex: 30 }}>
                 <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
                     {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                 </IconButton>

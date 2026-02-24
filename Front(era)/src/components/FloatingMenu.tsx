@@ -23,7 +23,7 @@ const styles: Record<string, React.CSSProperties> = {
         background: '#fff', borderRadius: '10px',
         boxShadow: '0 2px 10px rgba(0,0,0,0.15)', padding: '0.5rem',
         display: 'flex', flexDirection: 'column', gap: '0.5rem',
-        zIndex: 1000
+        zIndex: 900
     },
     menuItem: {
         background: '#A6B240', color: '#fff',

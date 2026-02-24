@@ -27,7 +27,6 @@ public class UserMealPrepController {
     @GetMapping("/mealpreps")
     public Page<MealPrepResponseDTO> getMealPrepsForUser(Authentication auth, Pageable pageable) {
         Long uid = userService.getIdByEmail(auth.getName());
-        return mealPrepService.getMealPrepsByUser(uid, pageable);
+        return mealPrepService.getMealPrepsByUser(uid, pageable, auth.getName());
     }
 }
-

@@ -28,6 +28,7 @@ export interface MealPrep {
     reviews: Review[];
     averageRating?: number;
     ratingCount?: number;
+    hasUndesiredIngredients?: boolean;
 }
 
 export interface MealPrepRequestDTO {

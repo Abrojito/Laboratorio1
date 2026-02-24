@@ -17,5 +17,6 @@ public record RecipeResponseDTO(
         Boolean publicRecipe,
         List<ReviewDTO> reviews,
         Double averageRating,
-        int    ratingCount
+        int    ratingCount,
+        boolean hasUndesiredIngredients
 ) {}

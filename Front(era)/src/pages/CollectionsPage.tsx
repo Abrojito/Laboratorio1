@@ -24,6 +24,7 @@ import {
     Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useModal } from "../context/ModalContext";
 
 interface Collection {
     id: number;
@@ -40,6 +41,7 @@ interface CollectionAccordionProps {
 const CollectionAccordion: React.FC<CollectionAccordionProps> = ({ collection, token }) => {
     const [mealPreps, setMealPreps] = useState<MealPrep[]>(collection.mealPreps);
     const [removedRecipeIds, setRemovedRecipeIds] = useState<number[]>([]);
+    const { confirm, alert } = useModal();
 
     const {
         items: recipes,
@@ -52,20 +54,44 @@ const CollectionAccordion: React.FC<CollectionAccordionProps> = ({ collection, t
     );
 
     const handleRemoveRecipe = async (recipeId: number) => {
+        const ok = await confirm({
+            title: "Quitar de colección",
+            message: "¿Querés quitar esta receta de la colección?",
+            confirmText: "Quitar",
+            cancelText: "Cancelar",
+        });
+        if (!ok) return;
+
         try {
             await removeRecipeFromCollection(collection.id, recipeId, token);
             setRemovedRecipeIds(prev => (prev.includes(recipeId) ? prev : [...prev, recipeId]));
         } catch (err) {
             console.error("No se pudo quitar la receta de la colección", err);
+            await alert({
+                title: "Colecciones",
+                message: "No se pudo quitar la receta de la colección.",
+            });
         }
     };
 
     const handleRemoveMealPrep = async (mealPrepId: number) => {
+        const ok = await confirm({
+            title: "Quitar de colección",
+            message: "¿Querés quitar este meal prep de la colección?",
+            confirmText: "Quitar",
+            cancelText: "Cancelar",
+        });
+        if (!ok) return;
+
         try {
             await removeMealPrepFromCollection(collection.id, mealPrepId, token);
             setMealPreps(prev => prev.filter(mp => mp.id !== mealPrepId));
         } catch (err) {
             console.error("No se pudo quitar el meal prep de la colección", err);
+            await alert({
+                title: "Colecciones",
+                message: "No se pudo quitar el meal prep de la colección.",
+            });
         }
     };
 

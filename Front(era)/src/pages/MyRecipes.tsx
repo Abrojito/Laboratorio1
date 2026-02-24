@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchMyRecipesPage } from "../api/recipeApi";
 import RecipeCard from "../components/RecipeCard";
 import { Recipe } from "../types/Recipe";
+import { useModal } from "../context/ModalContext";
 
 
 function toFullRecipe(r: any): Recipe {
@@ -28,6 +29,7 @@ function toFullRecipe(r: any): Recipe {
 const MyRecipes: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token") || "";
+  const { confirm, alert } = useModal();
 
   /* paginación */
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -65,7 +67,13 @@ const MyRecipes: React.FC = () => {
 
   const handleDeleteRecipe = async (id: number) => {
     if (!token) return;
-    if (!window.confirm("¿Estás seguro que querés eliminar esta receta?")) return;
+    const ok = await confirm({
+      title: "Eliminar receta",
+      message: "¿Estás seguro que querés eliminar esta receta?",
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+    });
+    if (!ok) return;
 
     try {
       const res = await fetch(`http://localhost:8080/api/recipes/${id}`, {
@@ -75,7 +83,7 @@ const MyRecipes: React.FC = () => {
       if (!res.ok) throw new Error();
       setRecipes(prev => prev.filter(r => r.id !== id));
     } catch {
-      alert("No se pudo eliminar la receta.");
+      await alert({ title: "Recetas", message: "No se pudo eliminar la receta." });
     }
   };
 

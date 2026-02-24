@@ -3,6 +3,7 @@ package com.dishly.app.services;
 import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.dto.RecipeResponseDTO;
 import com.dishly.app.models.FavoriteRecipeModel;
+import com.dishly.app.models.IngredientModel;
 import com.dishly.app.models.RecipeModel;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.repositories.FavoriteRecipeRepository;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,9 +50,12 @@ public class FavoriteRecipeService {
     public List<RecipeResponseDTO> getFavorites(String email) {
         UserModel user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Set<Long> undesiredIngredientIds = user.getUndesiredIngredients().stream()
+                .map(IngredientModel::getId)
+                .collect(Collectors.toSet());
 
         return favoriteRepo.findByUser(user).stream()
-                .map(fav -> recipeService.toDTO(fav.getRecipe()))
+                .map(fav -> recipeService.toDTO(fav.getRecipe(), undesiredIngredientIds))
                 .toList();
     }
 
@@ -75,14 +81,22 @@ public class FavoriteRecipeService {
 
     @Transactional
     public Page<RecipeResponseDTO> getFavRecipes(Long userId, Pageable pageable) {
+        Set<Long> undesiredIngredientIds = userRepo.findById(userId)
+                .map(u -> u.getUndesiredIngredients().stream()
+                        .map(IngredientModel::getId)
+                        .collect(Collectors.toSet()))
+                .orElse(Set.of());
         return favoriteRepo.findByUserId(userId, pageable)
-                .map(fr -> recipeService.toDTO(fr.getRecipe()));
+                .map(fr -> recipeService.toDTO(fr.getRecipe(), undesiredIngredientIds));
     }
 
     @Transactional
     public PagedResponse<RecipeResponseDTO> getFavRecipesByCursor(String email, String cursor, int limit) {
         UserModel user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Set<Long> undesiredIngredientIds = user.getUndesiredIngredients().stream()
+                .map(IngredientModel::getId)
+                .collect(Collectors.toSet());
 
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = PageRequest.of(0, safeLimit + 1);
@@ -101,7 +115,7 @@ public class FavoriteRecipeService {
                 : favModels;
 
         List<RecipeResponseDTO> items = pageModels.stream()
-                .map(fr -> recipeService.toDTO(fr.getRecipe()))
+                .map(fr -> recipeService.toDTO(fr.getRecipe(), undesiredIngredientIds))
                 .toList();
 
         String nextCursor = hasNext && !pageModels.isEmpty()

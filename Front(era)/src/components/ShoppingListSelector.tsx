@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     fetchPendingShoppingLists,
     createShoppingList
 } from "../api/shoppingListApi";
+import { useModal } from "../context/ModalContext";
 
 interface ShoppingList {
     id: number;
@@ -17,9 +18,9 @@ interface Props {
 const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) => {
     const [lists, setLists] = useState<ShoppingList[]>([]);
     const [showMenu, setShowMenu] = useState(false);
-    const [creatingNew, setCreatingNew] = useState(false);
-    const [newListName, setNewListName] = useState("");
     const token = localStorage.getItem("token") || "";
+    const { prompt, alert } = useModal();
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const loadPendingLists = async () => {
         try {
@@ -36,7 +37,29 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
         }
     }, [showMenu]);
 
+    useEffect(() => {
+        if (!showMenu) return;
+        const handleClickOutside = (event: MouseEvent) => {
+            if (!containerRef.current?.contains(event.target as Node)) {
+                setShowMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showMenu]);
+
     const handleAddToList = async () => {
+        const newListName = await prompt({
+            title: "Crear lista",
+            label: "Nombre de la lista",
+            confirmText: "Crear y agregar",
+            cancelText: "Cancelar",
+            required: true,
+            requiredMessage: "El nombre no puede estar vacío.",
+        });
+
+        if (newListName === null) return;
+
         try {
             const payload = {
                 name: newListName,
@@ -44,12 +67,10 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
                 mealPrepIds: mealPrepId ? [mealPrepId] : [],
             };
             await createShoppingList(payload, token);
-            alert("Lista creada y receta/meals agregados!");
+            await alert({ title: "Listas", message: "Lista creada y receta/meals agregados!" });
             setShowMenu(false);
-            setCreatingNew(false);
-            setNewListName("");
         } catch {
-            alert("Error creando la lista.");
+            await alert({ title: "Listas", message: "Error creando la lista." });
         }
     };
 
@@ -70,17 +91,17 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
                 body: JSON.stringify(payload.recipeIds.length ? payload.recipeIds : payload.mealPrepIds),
             });
 
-            alert("Agregado a lista existente!");
+            await alert({ title: "Listas", message: "Agregado a lista existente!" });
             setShowMenu(false);
         } catch (err) {
             console.error("Error agregando a lista existente", err);
-            alert("No se pudo agregar a la lista.");
+            await alert({ title: "Listas", message: "No se pudo agregar a la lista." });
         }
     };
 
 
     return (
-        <div style={{ position: "relative", display: "inline-block" }}>
+        <div ref={containerRef} style={{ position: "relative", display: "inline-block", zIndex: showMenu ? 20 : "auto" }}>
             <button
                 onClick={() => setShowMenu(prev => !prev)}
                 style={{
@@ -98,14 +119,14 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
             {showMenu && (
                 <div style={{
                     position: "absolute",
-                    top: "110%",
+                    top: "calc(100% + 8px)",
                     left: 0,
                     background: "white",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
                     boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                     padding: "1rem",
-                    zIndex: 999,
+                    zIndex: 20,
                     minWidth: "240px"
                 }}>
                     <h4>Listas pendientes</h4>
@@ -137,54 +158,21 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
                         ))
                     )}
 
-                    {!creatingNew ? (
-                        <button
-                            onClick={() => setCreatingNew(true)}
-                            style={{
-                                marginTop: "1rem",
-                                background: "#555",
-                                color: "white",
-                                border: "none",
-                                padding: "0.4rem 0.8rem",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                                width: "100%"
-                            }}
-                        >
-                            + Crear nueva lista
-                        </button>
-                    ) : (
-                        <div style={{ marginTop: "1rem" }}>
-                            <input
-                                type="text"
-                                placeholder="Nombre de la lista"
-                                value={newListName}
-                                onChange={(e) => setNewListName(e.target.value)}
-                                style={{
-                                    width: "100%",
-                                    padding: "0.4rem",
-                                    marginBottom: "0.5rem",
-                                    borderRadius: "5px",
-                                    border: "1px solid #ccc"
-                                }}
-                            />
-                            <button
-                                onClick={() => handleAddToList()}
-                                style={{
-                                    background: "#28a745",
-                                    color: "white",
-                                    border: "none",
-                                    padding: "0.4rem 0.8rem",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                    width: "100%"
-                                }}
-                                disabled={!newListName.trim()}
-                            >
-                                Crear y agregar
-                            </button>
-                        </div>
-                    )}
+                    <button
+                        onClick={handleAddToList}
+                        style={{
+                            marginTop: "1rem",
+                            background: "#555",
+                            color: "white",
+                            border: "none",
+                            padding: "0.4rem 0.8rem",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            width: "100%"
+                        }}
+                    >
+                        + Crear nueva lista
+                    </button>
                 </div>
             )}
         </div>

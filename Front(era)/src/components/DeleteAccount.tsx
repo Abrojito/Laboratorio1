@@ -1,11 +1,13 @@
 // src/components/DeleteAccount.tsx
 import React, { useState } from 'react';
 import { API_URL } from '../api/config';
+import { useModal } from "../context/ModalContext";
 
 const DeleteAccount: React.FC = () => {
     const [confirmText, setConfirmText] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const { alert } = useModal();
 
     // Obtener el ID del usuario y token del localStorage
     const userId = localStorage.getItem('userId');
@@ -42,7 +44,7 @@ const DeleteAccount: React.FC = () => {
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
 
-            alert('Cuenta eliminada correctamente');
+            await alert({ title: "Cuenta", message: "Cuenta eliminada correctamente" });
             // Aquí puedes redirigir al usuario a la página principal
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Error al eliminar cuenta');

@@ -15,10 +15,12 @@ import { useCursorPagination } from "../hooks/useCursorPagination";
 
 import RecipeCard from "../components/RecipeCard";
 import MealPrepCard from "../components/MealPrepCard";
+import { useModal } from "../context/ModalContext";
 
 const FavoritesPage: React.FC = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token") || "";
+    const { confirm, alert } = useModal();
 
     /* ---------- Recetas favoritas ---------- */
     const {
@@ -58,20 +60,44 @@ const FavoritesPage: React.FC = () => {
     const error = recipesError || mealPrepsError;
 
     const handleRemoveRecipe = async (recipeId: number) => {
+        const ok = await confirm({
+            title: "Quitar de favoritos",
+            message: "¿Querés quitar esta receta de favoritos?",
+            confirmText: "Quitar",
+            cancelText: "Cancelar",
+        });
+        if (!ok) return;
+
         try {
             await removeFavorite(recipeId);
             setRemovedRecipeIds(prev => (prev.includes(recipeId) ? prev : [...prev, recipeId]));
         } catch (err) {
             console.error("Error quitando receta de favoritos", err);
+            await alert({
+                title: "Favoritos",
+                message: "No se pudo quitar la receta de favoritos.",
+            });
         }
     };
 
     const handleRemoveMealPrep = async (mealPrepId: number) => {
+        const ok = await confirm({
+            title: "Quitar de favoritos",
+            message: "¿Querés quitar este meal prep de favoritos?",
+            confirmText: "Quitar",
+            cancelText: "Cancelar",
+        });
+        if (!ok) return;
+
         try {
             await removeMealPrepFavorite(mealPrepId);
             setRemovedMealPrepIds(prev => (prev.includes(mealPrepId) ? prev : [...prev, mealPrepId]));
         } catch (err) {
             console.error("Error quitando meal prep de favoritos", err);
+            await alert({
+                title: "Favoritos",
+                message: "No se pudo quitar el meal prep de favoritos.",
+            });
         }
     };
 

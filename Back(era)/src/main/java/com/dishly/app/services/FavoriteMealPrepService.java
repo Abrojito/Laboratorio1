@@ -3,6 +3,7 @@ package com.dishly.app.services;
 import com.dishly.app.dto.MealPrepResponseDTO;
 import com.dishly.app.dto.PagedResponse;
 import com.dishly.app.models.FavoriteMealPrepModel;
+import com.dishly.app.models.IngredientModel;
 import com.dishly.app.models.MealPrepModel;
 import com.dishly.app.models.UserModel;
 import com.dishly.app.repositories.FavoriteMealPrepRepository;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,8 +50,11 @@ public class FavoriteMealPrepService {
     public List<MealPrepResponseDTO> getFavorites(String email) {
         UserModel user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Set<Long> undesiredIngredientIds = user.getUndesiredIngredients().stream()
+                .map(IngredientModel::getId)
+                .collect(Collectors.toSet());
         return favoriteRepo.findByUser(user).stream()
-                .map(f -> mealPrepService.toDTO(f.getMealPrep()))
+                .map(f -> mealPrepService.toDTO(f.getMealPrep(), undesiredIngredientIds))
                 .toList();
     }
 
@@ -75,14 +81,22 @@ public class FavoriteMealPrepService {
 
     @Transactional
     public Page<MealPrepResponseDTO> getFavMealPreps(Long userId, Pageable pageable) {
+        Set<Long> undesiredIngredientIds = userRepo.findById(userId)
+                .map(u -> u.getUndesiredIngredients().stream()
+                        .map(IngredientModel::getId)
+                        .collect(Collectors.toSet()))
+                .orElse(Set.of());
         return favoriteRepo.findByUserId(userId, pageable)
-                .map(fmp -> mealPrepService.toDTO(fmp.getMealPrep()));
+                .map(fmp -> mealPrepService.toDTO(fmp.getMealPrep(), undesiredIngredientIds));
     }
 
     @Transactional
     public PagedResponse<MealPrepResponseDTO> getFavMealPrepsByCursor(String email, String cursor, int limit) {
         UserModel user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        Set<Long> undesiredIngredientIds = user.getUndesiredIngredients().stream()
+                .map(IngredientModel::getId)
+                .collect(Collectors.toSet());
 
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = PageRequest.of(0, safeLimit + 1);
@@ -101,7 +115,7 @@ public class FavoriteMealPrepService {
                 : favModels;
 
         List<MealPrepResponseDTO> items = pageModels.stream()
-                .map(fmp -> mealPrepService.toDTO(fmp.getMealPrep()))
+                .map(fmp -> mealPrepService.toDTO(fmp.getMealPrep(), undesiredIngredientIds))
                 .toList();
 
         String nextCursor = hasNext && !pageModels.isEmpty()

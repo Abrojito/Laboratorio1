@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { fetchRecipesCursorPage } from "../api/recipeApi";
@@ -36,6 +36,16 @@ const Home: React.FC = () => {
     const navigate = useNavigate();
     const loading = (recipesLoading && recipes.length === 0) || (mealPrepsLoading && mealPreps.length === 0);
     const error = recipesError || mealPrepsError;
+
+    useEffect(() => {
+        if (!import.meta.env.DEV || recipes.length === 0) return;
+        console.log("[Home][recipes][first]", recipes[0]);
+    }, [recipes]);
+
+    useEffect(() => {
+        if (!import.meta.env.DEV || mealPreps.length === 0) return;
+        console.log("[Home][mealpreps][first]", mealPreps[0]);
+    }, [mealPreps]);
 
     return (
         <div>

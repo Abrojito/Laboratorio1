@@ -6,6 +6,7 @@ import {
     repeatShoppingList,
     deleteShoppingList
 } from "../api/shoppingListApi";
+import { useModal } from "../context/ModalContext";
 
 interface ShoppingListItem {
     id: number;
@@ -30,6 +31,7 @@ const ShoppingListDetailPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const token = localStorage.getItem("token") || "";
+    const { alert } = useModal();
 
     const loadList = async () => {
         if (!id) return;
@@ -53,7 +55,7 @@ const ShoppingListDetailPage: React.FC = () => {
             await toggleShoppingListItem(Number(id), itemId, token);
             loadList();
         } catch {
-            alert("Error al marcar/desmarcar.");
+            await alert({ title: "Lista de compras", message: "Error al marcar/desmarcar." });
         }
     };
 
@@ -63,7 +65,7 @@ const ShoppingListDetailPage: React.FC = () => {
             await repeatShoppingList(Number(id), token);
             loadList();
         } catch {
-            alert("Error al repetir la lista.");
+            await alert({ title: "Lista de compras", message: "Error al repetir la lista." });
         }
     };
 
@@ -74,7 +76,7 @@ const ShoppingListDetailPage: React.FC = () => {
             await deleteShoppingList(Number(id), token);
             navigate("/shopping-list");
         } catch {
-            alert("Error al borrar la lista.");
+            await alert({ title: "Lista de compras", message: "Error al borrar la lista." });
         }
     };
 

@@ -13,6 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import { toggleMealPrepFavorite, isMealPrepFavorite, removeMealPrepFavorite } from "../api/favoriteApi";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import CollectionSelector from "../components/CollectionSelector";
+import { useModal } from "../context/ModalContext";
 
 
 const MealPrepDetail: React.FC = () => {
@@ -23,6 +24,7 @@ const MealPrepDetail: React.FC = () => {
     const [isFav, setIsFav] = useState(false);
     const [showCollectionMenu, setShowCollectionMenu] = useState(false);
     const navigate = useNavigate();
+    const { confirm, alert } = useModal();
 
 
     const token = localStorage.getItem("token");
@@ -49,6 +51,13 @@ const MealPrepDetail: React.FC = () => {
         if (!token || !id) return;
         try {
             if (isFav) {
+                const ok = await confirm({
+                    title: "Quitar de favoritos",
+                    message: "¿Querés quitar este meal prep de favoritos?",
+                    confirmText: "Quitar",
+                    cancelText: "Cancelar",
+                });
+                if (!ok) return;
                 await removeMealPrepFavorite(Number(id));
                 setIsFav(false);
                 return;
@@ -65,7 +74,7 @@ const MealPrepDetail: React.FC = () => {
         e.preventDefault();
 
         if (!token || !username) {
-            alert("Tenés que estar logueado para comentar.");
+            await alert({ title: "Reseñas", message: "Tenés que estar logueado para comentar." });
             return;
         }
 
@@ -115,7 +124,7 @@ const MealPrepDetail: React.FC = () => {
             </div>
 
 
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", position: "relative", zIndex: 30 }}>
                 <IconButton onClick={handleToggleFavorite} style={{ color: isFav ? 'red' : 'gray' }}>
                     {isFav ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                 </IconButton>

@@ -281,8 +281,14 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public PagedResponse<RecipeResponseDTO> getPublicRecipesByUsernameCursor(String username, String cursor, int limit) {
+        return getPublicRecipesByUsernameCursor(username, cursor, limit, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> getPublicRecipesByUsernameCursor(String username, String cursor, int limit, String requesterEmail) {
         UserModel target = repository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+        java.util.Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(requesterEmail);
 
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
@@ -298,7 +304,7 @@ public class UserService implements UserDetailsService {
         boolean hasNext = models.size() > safeLimit;
         List<com.dishly.app.models.RecipeModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
 
-        List<RecipeResponseDTO> items = pageModels.stream().map(recipeService::toDTO).toList();
+        List<RecipeResponseDTO> items = pageModels.stream().map(m -> recipeService.toDTO(m, undesiredIngredientIds)).toList();
         String nextCursor = hasNext && !items.isEmpty()
                 ? String.valueOf(items.get(items.size() - 1).id())
                 : null;
@@ -308,8 +314,14 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUsernameCursor(String username, String cursor, int limit) {
+        return getPublicMealPrepsByUsernameCursor(username, cursor, limit, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUsernameCursor(String username, String cursor, int limit, String requesterEmail) {
         UserModel target = repository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
+        java.util.Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(requesterEmail);
 
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
@@ -325,7 +337,7 @@ public class UserService implements UserDetailsService {
         boolean hasNext = models.size() > safeLimit;
         List<com.dishly.app.models.MealPrepModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
 
-        List<MealPrepResponseDTO> items = pageModels.stream().map(mealPrepService::toDTO).toList();
+        List<MealPrepResponseDTO> items = pageModels.stream().map(m -> mealPrepService.toDTO(m, undesiredIngredientIds)).toList();
         String nextCursor = hasNext && !items.isEmpty()
                 ? String.valueOf(items.get(items.size() - 1).id())
                 : null;
@@ -335,6 +347,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public PagedResponse<RecipeResponseDTO> getPublicRecipesByUserIdCursor(Long userId, String cursor, int limit) {
+        return getPublicRecipesByUserIdCursor(userId, cursor, limit, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<RecipeResponseDTO> getPublicRecipesByUserIdCursor(Long userId, String cursor, int limit, String requesterEmail) {
+        java.util.Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(requesterEmail);
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
 
@@ -349,7 +367,7 @@ public class UserService implements UserDetailsService {
         boolean hasNext = models.size() > safeLimit;
         List<com.dishly.app.models.RecipeModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
 
-        List<RecipeResponseDTO> items = pageModels.stream().map(recipeService::toDTO).toList();
+        List<RecipeResponseDTO> items = pageModels.stream().map(m -> recipeService.toDTO(m, undesiredIngredientIds)).toList();
         String nextCursor = hasNext && !items.isEmpty()
                 ? String.valueOf(items.get(items.size() - 1).id())
                 : null;
@@ -359,6 +377,12 @@ public class UserService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUserIdCursor(Long userId, String cursor, int limit) {
+        return getPublicMealPrepsByUserIdCursor(userId, cursor, limit, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<MealPrepResponseDTO> getPublicMealPrepsByUserIdCursor(Long userId, String cursor, int limit, String requesterEmail) {
+        java.util.Set<Long> undesiredIngredientIds = getUndesiredIngredientIds(requesterEmail);
         int safeLimit = limit > 0 ? limit : 10;
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, safeLimit + 1);
 
@@ -373,12 +397,21 @@ public class UserService implements UserDetailsService {
         boolean hasNext = models.size() > safeLimit;
         List<com.dishly.app.models.MealPrepModel> pageModels = hasNext ? models.subList(0, safeLimit) : models;
 
-        List<MealPrepResponseDTO> items = pageModels.stream().map(mealPrepService::toDTO).toList();
+        List<MealPrepResponseDTO> items = pageModels.stream().map(m -> mealPrepService.toDTO(m, undesiredIngredientIds)).toList();
         String nextCursor = hasNext && !items.isEmpty()
                 ? String.valueOf(items.get(items.size() - 1).id())
                 : null;
 
         return new PagedResponse<>(items, nextCursor, hasNext);
+    }
+
+    private java.util.Set<Long> getUndesiredIngredientIds(String email) {
+        if (email == null || email.isBlank()) return java.util.Set.of();
+        return repository.findByEmail(email)
+                .map(u -> u.getUndesiredIngredients().stream()
+                        .map(IngredientModel::getId)
+                        .collect(java.util.stream.Collectors.toSet()))
+                .orElse(java.util.Set.of());
     }
 
     @Transactional(readOnly = true)

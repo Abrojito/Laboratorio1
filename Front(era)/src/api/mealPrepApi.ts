@@ -2,6 +2,7 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
 import { MealPrep, MealPrepRequestDTO } from "../types/MealPrep";
 import { Page, PagedResponse } from "../types/Page";
+import { getAuthHeaders } from "./config";
 
 export async function fetchMealPreps(): Promise<MealPrep[]> {
     const res = await fetch(`${BASE_URL}/api/mealpreps`);
@@ -28,7 +29,9 @@ export async function fetchMealPrepsCursorPage(
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor !== null) params.set("cursor", cursor);
 
-    const res = await fetch(`${BASE_URL}/api/mealpreps/cursor?${params.toString()}`);
+    const res = await fetch(`${BASE_URL}/api/mealpreps/cursor?${params.toString()}`, {
+        headers: getAuthHeaders(),
+    });
     if (!res.ok) throw new Error("Error fetch meal preps cursor");
     return res.json();
 }
@@ -93,7 +96,13 @@ export async function searchMealPreps(filters: {
 }
 
 export async function searchMealPrepsCursor(
-    filters: { name?: string; ingredient?: string; author?: string },
+    filters: {
+        name?: string;
+        ingredient?: string;
+        author?: string;
+        onlyFollowing?: boolean;
+        excludeUndesired?: boolean;
+    },
     cursor: string | null,
     limit = 6
 ): Promise<PagedResponse<MealPrep>> {
@@ -101,10 +110,14 @@ export async function searchMealPrepsCursor(
     if (filters.name) params.set("name", filters.name);
     if (filters.ingredient) params.set("ingredient", filters.ingredient);
     if (filters.author) params.set("author", filters.author);
+    if (typeof filters.onlyFollowing === "boolean") params.set("onlyFollowing", String(filters.onlyFollowing));
+    if (typeof filters.excludeUndesired === "boolean") params.set("excludeUndesired", String(filters.excludeUndesired));
     params.set("limit", String(limit));
     if (cursor !== null) params.set("cursor", cursor);
 
-    const res = await fetch(`${BASE_URL}/api/mealpreps/search/cursor?${params.toString()}`);
+    const res = await fetch(`${BASE_URL}/api/mealpreps/search/cursor?${params.toString()}`, {
+        headers: getAuthHeaders(),
+    });
     if (!res.ok) throw new Error("Error search meal preps cursor");
     return res.json();
 }

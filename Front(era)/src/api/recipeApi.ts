@@ -1,5 +1,6 @@
 import { Recipe } from "../types/Recipe";
 import { Page, PagedResponse } from "../types/Page";
+import { getAuthHeaders } from "./config";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
@@ -29,7 +30,9 @@ export async function fetchRecipesCursorPage(
     const params = new URLSearchParams({ limit: String(limit) });
     if (cursor !== null) params.set("cursor", cursor);
 
-    const res = await fetch(`${BASE_URL}/api/recipes/cursor?${params.toString()}`);
+    const res = await fetch(`${BASE_URL}/api/recipes/cursor?${params.toString()}`, {
+        headers: getAuthHeaders(),
+    });
     if (res.status === 404) {
         throw new Error("Endpoint /api/recipes/cursor no encontrado (ver backend)");
     }
@@ -62,7 +65,13 @@ export async function searchRecipes(filters: {
 }
 
 export async function searchRecipesCursor(
-    filters: { name?: string; ingredient?: string; author?: string },
+    filters: {
+        name?: string;
+        ingredient?: string;
+        author?: string;
+        onlyFollowing?: boolean;
+        excludeUndesired?: boolean;
+    },
     cursor: string | null,
     limit = 6
 ): Promise<PagedResponse<Recipe>> {
@@ -70,10 +79,14 @@ export async function searchRecipesCursor(
     if (filters.name) params.set("name", filters.name);
     if (filters.ingredient) params.set("ingredient", filters.ingredient);
     if (filters.author) params.set("author", filters.author);
+    if (typeof filters.onlyFollowing === "boolean") params.set("onlyFollowing", String(filters.onlyFollowing));
+    if (typeof filters.excludeUndesired === "boolean") params.set("excludeUndesired", String(filters.excludeUndesired));
     params.set("limit", String(limit));
     if (cursor !== null) params.set("cursor", cursor);
 
-    const res = await fetch(`${BASE_URL}/api/recipes/search/cursor?${params.toString()}`);
+    const res = await fetch(`${BASE_URL}/api/recipes/search/cursor?${params.toString()}`, {
+        headers: getAuthHeaders(),
+    });
     if (!res.ok) throw new Error("Error search recipes cursor");
     return res.json();
 }

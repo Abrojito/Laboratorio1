@@ -30,6 +30,7 @@ export interface Recipe {
     reviews?: Review[];
     averageRating?: number;
     ratingCount?: number;
+    hasUndesiredIngredients?: boolean;
     publicRecipe: boolean;
 }
 

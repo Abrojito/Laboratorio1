@@ -34,15 +34,18 @@ public class RecipeController {
 
 
     @GetMapping           // /api/recipes?page=&size=
-    public Page<RecipeResponseDTO> getAllPublic(Pageable pageable) {
-        return recipeService.getPublic(pageable);
+    public Page<RecipeResponseDTO> getAllPublic(Pageable pageable, Authentication auth) {
+        String email = auth != null ? auth.getName() : null;
+        return recipeService.getPublic(pageable, email);
     }
 
     @GetMapping("/cursor")
     public PagedResponse<RecipeResponseDTO> getAllPublicByCursor(
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit) {
-        return recipeService.getPublicByCursor(cursor, limit);
+            @RequestParam(defaultValue = "10") int limit,
+            Authentication auth) {
+        String email = auth != null ? auth.getName() : null;
+        return recipeService.getPublicByCursor(cursor, limit, email);
     }
 
     @GetMapping("/{id:\\d+}")
@@ -54,9 +57,11 @@ public class RecipeController {
     public List<RecipeResponseDTO> searchRecipes(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String ingredient,
-            @RequestParam(required = false) String author
+            @RequestParam(required = false) String author,
+            Authentication auth
     ) {
-        return recipeService.search(name, ingredient, author);
+        String email = auth != null ? auth.getName() : null;
+        return recipeService.search(name, ingredient, author, email);
     }
 
     @GetMapping("/search/cursor")
@@ -65,9 +70,13 @@ public class RecipeController {
             @RequestParam(required = false) String ingredient,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String cursor,
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "false") boolean onlyFollowing,
+            @RequestParam(defaultValue = "false") boolean excludeUndesired,
+            Authentication auth
     ) {
-        return recipeService.searchByCursor(name, ingredient, author, cursor, limit);
+        String email = auth != null ? auth.getName() : null;
+        return recipeService.searchByCursor(name, ingredient, author, cursor, limit, email, onlyFollowing, excludeUndesired);
     }
 
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useModal } from "../context/ModalContext";
 
 interface Ingredient {
     id: number;
@@ -11,6 +12,7 @@ interface Props {
 
 const IngredientSearch: React.FC<Props> = ({ onIngredientAdded }) => {
     const [term, setTerm] = useState("");
+    const { alert } = useModal();
 
     const handleSearchAndAdd = async () => {
         if (!term.trim()) return;
@@ -47,7 +49,7 @@ const IngredientSearch: React.FC<Props> = ({ onIngredientAdded }) => {
 
         } catch (err) {
             console.error("No se pudo agregar el ingrediente", err);
-            alert("No se pudo agregar el ingrediente.");
+            await alert({ title: "Ingredientes", message: "No se pudo agregar el ingrediente." });
         }
     };
 

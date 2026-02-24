@@ -8,11 +8,8 @@ import RecipeSearchCard from "../components/RecipeSearchCard";
 import BottomNav from "../components/BottomNav.tsx";
 import FloatingMenu from "../components/FloatingMenu.tsx";
 import { useCursorPagination } from "../hooks/useCursorPagination.ts";
-
-interface Ingredient {
-    id: number;
-    name: string;
-}
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 
 const SearchPage: React.FC = () => {
     const [searchType, setSearchType] = useState<"recipes" | "mealpreps">("recipes");
@@ -21,21 +18,24 @@ const SearchPage: React.FC = () => {
     const [author, setAuthor] = useState("");
     const [hasSearched, setHasSearched] = useState(false);
     const navigate = useNavigate();
-    const filterUndesired = true;
+    const [onlyFollowing, setOnlyFollowing] = useState(false);
+    const [excludeUndesired, setExcludeUndesired] = useState(true);
     const [activeSearch, setActiveSearch] = useState<{
         enabled: boolean;
         type: "recipes" | "mealpreps";
         name: string;
         ingredient: string;
         author: string;
-        bannedIds: number[];
+        onlyFollowing: boolean;
+        excludeUndesired: boolean;
     }>({
         enabled: false,
         type: "recipes",
         name: "",
         ingredient: "",
         author: "",
-        bannedIds: [],
+        onlyFollowing: false,
+        excludeUndesired: true,
     });
 
     const {
@@ -51,18 +51,17 @@ const SearchPage: React.FC = () => {
         }
 
         const page = await searchRecipesCursor(
-            { name: activeSearch.name, ingredient: activeSearch.ingredient, author: activeSearch.author },
+            {
+                name: activeSearch.name,
+                ingredient: activeSearch.ingredient,
+                author: activeSearch.author,
+                onlyFollowing: activeSearch.onlyFollowing,
+                excludeUndesired: activeSearch.excludeUndesired,
+            },
             cursor,
             6
         );
-        const filtered = page.items.filter(recipe =>
-            recipe.ingredients.every(i => !activeSearch.bannedIds.includes(i.ingredientId))
-        );
-
-        return {
-            ...page,
-            items: filtered as RecipeSearchResult[],
-        };
+        return page;
     });
 
     const {
@@ -78,7 +77,13 @@ const SearchPage: React.FC = () => {
         }
 
         return searchMealPrepsCursor(
-            { name: activeSearch.name, ingredient: activeSearch.ingredient, author: activeSearch.author },
+            {
+                name: activeSearch.name,
+                ingredient: activeSearch.ingredient,
+                author: activeSearch.author,
+                onlyFollowing: activeSearch.onlyFollowing,
+                excludeUndesired: activeSearch.excludeUndesired,
+            },
             cursor,
             6
         );
@@ -92,29 +97,14 @@ const SearchPage: React.FC = () => {
 
         setHasSearched(true);
 
-        const token = localStorage.getItem("token") || "";
-        let bannedIds: number[] = [];
-
-        if (filterUndesired){
-            try {
-                const res = await fetch("http://localhost:8080/api/undesired", {
-                    headers: {Authorization: `Bearer ${token}`},
-                });
-                if (!res.ok) throw new Error("Error al cargar lista");
-                const data: Ingredient[] = await res.json();
-                bannedIds = data.map(ing => ing.id);
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
         setActiveSearch({
             enabled: true,
             type: searchType,
             name,
             ingredient,
             author,
-            bannedIds,
+            onlyFollowing,
+            excludeUndesired,
         });
     };
 
@@ -125,10 +115,25 @@ const SearchPage: React.FC = () => {
     }, [searchType]);
 
     useEffect(() => {
+        if (!hasSearched) return;
+        handleSearch();
+    }, [onlyFollowing, excludeUndesired]);
+
+    useEffect(() => {
         if (!activeSearch.enabled) return;
         resetRecipes();
         resetMealPreps();
     }, [activeSearch, resetRecipes, resetMealPreps]);
+
+    useEffect(() => {
+        if (!import.meta.env.DEV || recipeResults.length === 0) return;
+        console.log("[Search][recipes][first]", recipeResults[0]);
+    }, [recipeResults]);
+
+    useEffect(() => {
+        if (!import.meta.env.DEV || mealPrepResults.length === 0) return;
+        console.log("[Search][mealpreps][first]", mealPrepResults[0]);
+    }, [mealPrepResults]);
 
     return (
         <>
@@ -221,6 +226,26 @@ const SearchPage: React.FC = () => {
                         border: "1px solid #ccc"
                     }}
                 />
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", marginTop: "0.25rem" }}>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={onlyFollowing}
+                                onChange={(e) => setOnlyFollowing(e.target.checked)}
+                            />
+                        }
+                        label="Solo de seguidos"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                checked={excludeUndesired}
+                                onChange={(e) => setExcludeUndesired(e.target.checked)}
+                            />
+                        }
+                        label="Excluir no deseados"
+                    />
+                </div>
                 <button
                     onClick={handleSearch}
                     disabled={!name.trim() && !ingredient.trim() && !author.trim()}

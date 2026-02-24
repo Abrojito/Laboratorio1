@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 
 import { fetchMyMealPrepsPage, deleteMealPrep } from "../api/mealPrepApi";
 import { MealPrep } from "../types/MealPrep";
+import { useModal } from "../context/ModalContext";
 
 const MyMealPreps: React.FC = () => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token") || "";
+    const { confirm, alert } = useModal();
 
     /* paginación */
     const [mealPreps, setMealPreps] = useState<MealPrep[]>([]);
@@ -43,12 +45,18 @@ const MyMealPreps: React.FC = () => {
 
     const handleDeleteMealPrep = async (id: number) => {
         if (!token) return;
-        if (!window.confirm("¿Estás seguro que querés eliminar este meal prep?")) return;
+        const ok = await confirm({
+            title: "Eliminar meal prep",
+            message: "¿Estás seguro que querés eliminar este meal prep?",
+            confirmText: "Eliminar",
+            cancelText: "Cancelar",
+        });
+        if (!ok) return;
         try {
             await deleteMealPrep(id, token);
             setMealPreps(prev => prev.filter(mp => mp.id !== id));
         } catch {
-            alert("No se pudo eliminar el meal prep.");
+            await alert({ title: "Meal Preps", message: "No se pudo eliminar el meal prep." });
         }
     };
 

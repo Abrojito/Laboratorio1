@@ -49,7 +49,7 @@ const styles: Record<string, React.CSSProperties> = {
         alignItems: 'center',
         padding: '0.5rem 0',
         borderTop: '1px solid #ccc',
-        zIndex: 1000
+        zIndex: 900
     },
     button: {
         background: 'transparent',

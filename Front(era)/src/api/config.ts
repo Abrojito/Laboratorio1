@@ -4,12 +4,16 @@ export const API_URL = 'http://localhost:8080/users';
 export const AUTH_URL = 'http://localhost:8080/auth';
 export const INGREDIENT_URL = 'http://localhost:8080/ingredients';
 
-export const authFetch = async (endpoint: string, options: RequestInit = {}) => {
+export const getAuthHeaders = (): HeadersInit => {
     const token = localStorage.getItem("token");
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
+};
 
+export const authFetch = async (endpoint: string, options: RequestInit = {}) => {
     const headers = {
         ...options.headers,
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeaders(),
         'Content-Type': 'application/json',
     };
 

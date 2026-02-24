@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     fetchCollections,
     createCollection,
     addRecipeToCollection,
     addMealPrepToCollection,
 } from "../api/collectionApi";
+import { useModal } from "../context/ModalContext";
 
 interface Collection {
     id: number;
@@ -19,8 +20,8 @@ interface Props {
 const CollectionSelector: React.FC<Props> = ({ recipeId, mealPrepId }) => {
     const [collections, setCollections] = useState<Collection[]>([]);
     const [showMenu, setShowMenu] = useState(false);
-    const [creatingNew, setCreatingNew] = useState(false);
-    const [newName, setNewName] = useState("");
+    const { prompt, alert } = useModal();
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const token = localStorage.getItem("token") || "";
 
@@ -37,18 +38,40 @@ const CollectionSelector: React.FC<Props> = ({ recipeId, mealPrepId }) => {
         if (showMenu) loadCollections();
     }, [showMenu]);
 
+    useEffect(() => {
+        if (!showMenu) return;
+        const handleClickOutside = (event: MouseEvent) => {
+            if (!containerRef.current?.contains(event.target as Node)) {
+                setShowMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showMenu]);
+
     const handleAddToCollection = async (id: number) => {
         try {
             if (recipeId) await addRecipeToCollection(id, recipeId, token);
             if (mealPrepId) await addMealPrepToCollection(id, mealPrepId, token);
-            alert("Agregado a la colección!");
+            await alert({ title: "Colecciones", message: "Agregado a la colección!" });
             setShowMenu(false);
         } catch (err) {
-            alert("No se pudo agregar a la colección.");
+            await alert({ title: "Colecciones", message: "No se pudo agregar a la colección." });
         }
     };
 
     const handleCreateNew = async () => {
+        const newName = await prompt({
+            title: "Crear colección",
+            label: "Nombre de la colección",
+            confirmText: "Crear y agregar",
+            cancelText: "Cancelar",
+            required: true,
+            requiredMessage: "El nombre no puede estar vacío.",
+        });
+
+        if (newName === null) return;
+
         try {
             const payload = {
                 name: newName,
@@ -56,17 +79,15 @@ const CollectionSelector: React.FC<Props> = ({ recipeId, mealPrepId }) => {
                 mealPrepIds: mealPrepId ? [mealPrepId] : [],
             };
             await createCollection(payload, token);
-            alert("Colección creada!");
+            await alert({ title: "Colecciones", message: "Colección creada!" });
             setShowMenu(false);
-            setCreatingNew(false);
-            setNewName("");
         } catch {
-            alert("Error creando la colección.");
+            await alert({ title: "Colecciones", message: "Error creando la colección." });
         }
     };
 
     return (
-        <div style={{ position: "relative", display: "inline-block" }}>
+        <div ref={containerRef} style={{ position: "relative", display: "inline-block", zIndex: showMenu ? 20 : "auto" }}>
             <button
                 onClick={() => setShowMenu(prev => !prev)}
                 style={{
@@ -84,14 +105,14 @@ const CollectionSelector: React.FC<Props> = ({ recipeId, mealPrepId }) => {
             {showMenu && (
                 <div style={{
                     position: "absolute",
-                    top: "110%",
+                    top: "calc(100% + 8px)",
                     left: 0,
                     background: "white",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
                     boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
                     padding: "1rem",
-                    zIndex: 999,
+                    zIndex: 20,
                     minWidth: "240px"
                 }}>
                     <h4>Tus colecciones</h4>
@@ -123,54 +144,21 @@ const CollectionSelector: React.FC<Props> = ({ recipeId, mealPrepId }) => {
                         ))
                     )}
 
-                    {!creatingNew ? (
-                        <button
-                            onClick={() => setCreatingNew(true)}
-                            style={{
-                                marginTop: "1rem",
-                                background: "#555",
-                                color: "white",
-                                border: "none",
-                                padding: "0.4rem 0.8rem",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                                width: "100%"
-                            }}
-                        >
-                            + Crear nueva colección
-                        </button>
-                    ) : (
-                        <div style={{ marginTop: "1rem" }}>
-                            <input
-                                type="text"
-                                placeholder="Nombre de la colección"
-                                value={newName}
-                                onChange={(e) => setNewName(e.target.value)}
-                                style={{
-                                    width: "100%",
-                                    padding: "0.4rem",
-                                    marginBottom: "0.5rem",
-                                    borderRadius: "5px",
-                                    border: "1px solid #ccc"
-                                }}
-                            />
-                            <button
-                                onClick={handleCreateNew}
-                                style={{
-                                    background: "#28a745",
-                                    color: "white",
-                                    border: "none",
-                                    padding: "0.4rem 0.8rem",
-                                    borderRadius: "5px",
-                                    cursor: "pointer",
-                                    width: "100%"
-                                }}
-                                disabled={!newName.trim()}
-                            >
-                                Crear y agregar
-                            </button>
-                        </div>
-                    )}
+                    <button
+                        onClick={handleCreateNew}
+                        style={{
+                            marginTop: "1rem",
+                            background: "#555",
+                            color: "white",
+                            border: "none",
+                            padding: "0.4rem 0.8rem",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            width: "100%"
+                        }}
+                    >
+                        + Crear nueva colección
+                    </button>
                 </div>
             )}
         </div>
