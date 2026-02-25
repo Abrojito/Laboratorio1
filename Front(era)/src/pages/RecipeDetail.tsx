@@ -164,9 +164,9 @@ const RecipeDetail: React.FC = () => {
         const url = window.location.href;
         try {
             await navigator.clipboard.writeText(url);
-            await alert({ title: "Compartir", message: "Link copiado al portapapeles" });
+            await alert({ title: "Compartir", message: "Enlace copiado al portapapeles" });
         } catch {
-            await alert({ title: "Compartir", message: "No se pudo copiar el link." });
+            await alert({ title: "Compartir", message: "No se pudo copiar el enlace." });
         }
     };
 

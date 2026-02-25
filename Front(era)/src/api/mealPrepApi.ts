@@ -6,19 +6,19 @@ import { getAuthHeaders } from "./config";
 
 export async function fetchMealPreps(): Promise<MealPrep[]> {
     const res = await fetch(`${BASE_URL}/api/mealpreps`);
-    if (!res.ok) throw new Error('Error fetching mealpreps');
+    if (!res.ok) throw new Error('Error al cargar Meal Preps');
     return res.json();
 }
 
 export async function fetchMealPrep(id: number): Promise<MealPrep> {
     const res = await fetch(`${BASE_URL}/api/mealpreps/${id}`);
-    if (!res.ok) throw new Error('Error fetching mealprep');
+    if (!res.ok) throw new Error('Error al cargar Meal Prep');
     return res.json();
 }
 
 export async function fetchMealPrepsPage(page = 0, size = 3): Promise<Page<MealPrep>> {
     const res = await fetch(`${BASE_URL}/api/mealpreps?page=${page}&size=${size}`);
-    if (!res.ok) throw new Error("Error fetch meal preps");
+    if (!res.ok) throw new Error("Error al cargar Meal Preps");
     return res.json();
 }
 
@@ -32,7 +32,7 @@ export async function fetchMealPrepsCursorPage(
     const res = await fetch(`${BASE_URL}/api/mealpreps/cursor?${params.toString()}`, {
         headers: getAuthHeaders(),
     });
-    if (!res.ok) throw new Error("Error fetch meal preps cursor");
+    if (!res.ok) throw new Error("Error al cargar Meal Preps");
     return res.json();
 }
 
@@ -42,7 +42,7 @@ export async function fetchMyMealPreps(token: string): Promise<MealPrep[]> {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error('Error fetching my meal preps');
+    if (!res.ok) throw new Error('Error al cargar tus Meal Preps');
 
     const ct = res.headers.get('Content-Type') ?? '';
     if (!ct.includes('application/json')) return [];
@@ -60,7 +60,7 @@ export async function createMealPrep(dto: MealPrepRequestDTO, token: string): Pr
         },
         body: JSON.stringify(dto),
     });
-    if (!res.ok) throw new Error('Error creating mealprep');
+    if (!res.ok) throw new Error('Error al crear Meal Prep');
 }
 
 export async function deleteMealPrep(id: number, token: string): Promise<void> {
@@ -70,7 +70,7 @@ export async function deleteMealPrep(id: number, token: string): Promise<void> {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error('Error deleting mealprep');
+    if (!res.ok) throw new Error('Error al eliminar Meal Prep');
 }
 
 export async function createMealPrepReview(mealPrepId: number, dto: { comment: string; rating: number; username: string; }, token: string): Promise<void> {
@@ -82,7 +82,7 @@ export async function createMealPrepReview(mealPrepId: number, dto: { comment: s
         },
         body: JSON.stringify(dto),
     });
-    if (!res.ok) throw new Error('Error creating mealprep review');
+    if (!res.ok) throw new Error('Error al crear reseña de Meal Prep');
 }
 
 export async function searchMealPreps(filters: {
@@ -118,7 +118,7 @@ export async function searchMealPrepsCursor(
     const res = await fetch(`${BASE_URL}/api/mealpreps/search/cursor?${params.toString()}`, {
         headers: getAuthHeaders(),
     });
-    if (!res.ok) throw new Error("Error search meal preps cursor");
+    if (!res.ok) throw new Error("Error al buscar Meal Preps");
     return res.json();
 }
 
@@ -134,7 +134,7 @@ export async function fetchMyMealPrepsPage(
             headers: { Authorization: `Bearer ${token}` },
         }
     );
-    if (!res.ok) throw new Error("Error fetch my meal preps");
+    if (!res.ok) throw new Error("Error al cargar tus Meal Preps");
     return res.json();
 }
 
@@ -142,6 +142,6 @@ export async function downloadMealPrepPdf(id: number): Promise<Blob> {
     const res = await fetch(`${BASE_URL}/api/mealpreps/${id}/pdf`, {
         headers: getAuthHeaders(),
     });
-    if (!res.ok) throw new Error("No se pudo exportar el PDF del meal prep");
+    if (!res.ok) throw new Error("No se pudo exportar el PDF del Meal Prep");
     return res.blob();
 }

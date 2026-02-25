@@ -83,7 +83,7 @@ const FavoritesPage: React.FC = () => {
     const handleRemoveMealPrep = async (mealPrepId: number) => {
         const ok = await confirm({
             title: "Quitar de favoritos",
-            message: "¿Querés quitar este meal prep de favoritos?",
+            message: "¿Querés quitar este Meal Prep de favoritos?",
             confirmText: "Quitar",
             cancelText: "Cancelar",
         });
@@ -96,7 +96,7 @@ const FavoritesPage: React.FC = () => {
             console.error("Error quitando meal prep de favoritos", err);
             await alert({
                 title: "Favoritos",
-                message: "No se pudo quitar el meal prep de favoritos.",
+                message: "No se pudo quitar el Meal Prep de favoritos.",
             });
         }
     };

@@ -56,7 +56,7 @@ const MealPrepCard: React.FC<Props> = ({ mealPrep }) => {
                     zIndex: 3,
                 }}
             >
-                {mealPrep.publicMealPrep ? 'Public' : 'Private'}
+                {mealPrep.publicMealPrep ? 'Pública' : 'Privada'}
             </span>
 
             {/* Image */}
@@ -76,7 +76,7 @@ const MealPrepCard: React.FC<Props> = ({ mealPrep }) => {
             <p>{mealPrep.description}</p>
 
             {/* Optional: author */}
-            <small style={{ color: '#666' }}>by {mealPrep.author}</small>
+            <small style={{ color: '#666' }}>por {mealPrep.author}</small>
         </div>
     );
 };

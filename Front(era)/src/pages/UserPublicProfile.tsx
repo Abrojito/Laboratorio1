@@ -80,7 +80,7 @@ const UserPublicProfile: React.FC = () => {
         const res = await fetch(`http://localhost:8080/api/users/${id}/public/mealpreps/cursor?${params.toString()}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error("Error cargando meal preps públicos");
+        if (!res.ok) throw new Error("Error cargando Meal Preps públicos");
         return res.json();
     });
 
@@ -208,7 +208,7 @@ const UserPublicProfile: React.FC = () => {
             </section>
 
             <section style={{ marginTop: "2rem" }}>
-                <h3>Meal preps públicos</h3>
+                <h3>Meal Preps públicos</h3>
                 {mealPrepsError && <p>{mealPrepsError}</p>}
                 <div style={{
                     display: "grid",

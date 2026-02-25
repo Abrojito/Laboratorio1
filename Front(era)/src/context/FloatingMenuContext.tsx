@@ -1,9 +1,10 @@
 // src/context/FloatingMenuContext.tsx
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useCallback, useMemo } from "react";
 
 interface FloatingMenuContextType {
     showMenu: boolean;
     toggleMenu: () => void;
+    closeMenu: () => void;
 }
 
 const FloatingMenuContext = createContext<FloatingMenuContextType | undefined>(undefined);
@@ -11,10 +12,12 @@ const FloatingMenuContext = createContext<FloatingMenuContextType | undefined>(u
 export const FloatingMenuProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [showMenu, setShowMenu] = useState(false);
 
-    const toggleMenu = () => setShowMenu(prev => !prev);
+    const toggleMenu = useCallback(() => setShowMenu(prev => !prev), []);
+    const closeMenu = useCallback(() => setShowMenu(false), []);
+    const value = useMemo(() => ({ showMenu, toggleMenu, closeMenu }), [showMenu, toggleMenu, closeMenu]);
 
     return (
-        <FloatingMenuContext.Provider value={{ showMenu, toggleMenu }}>
+        <FloatingMenuContext.Provider value={value}>
             {children}
         </FloatingMenuContext.Provider>
     );

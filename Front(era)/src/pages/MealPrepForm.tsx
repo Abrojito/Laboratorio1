@@ -72,9 +72,9 @@ const MealPrepForm: React.FC = () => {
                     form="mealprep-form"
                     className="create-button"
                     disabled={!image}
-                    title={!image ? "You must add a picture" : undefined}
+                    title={!image ? "Debes agregar una imagen" : undefined}
                 >
-                    Create
+                    Crear
                 </button>
             </div>
 
@@ -85,7 +85,7 @@ const MealPrepForm: React.FC = () => {
                         <img src={image} alt="preview" className="image-preview" />
                     ) : (
                         <>
-                            <p className="image-helper">Add a picture of your meal prep</p>
+                            <p className="image-helper">Agregá una imagen de tu Meal Prep</p>
                         </>
                     )}
                     <input
@@ -99,12 +99,12 @@ const MealPrepForm: React.FC = () => {
 
                 {/* Campos básicos */}
                 <StyledTextField
-                    label="Title"
+                    label="Título"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
                 <StyledTextField
-                    label="Description"
+                    label="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
@@ -115,7 +115,7 @@ const MealPrepForm: React.FC = () => {
                         fontFamily: 'Albert Sans, sans-serif',
                         fontSize: '1.5rem',
                         fontWeight: 700
-                    }}>Recipes to include</h4>
+                    }}>Recetas para incluir</h4>
 
                     {recipes.map(recipe => (
                         <div key={recipe.id} className="ingredient-row">
@@ -144,7 +144,7 @@ const MealPrepForm: React.FC = () => {
                 {/* Visibility */}
                 <div className="visibility-card">
                     <div className="visibility-header">
-                        <h4 className="visibility-title">Do you want your meal prep to be public?</h4>
+                        <h4 className="visibility-title">¿Querés que tu Meal Prep sea público?</h4>
                         <label className="switch">
                             <input
                                 type="checkbox"
@@ -155,7 +155,7 @@ const MealPrepForm: React.FC = () => {
                         </label>
                     </div>
                     <p className="visibility-text">
-                        {publicMealPrep ? "This meal prep will be public." : "This meal prep will be private."}
+                        {publicMealPrep ? "Este Meal Prep será público." : "Este Meal Prep será privado."}
                     </p>
                 </div>
             </form>

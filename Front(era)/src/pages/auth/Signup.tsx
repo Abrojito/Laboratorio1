@@ -15,7 +15,7 @@ const Signup: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError('Las contraseñas no coinciden');
             return;
         }
 
@@ -76,7 +76,7 @@ const Signup: React.FC = () => {
             // Registro exitoso
             return true;
         } catch (error) {
-            displayError("There has been a connection error");
+            displayError("Hubo un error de conexión");
             return false;
         }
     }
@@ -90,12 +90,12 @@ const Signup: React.FC = () => {
 
     return (
         <div className="auth-form">
-            <h1>Welcome!</h1>
+            <h1>¡Bienvenido!</h1>
             {error && <p className="error-text">{error}</p>}
-            <p>Signup to Dishly</p>
+            <p>Registrate en Dishly</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="name">Username</label>
+                    <label htmlFor="name">Nombre de usuario</label>
                     <input
                         type="text"
                         id="name"
@@ -105,7 +105,7 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Correo electrónico</label>
                     <input
                         type="email"
                         id="email"
@@ -115,7 +115,7 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">Contraseña</label>
                     <input
                         type="password"
                         id="password"
@@ -125,7 +125,7 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="confirm-password">Confirm Password</label>
+                    <label htmlFor="confirm-password">Confirmar contraseña</label>
                     <input
                         type="password"
                         id="confirm-password"
@@ -135,9 +135,9 @@ const Signup: React.FC = () => {
                     />
                 </div>
                 <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Procesando...' : 'Signup'}
+                    {loading ? 'Procesando...' : 'Registrarme'}
                 </button>
-                <button className="button-signup" onClick={() => navigate('/login')}>Login</button>
+                <button className="button-signup" onClick={() => navigate('/login')}>Iniciar sesión</button>
             </form>
         </div>
     );

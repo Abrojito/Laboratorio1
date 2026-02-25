@@ -49,7 +49,7 @@ const ShoppingListPage: React.FC = () => {
                 ←
             </button>
         <div style={{ padding: "1rem", maxWidth: "800px", margin: "auto" }}>
-            <h2 style={{ fontSize: "2rem", marginBottom: "1rem", marginTop: "2.5rem"  }}>🛒 Shopping Lists</h2>
+            <h2 style={{ fontSize: "2rem", marginBottom: "1rem", marginTop: "2.5rem"  }}>🛒 Listas de compras</h2>
 
             <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
                 <button

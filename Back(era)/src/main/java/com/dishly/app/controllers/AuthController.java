@@ -8,6 +8,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,18 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil      jwtUtil;
@@ -103,12 +109,40 @@ public class AuthController {
 
     @PostMapping("/google")
     public ResponseEntity<?> googleAuth(@RequestBody GoogleAuthRequest request) {
+        log.info("Google auth endpoint reached");
+        log.info("Google auth configured clientId={}", googleClientId);
+
+        String rawToken = request != null ? request.idToken() : null;
+        boolean tokenBlank = rawToken == null || rawToken.isBlank();
+        int tokenLength = rawToken == null ? 0 : rawToken.length();
+        int dotCount = rawToken == null ? 0 : (int) rawToken.chars().filter(ch -> ch == '.').count();
+        boolean hasJwtShape = dotCount == 2;
+        String tokenPrefix = rawToken == null ? "" : rawToken.substring(0, Math.min(10, rawToken.length()));
+        log.info("Google idToken diagnostics: nullOrBlank={}, length={}, has3Parts={}, prefix10={}",
+                tokenBlank, tokenLength, hasJwtShape, tokenPrefix);
+        log.info("Google auth serverTimeEpochSeconds={}", Instant.now().getEpochSecond());
+
         if (googleClientId == null || googleClientId.isBlank()) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Google auth no configurado: falta app.google.clientId / GOOGLE_CLIENT_ID");
         }
-        if (request == null || request.idToken() == null || request.idToken().isBlank()) {
+        if (tokenBlank) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google idToken invalido");
+        }
+
+        Map<String, Object> unverified = null;
+        try {
+            unverified = decodeJwtPayloadNoVerify(rawToken);
+            log.info("Google unverified payload: aud={}, azp={}, iss={}, exp={}, iat={}, email={}, sub={}",
+                    unverified.get("aud"),
+                    unverified.get("azp"),
+                    unverified.get("iss"),
+                    unverified.get("exp"),
+                    unverified.get("iat"),
+                    unverified.get("email"),
+                    unverified.get("sub"));
+        } catch (Exception ex) {
+            log.warn("Google unverified payload decode failed: {}", ex.getMessage());
         }
 
         try {
@@ -117,8 +151,16 @@ public class AuthController {
                     GsonFactory.getDefaultInstance()
             ).setAudience(Collections.singletonList(googleClientId)).build();
 
-            GoogleIdToken idToken = verifier.verify(request.idToken());
+            GoogleIdToken idToken = verifier.verify(rawToken);
             if (idToken == null) {
+                log.warn("Google idToken verification returned null (invalid token or audience mismatch)");
+                if (unverified != null) {
+                    log.warn("verify=null unverified payload: aud={}, iss={}, exp={}, iat={}",
+                            unverified.get("aud"),
+                            unverified.get("iss"),
+                            unverified.get("exp"),
+                            unverified.get("iat"));
+                }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google idToken invalido");
             }
 
@@ -127,6 +169,9 @@ public class AuthController {
             String googleId = payload.getSubject();
             Object nameObj = payload.get("name");
             String name = nameObj != null ? String.valueOf(nameObj) : null;
+            Object aud = payload.getAudience();
+            Object iss = payload.getIssuer();
+            log.info("Google payload: email={}, aud={}, iss={}, sub={}", email, aud, iss, googleId);
 
             if (email == null || email.isBlank()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token Google sin email");
@@ -136,8 +181,22 @@ public class AuthController {
             UserModel user = userService.resolveOrCreateGoogleUser(email, name, googleId);
             String token = jwtUtil.generateToken(user.getEmail(), user.getUsername());
             return ResponseEntity.ok(new LoginResponse(token));
+        } catch (IllegalArgumentException ex) {
+            log.warn("Google token verification illegal argument: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google idToken invalido");
         } catch (Exception ex) {
+            log.warn("Google token verification error: {}", ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Google idToken invalido");
         }
+    }
+
+    private Map<String, Object> decodeJwtPayloadNoVerify(String jwt) throws Exception {
+        String[] parts = jwt.split("\\.");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Token without payload part");
+        }
+        byte[] decoded = Base64.getUrlDecoder().decode(parts[1]);
+        String json = new String(decoded, StandardCharsets.UTF_8);
+        return OBJECT_MAPPER.readValue(json, Map.class);
     }
 }

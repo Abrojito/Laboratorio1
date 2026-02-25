@@ -77,7 +77,7 @@ const CollectionAccordion: React.FC<CollectionAccordionProps> = ({ collection, t
     const handleRemoveMealPrep = async (mealPrepId: number) => {
         const ok = await confirm({
             title: "Quitar de colección",
-            message: "¿Querés quitar este meal prep de la colección?",
+            message: "¿Querés quitar este Meal Prep de la colección?",
             confirmText: "Quitar",
             cancelText: "Cancelar",
         });
@@ -90,7 +90,7 @@ const CollectionAccordion: React.FC<CollectionAccordionProps> = ({ collection, t
             console.error("No se pudo quitar el meal prep de la colección", err);
             await alert({
                 title: "Colecciones",
-                message: "No se pudo quitar el meal prep de la colección.",
+                message: "No se pudo quitar el Meal Prep de la colección.",
             });
         }
     };

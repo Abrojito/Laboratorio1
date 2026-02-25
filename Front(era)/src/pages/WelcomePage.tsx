@@ -12,8 +12,8 @@ const WelcomePage: React.FC = () => {
                     Dishly<span className="dot">.</span>
                 </h1>
                 <div className="button-group">
-                    <button className="login" onClick={() => navigate('/login')}>Login</button>
-                    <button className="signup" onClick={() => navigate('/signup')}>Signup</button>
+                    <button className="login" onClick={() => navigate('/login')}>Iniciar sesión</button>
+                    <button className="signup" onClick={() => navigate('/signup')}>Registrarme</button>
                 </div>
             </main>
         </section>

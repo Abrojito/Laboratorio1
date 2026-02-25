@@ -39,25 +39,25 @@ export const toggleMealPrepFavorite = async (mealPrepId: number) => {
     const res = await authFetch(`/favorites/mealpreps/${mealPrepId}`, {
         method: 'POST',
     });
-    if (!res.ok) throw new Error("No se pudo cambiar el estado de favorito del meal prep");
+    if (!res.ok) throw new Error("No se pudo cambiar el estado de favorito del Meal Prep");
 };
 
 export const removeMealPrepFavorite = async (mealPrepId: number) => {
     const res = await authFetch(`/favorites/mealpreps/${mealPrepId}`, {
         method: "DELETE",
     });
-    if (!res.ok) throw new Error("No se pudo quitar el meal prep de favoritos");
+    if (!res.ok) throw new Error("No se pudo quitar el Meal Prep de favoritos");
 };
 
 export const isMealPrepFavorite = async (mealPrepId: number): Promise<boolean> => {
     const res = await authFetch(`/favorites/mealpreps/${mealPrepId}/check`);
-    if (!res.ok) throw new Error("Error verificando favorito de meal prep");
+    if (!res.ok) throw new Error("Error verificando favorito de Meal Prep");
     return await res.json();
 };
 
 export const getMealPrepFavorites = async (): Promise<MealPrep[]> => {
     const res = await authFetch(`/favorites/mealpreps`);
-    if (!res.ok) throw new Error("Error cargando meal preps favoritos");
+    if (!res.ok) throw new Error("Error cargando Meal Preps favoritos");
     return await res.json();
 };
 
@@ -71,7 +71,7 @@ export async function fetchFavRecipesPage(
         `/favorites/recipes?page=${page}&size=${size}`,
         { headers: { Authorization: `Bearer ${token}` } }
     );
-    if (!res.ok) throw new Error("fetch fav recipes");
+    if (!res.ok) throw new Error("Error al cargar recetas favoritas");
     return res.json();
 }
 
@@ -85,7 +85,7 @@ export async function fetchFavMealPrepsPage(
         `/favorites/mealpreps?page=${page}&size=${size}`,
         { headers: { Authorization: `Bearer ${token}` } }
     );
-    if (!res.ok) throw new Error("fetch fav mealpreps");
+    if (!res.ok) throw new Error("Error al cargar Meal Preps favoritos");
     return res.json();
 }
 
@@ -101,7 +101,7 @@ export async function fetchFavRecipesCursorPage(
         `/favorites/recipes/cursor?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
     );
-    if (!res.ok) throw new Error("fetch fav recipes cursor");
+    if (!res.ok) throw new Error("Error al cargar recetas favoritas");
     return res.json();
 }
 
@@ -117,6 +117,6 @@ export async function fetchFavMealPrepsCursorPage(
         `/favorites/mealpreps/cursor?${params.toString()}`,
         { headers: { Authorization: `Bearer ${token}` } }
     );
-    if (!res.ok) throw new Error("fetch fav mealpreps cursor");
+    if (!res.ok) throw new Error("Error al cargar Meal Preps favoritos");
     return res.json();
 }

@@ -34,7 +34,7 @@ const MyMealPreps: React.FC = () => {
                 );
                 setHasMore(page + 1 < p.totalPages);
             })
-            .catch(() => setError("Error cargando tus meal preps."))
+            .catch(() => setError("Error cargando tus Meal Preps."))
             .finally(() => setLoading(false));
     }, [page, token]);
 
@@ -46,8 +46,8 @@ const MyMealPreps: React.FC = () => {
     const handleDeleteMealPrep = async (id: number) => {
         if (!token) return;
         const ok = await confirm({
-            title: "Eliminar meal prep",
-            message: "¿Estás seguro que querés eliminar este meal prep?",
+            title: "Eliminar Meal Prep",
+            message: "¿Estás seguro que querés eliminar este Meal Prep?",
             confirmText: "Eliminar",
             cancelText: "Cancelar",
         });
@@ -56,7 +56,7 @@ const MyMealPreps: React.FC = () => {
             await deleteMealPrep(id, token);
             setMealPreps(prev => prev.filter(mp => mp.id !== id));
         } catch {
-            await alert({ title: "Meal Preps", message: "No se pudo eliminar el meal prep." });
+            await alert({ title: "Meal Preps", message: "No se pudo eliminar el Meal Prep." });
         }
     };
 
@@ -72,7 +72,7 @@ const MyMealPreps: React.FC = () => {
                 <h2 style={styles.title}>Mis Meal Preps</h2>
 
                 {mealPreps.length === 0 ? (
-                    <p>No tenés meal preps creados.</p>
+                    <p>No tenés Meal Preps creados.</p>
                 ) : (
                     <>
                         <div style={styles.grid}>
@@ -80,7 +80,7 @@ const MyMealPreps: React.FC = () => {
                                 <div key={mp.id} style={styles.card}>
                                     <button
                                         style={styles.deleteButton}
-                                        title="Eliminar meal prep"
+                                        title="Eliminar Meal Prep"
                                         onClick={() => handleDeleteMealPrep(mp.id)}
                                     >
                                         ×
@@ -105,7 +105,7 @@ const MyMealPreps: React.FC = () => {
 
                         {hasMore && (
                             <button style={styles.loadBtn} onClick={() => setPage(p => p + 1)}>
-                                Ver más meal preps
+                                Ver más Meal Preps
                             </button>
                         )}
                     </>

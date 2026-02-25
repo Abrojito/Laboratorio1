@@ -8,7 +8,7 @@ export async function fetchPendingShoppingLists(token: string) {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error fetching pending shopping lists");
+    if (!res.ok) throw new Error("Error al cargar listas de compras pendientes");
     return res.json();
 }
 
@@ -18,7 +18,7 @@ export async function fetchHistoryShoppingLists(token: string) {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error fetching history shopping lists");
+    if (!res.ok) throw new Error("Error al cargar historial de listas de compras");
     return res.json();
 }
 
@@ -28,7 +28,7 @@ export async function fetchShoppingListById(id: number, token: string) {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error fetching shopping list");
+    if (!res.ok) throw new Error("Error al cargar lista de compras");
     return res.json();
 }
 
@@ -39,7 +39,7 @@ export async function toggleShoppingListItem(listId: number, itemId: number, tok
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error toggling shopping list item");
+    if (!res.ok) throw new Error("Error al marcar/desmarcar ítem de la lista");
 }
 
 export async function repeatShoppingList(listId: number, token: string) {
@@ -49,7 +49,7 @@ export async function repeatShoppingList(listId: number, token: string) {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error repeating shopping list");
+    if (!res.ok) throw new Error("Error al repetir lista de compras");
 }
 
 export async function deleteShoppingList(listId: number, token: string) {
@@ -59,7 +59,7 @@ export async function deleteShoppingList(listId: number, token: string) {
             Authorization: `Bearer ${token}`,
         },
     });
-    if (!res.ok) throw new Error("Error deleting shopping list");
+    if (!res.ok) throw new Error("Error al borrar lista de compras");
 }
 
 export async function createShoppingList(payload: any, token: string) {
@@ -71,6 +71,6 @@ export async function createShoppingList(payload: any, token: string) {
         },
         body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error("Error creating shopping list");
+    if (!res.ok) throw new Error("Error al crear lista de compras");
     return res.json();
 }

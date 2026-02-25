@@ -36,7 +36,7 @@ const EditMealPrepForm: React.FC = () => {
                 setRecipes(allRecipes);
             } catch (err) {
                 console.error(err);
-                setError("Error cargando meal prep.");
+                setError("Error cargando Meal Prep.");
             }
         };
 
@@ -83,7 +83,7 @@ const EditMealPrepForm: React.FC = () => {
 
         if (!res.ok) {
             const error = await res.text();
-            setError("Error actualizando meal prep: " + error);
+            setError("Error actualizando Meal Prep: " + error);
             return;
         }
 
@@ -106,9 +106,9 @@ const EditMealPrepForm: React.FC = () => {
                     form="mealprep-form"
                     className="create-button"
                     disabled={!image}
-                    title={!image ? "You must add a picture" : undefined}
+                    title={!image ? "Debes agregar una imagen" : undefined}
                 >
-                    Save
+                    Guardar
                 </button>
             </div>
 
@@ -117,7 +117,7 @@ const EditMealPrepForm: React.FC = () => {
                     {image ? (
                         <img src={image} alt="preview" className="image-preview" />
                     ) : (
-                        <p className="image-helper">Add a picture of your meal prep</p>
+                        <p className="image-helper">Agregá una imagen de tu Meal Prep</p>
                     )}
                     <input
                         type="file"
@@ -129,12 +129,12 @@ const EditMealPrepForm: React.FC = () => {
                 </div>
 
                 <StyledTextField
-                    label="Title"
+                    label="Título"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
                 <StyledTextField
-                    label="Description"
+                    label="Descripción"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                 />
@@ -144,7 +144,7 @@ const EditMealPrepForm: React.FC = () => {
                         fontFamily: 'Albert Sans, sans-serif',
                         fontSize: '1.5rem',
                         fontWeight: 700
-                    }}>Recipes to include</h4>
+                    }}>Recetas para incluir</h4>
 
                     {recipes.map(recipe => (
                         <div key={recipe.id} className="ingredient-row">
@@ -172,7 +172,7 @@ const EditMealPrepForm: React.FC = () => {
 
                 <div className="visibility-card">
                     <div className="visibility-header">
-                        <h4 className="visibility-title">Do you want your meal prep to be public?</h4>
+                        <h4 className="visibility-title">¿Querés que tu Meal Prep sea público?</h4>
                         <label className="switch">
                             <input
                                 type="checkbox"
@@ -183,7 +183,7 @@ const EditMealPrepForm: React.FC = () => {
                         </label>
                     </div>
                     <p className="visibility-text">
-                        {publicMealPrep ? "This meal prep will be public." : "This meal prep will be private."}
+                        {publicMealPrep ? "Este Meal Prep será público." : "Este Meal Prep será privado."}
                     </p>
                 </div>
 

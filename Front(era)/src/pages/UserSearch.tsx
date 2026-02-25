@@ -58,7 +58,7 @@ const UserSearch: React.FC = () => {
             <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem"}}>
                 <input
                     type="text"
-                    placeholder="Buscar por username"
+                    placeholder="Buscar por nombre de usuario"
                     value={term}
                     onChange={(e) => setTerm(e.target.value)}
                     style={{

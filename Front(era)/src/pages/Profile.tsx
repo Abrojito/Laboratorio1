@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
             .catch(() => navigate('/start'));
     }, [navigate, token]);
 
-    if (!profile) return <div className="loading">Loading…</div>;
+    if (!profile) return <div className="loading">Cargando…</div>;
 
 
     return (
@@ -51,9 +51,9 @@ const Profile: React.FC = () => {
                 ←
             </button>
 
-            <h2 className="profile-title">Profile</h2>
+            <h2 className="profile-title">Perfil</h2>
             <div className="profile-pic-wrapper">
-                <img className="profile-pic" src={profile.photo || '/default-avatar.png'} alt="Profile" />
+                <img className="profile-pic" src={profile.photo || '/default-avatar.png'} alt="Perfil" />
             </div>
             <h3 className="profile-name">@{profile.username}</h3>
             <p
@@ -69,12 +69,12 @@ const Profile: React.FC = () => {
             </p>
 
             <div className="profile-options">
-                <button onClick={() => navigate('/me/update')}>Edit Profile</button>
-                <button onClick={() => navigate('/me/myrecipes')}>My Recipes</button>
-                <button onClick={() => navigate('/me/my-mealpreps')}>My MealPreps</button>
-                <button onClick={() => navigate('/favorites')}>Favorites</button>
-                <button onClick={() => navigate('/collections')}>Collections</button>
-                <button onClick={() => navigate('/me/undesired-ingredients')}>Undesired Ingredients</button>
+                <button onClick={() => navigate('/me/update')}>Editar perfil</button>
+                <button onClick={() => navigate('/me/myrecipes')}>Mis recetas</button>
+                <button onClick={() => navigate('/me/my-mealpreps')}>Mis Meal Preps</button>
+                <button onClick={() => navigate('/favorites')}>Favoritos</button>
+                <button onClick={() => navigate('/collections')}>Colecciones</button>
+                <button onClick={() => navigate('/me/undesired-ingredients')}>Ingredientes no deseados</button>
             </div>
 
             <button
@@ -84,7 +84,7 @@ const Profile: React.FC = () => {
                     navigate('/start');
                 }}
             >
-                Logout
+                Cerrar sesión
             </button>
 
             <button
@@ -112,7 +112,7 @@ const Profile: React.FC = () => {
                     }
                 }}
             >
-                Delete Account
+                Eliminar cuenta
             </button>
 
             <FloatingMenu />

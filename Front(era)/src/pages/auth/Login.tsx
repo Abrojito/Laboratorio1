@@ -63,7 +63,7 @@ const Login: React.FC = () => {
         const idToken = googleResponse.credential;
         if (!idToken) {
             setError("Google no devolvió credenciales.");
-            await alert({ title: "Login", message: "Google no devolvió credenciales." });
+            await alert({ title: "Iniciar sesión", message: "Google no devolvió credenciales." });
             return;
         }
 
@@ -89,7 +89,7 @@ const Login: React.FC = () => {
         } catch (err) {
             const message = err instanceof Error ? err.message : "Error al iniciar sesión con Google";
             setError(message);
-            await alert({ title: "Login", message });
+            await alert({ title: "Iniciar sesión", message });
         } finally {
             setLoading(false);
         }
@@ -156,13 +156,13 @@ const Login: React.FC = () => {
         if (!googleClientId) {
             const message = "Falta configurar VITE_GOOGLE_CLIENT_ID";
             setError(message);
-            await alert({ title: "Login", message });
+            await alert({ title: "Iniciar sesión", message });
             return;
         }
         if (!googleButtonHostRef.current) {
             const message = "Google Identity Services no está disponible todavía.";
             setError(message);
-            await alert({ title: "Login", message });
+            await alert({ title: "Iniciar sesión", message });
             return;
         }
 
@@ -170,7 +170,7 @@ const Login: React.FC = () => {
         if (!target) {
             const message = "No se pudo iniciar el login con Google.";
             setError(message);
-            await alert({ title: "Login", message });
+            await alert({ title: "Iniciar sesión", message });
             return;
         }
 
@@ -179,12 +179,12 @@ const Login: React.FC = () => {
 
     return (
         <div className="auth-form">
-            <h1>Welcome back!</h1>
+            <h1>¡Bienvenido de nuevo!</h1>
             {error && <p className="error-text">{error}</p>}
-            <p>Login to your Dishly account</p>
+            <p>Iniciá sesión en tu cuenta de Dishly</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">Correo electrónico</label>
                     <input
                         type="email"
                         id="email"
@@ -194,7 +194,7 @@ const Login: React.FC = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">Contraseña</label>
                     <input
                         type="password"
                         id="password"
@@ -204,7 +204,7 @@ const Login: React.FC = () => {
                     />
                 </div>
                 <button type="submit" className="btn-primary" disabled={loading}>
-                    {loading ? 'Procesando...' : 'Login'}
+                    {loading ? 'Procesando...' : 'Iniciar sesión'}
                 </button>
 
                 <button
@@ -220,7 +220,7 @@ const Login: React.FC = () => {
 
                 <div ref={googleButtonHostRef} id="googleSignInDiv" className="google-signin-hidden"></div>
 
-                <button type="button" className="button-signup" onClick={() => navigate('/signup')}>Signup</button>
+                <button type="button" className="button-signup" onClick={() => navigate('/signup')}>Registrarme</button>
             </form>
         </div>
     );

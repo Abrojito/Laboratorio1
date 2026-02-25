@@ -42,7 +42,7 @@ const ShoppingListDetailPage: React.FC = () => {
     const [selectedCandidates, setSelectedCandidates] = useState<Record<string, PriceCandidate>>({});
     const [totalUI, setTotalUI] = useState(0);
     const token = localStorage.getItem("token") || "";
-    const { alert } = useModal();
+    const { alert, confirm } = useModal();
 
     const itemKey = (name: string, index: number) => `${name}__${index}`;
 
@@ -98,12 +98,19 @@ const ShoppingListDetailPage: React.FC = () => {
 
     const handleDelete = async () => {
         if (!id) return;
-        if (!window.confirm("¿Seguro que querés borrar esta lista?")) return;
+        const ok = await confirm({
+            title: "Borrar lista",
+            message: "¿Seguro que querés borrar esta lista?",
+            confirmText: "Aceptar",
+            cancelText: "Cancelar",
+        });
+        if (!ok) return;
         try {
             await deleteShoppingList(Number(id), token);
+            await alert({ title: "Listas", message: "Lista borrada" });
             navigate("/shopping-list");
         } catch {
-            await alert({ title: "Lista de compras", message: "Error al borrar la lista." });
+            await alert({ title: "Listas", message: "No se pudo borrar la lista" });
         }
     };
 

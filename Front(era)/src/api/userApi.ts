@@ -11,7 +11,7 @@ export async function fetchProfile(token: string): Promise<UserProfile> {
     const res = await fetch(`http://localhost:8080/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Error fetching profile');
+    if (!res.ok) throw new Error('Error al cargar perfil');
     return await res.json();
 }
 
@@ -24,7 +24,7 @@ export async function updatePhoto(photo: string, token: string) {
         },
         body: JSON.stringify({ photoBase64: photo })
     });
-    if (!res.ok) throw new Error('Error updating photo');
+    if (!res.ok) throw new Error('Error al actualizar foto');
     return res.json() as Promise<UserProfile>;
 }
 
@@ -33,14 +33,14 @@ export async function deleteAccount(token: string) {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
     });
-    if (!res.ok) throw new Error('Error deleting account');
+    if (!res.ok) throw new Error('Error al eliminar cuenta');
 }
 
 export async function fetchMyRecipes(token: string) {
     const res = await fetch(`${BASE}/api/users/me/recipes`, {
         headers: { Authorization: `Bearer ${token}` },
     });
-    if (!res.ok) throw new Error('Error fetching my recipes');
+    if (!res.ok) throw new Error('Error al cargar tus recetas');
     return res.json();
 }
 
@@ -55,6 +55,6 @@ export async function updateProfile(username: string, password: string, photo: s
     });
 
     if (!res.ok) {
-        throw new Error('Error updating profile');
+        throw new Error('Error al actualizar perfil');
     }
 }

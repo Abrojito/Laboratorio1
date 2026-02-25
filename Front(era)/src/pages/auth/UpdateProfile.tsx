@@ -18,7 +18,7 @@ const UpdateProfile = () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('No token found.');
+                setError('No se encontró token.');
                 return;
             }
 
@@ -52,7 +52,7 @@ const UpdateProfile = () => {
 
             <form onSubmit={handleSubmit} style={styles.form}>
                 <div style={styles.inputGroup}>
-                    <label style={styles.label}>Nuevo Username</label>
+                    <label style={styles.label}>Nuevo nombre de usuario</label>
                     <input
                         type="text"
                         value={username}

@@ -52,7 +52,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                             onClose();
                         }}
                     >
-                        Copiar link
+                        Copiar enlace
                     </Button>
                 </Stack>
             </DialogContent>

@@ -90,7 +90,7 @@ const NewRecipeForm: React.FC  = () => {
 
     const handleAddIngredient = async () => {
         if (!newIngredient || newIngredient.trim() === '') {
-            await alert({ title: "Recetas", message: "Ingredient name cannot be empty" });
+            await alert({ title: "Recetas", message: "El nombre del ingrediente no puede estar vacío" });
             return;
         }
 
@@ -108,7 +108,7 @@ const NewRecipeForm: React.FC  = () => {
                 newIngredientId = data.id;
             } else {
                 const existing = await fetch(`http://localhost:8080/ingredients/search?name=${encodeURIComponent(newIngredient)}`);
-                if (!existing.ok) throw new Error("Ingredient not found or error on fallback");
+                if (!existing.ok) throw new Error("Ingrediente no encontrado o error en fallback");
                 const data = await existing.json();
                 newIngredientId = data.id;
             }
@@ -297,9 +297,9 @@ const NewRecipeForm: React.FC  = () => {
                     form="recipe-form"
                     className="create-button"
                     disabled={!recipe.image}
-                    title={!recipe.image ? "You must add a picture" : undefined}
+                    title={!recipe.image ? "Debes agregar una imagen" : undefined}
                 >
-                    Create
+                    Crear
                 </button>
             </div>
 
@@ -310,7 +310,7 @@ const NewRecipeForm: React.FC  = () => {
                     <img src={recipe.image} alt="preview" className="image-preview"/>
                 ) : (
                     <>
-                        <p className="image-helper">Add a picture of your recipe</p>
+                        <p className="image-helper">Agregá una imagen de tu receta</p>
                     </>
                 )}
                 <input
@@ -324,12 +324,12 @@ const NewRecipeForm: React.FC  = () => {
 
             {/* Campos básicos */}
             <StyledTextField
-                label="Title"
+                label="Título"
                 value={recipe.name}
                 onChange={(e) => setRecipe({...recipe, name: e.target.value})}
             />
             <StyledTextField
-                label="Description"
+                label="Descripción"
                 value={recipe.description}
                 onChange={(e) => setRecipe({...recipe, description: e.target.value})}
             />
@@ -337,7 +337,7 @@ const NewRecipeForm: React.FC  = () => {
 
             <div>
                 <StyledTextField
-                    label="Time of duration"
+                    label="Duración"
                     value={recipe.time}
                     onChange={(e) => setRecipe({...recipe, time: e.target.value})}
                 />
@@ -348,17 +348,17 @@ const NewRecipeForm: React.FC  = () => {
             fontFamily: 'Albert Sans, sans-serif',
             fontSize: '1.5rem',
             fontWeight: 700
-            }}>Ingredients</h4>
+            }}>Ingredientes</h4>
 
             <div className="ingredient-inputs-row">
                 <StyledTextField
-                    label="Ingredient"
+                    label="Ingrediente"
                     value={newIngredient}
                     onChange={(e) => setNewIngredient(e.target.value)}
                     style={{ flex: 2, marginRight: '1rem' }}
                 />
                 <StyledTextField
-                    label="Quantity"
+                    label="Cantidad"
                     value={newIngredientQuantity}
                     onChange={(e) => setNewIngredientQuantity(e.target.value)}
                     style={{ flex: 1 }}
@@ -453,10 +453,10 @@ const NewRecipeForm: React.FC  = () => {
             {/* Botones principales */}
             <div className="buttons-container">
                 <button type="button" className="add-button" onClick={handleAddIngredient}>
-                    + Add ingredient
+                    + Agregar ingrediente
                 </button>
                 <button type="button" className="add-button" onClick={handleAddGroup}>
-                    + Add Group
+                    + Agregar grupo
                 </button>
             </div>
 
@@ -464,7 +464,7 @@ const NewRecipeForm: React.FC  = () => {
             {showGroupInput && (
                 <div className="group-input-container">
                     <StyledTextField
-                        label="Group name"
+                        label="Nombre del grupo"
                         value={newGroupName}
                         onChange={(e) => setNewGroupName(e.target.value)}
                     />
@@ -473,7 +473,7 @@ const NewRecipeForm: React.FC  = () => {
                         className="create-group-button"
                         onClick={handleCreateGroup}
                     >
-                        Create group
+                        Crear grupo
                     </button>
                 </div>
             )}
@@ -484,7 +484,7 @@ const NewRecipeForm: React.FC  = () => {
                 fontFamily: 'Albert Sans, sans-serif',
                 fontSize: '1.5rem',
                 fontWeight: 700
-            }}>Steps</h4>
+            }}>Pasos</h4>
 
             {stepsList.map((step, index) => (
                 <div key={index} className="step-card">
@@ -494,7 +494,7 @@ const NewRecipeForm: React.FC  = () => {
                         <input
                             className="step-input"
                             type="text"
-                            placeholder="Ex: Mix the eggs with the milk..."
+                            placeholder="Ej: Mezclar los huevos con la leche..."
                             value={step}
                             onChange={(e) => handleStepChange(index, e.target.value)}
                         />
@@ -502,8 +502,8 @@ const NewRecipeForm: React.FC  = () => {
                             <button type="button" className="menu-btn" onClick={() => toggleMenu(index)}>⋯</button>
                             {openMenuIndex === index && (
                                 <div className="menu-dropdown">
-                                    <button type="button" onClick={() => handleAddImageToStep(index)}>Add picture</button>
-                                    <button type="button" onClick={() => handleRemoveStep(index)}>Delete step</button>
+                                    <button type="button" onClick={() => handleAddImageToStep(index)}>Agregar imagen</button>
+                                    <button type="button" onClick={() => handleRemoveStep(index)}>Eliminar paso</button>
                                 </div>
                             )}
                         </div>
@@ -536,13 +536,13 @@ const NewRecipeForm: React.FC  = () => {
 
             <div className="buttons-container">
                     <button type="button" className="add-button" onClick={handleAddStep}>
-                        + Add Step
+                        + Agregar paso
                     </button>
                 </div>
            </div>
         <div className="visibility-card">
             <div className="visibility-header">
-                <h4 className="visibility-title">Do you want your recipe to be public?</h4>
+                <h4 className="visibility-title">¿Querés que tu receta sea pública?</h4>
                 <label className="switch">
                     <input
                         type="checkbox"
@@ -554,7 +554,7 @@ const NewRecipeForm: React.FC  = () => {
                 </label>
             </div>
             <p className="visibility-text">
-                {recipe.publicRecipe ? "This recipe will be public." : "This recipe will be private."}
+                {recipe.publicRecipe ? "Esta receta será pública." : "Esta receta será privada."}
             </p>
         </div>
 

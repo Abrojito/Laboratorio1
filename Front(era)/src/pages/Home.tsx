@@ -97,7 +97,7 @@ const Home: React.FC = () => {
                         {/* === Meal Preps === */}
                         <h2 style={{ marginTop: "3rem" }}>Meal Preps</h2>
                         {mealPreps.length === 0 ? (
-                            <p>No hay meal preps todavía.</p>
+                            <p>No hay Meal Preps todavía.</p>
                         ) : (
                             <>
                                 <div style={styles.grid}>

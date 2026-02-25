@@ -23,6 +23,7 @@ const BottomNav: React.FC = () => {
                     <button
                         key={index}
                         onClick={() => item.path ? navigate(item.path) : item.action?.()}
+                        data-floating-menu-toggle={item.action ? "true" : undefined}
                         style={{
                             ...styles.button,
                             backgroundColor: isActive ? "#A6B240" : "transparent",

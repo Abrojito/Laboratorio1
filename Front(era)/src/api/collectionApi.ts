@@ -61,6 +61,6 @@ export const fetchCollectionRecipesCursorPage = async (
     const res = await fetch(`${BASE_URL}/${collectionId}/recipes/cursor?${params.toString()}`, {
         headers: { Authorization: `Bearer ${token}` }
     });
-    if (!res.ok) throw new Error("Error fetch collection recipes cursor");
+    if (!res.ok) throw new Error("Error al cargar recetas de la colección");
     return res.json();
 };

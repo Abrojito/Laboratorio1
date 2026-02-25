@@ -56,7 +56,7 @@ const MealPrepDetail: React.FC = () => {
             if (isFav) {
                 const ok = await confirm({
                     title: "Quitar de favoritos",
-                    message: "¿Querés quitar este meal prep de favoritos?",
+                    message: "¿Querés quitar este Meal Prep de favoritos?",
                     confirmText: "Quitar",
                     cancelText: "Cancelar",
                 });
@@ -113,7 +113,7 @@ const MealPrepDetail: React.FC = () => {
             const blob = await downloadMealPrepPdf(Number(id));
             downloadBlobFile(blob, `mealprep-${id}.pdf`);
         } catch {
-            await alert({ title: "PDF", message: "No se pudo exportar el PDF del meal prep." });
+            await alert({ title: "PDF", message: "No se pudo exportar el PDF del Meal Prep." });
         }
     };
 
@@ -121,13 +121,13 @@ const MealPrepDetail: React.FC = () => {
         const url = window.location.href;
         try {
             await navigator.clipboard.writeText(url);
-            await alert({ title: "Compartir", message: "Link copiado al portapapeles" });
+            await alert({ title: "Compartir", message: "Enlace copiado al portapapeles" });
         } catch {
-            await alert({ title: "Compartir", message: "No se pudo copiar el link." });
+            await alert({ title: "Compartir", message: "No se pudo copiar el enlace." });
         }
     };
 
-    if (!mealPrep) return <p>Cargando meal prep...</p>;
+    if (!mealPrep) return <p>Cargando Meal Prep...</p>;
 
     return (
         <>

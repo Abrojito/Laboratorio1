@@ -161,7 +161,7 @@ const FollowingLists: React.FC = () => {
                     color: activeTab === "following" ? "white" : "#333",
                     cursor: "pointer"
                 }}>
-                    Seguidos
+                    Siguiendo
                 </button>
             </div>
 

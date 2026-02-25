@@ -67,7 +67,7 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
                 mealPrepIds: mealPrepId ? [mealPrepId] : [],
             };
             await createShoppingList(payload, token);
-            await alert({ title: "Listas", message: "Lista creada y receta/meals agregados!" });
+            await alert({ title: "Listas", message: "Lista creada y recetas/Meal Preps agregados." });
             setShowMenu(false);
         } catch {
             await alert({ title: "Listas", message: "Error creando la lista." });
@@ -91,7 +91,7 @@ const ShoppingListSelector: React.FC<Props> = ({ recipeIds = [], mealPrepId }) =
                 body: JSON.stringify(payload.recipeIds.length ? payload.recipeIds : payload.mealPrepIds),
             });
 
-            await alert({ title: "Listas", message: "Agregado a lista existente!" });
+            await alert({ title: "Listas", message: "Agregado a lista existente." });
             setShowMenu(false);
         } catch (err) {
             console.error("Error agregando a lista existente", err);

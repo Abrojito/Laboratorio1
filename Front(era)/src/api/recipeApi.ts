@@ -8,7 +8,7 @@ export async function fetchRecipes(token?: string): Promise<Recipe[]> {
     const res = await fetch(`${BASE_URL}/api/recipes`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
-    if (!res.ok) throw new Error('Error fetching recipes');
+    if (!res.ok) throw new Error('Error al cargar recetas');
 
     /** Si el back devolvió 204 o no-JSON, regresamos lista vacía */
     const ct = res.headers.get('Content-Type') ?? '';
@@ -19,7 +19,7 @@ export async function fetchRecipes(token?: string): Promise<Recipe[]> {
 
 export async function fetchRecipesPage(page = 0, size = 3): Promise<Page<Recipe>> {
     const res = await fetch(`${BASE_URL}/api/recipes?page=${page}&size=${size}`);
-    if (!res.ok) throw new Error("Error fetch recipes");
+    if (!res.ok) throw new Error("Error al cargar recetas");
     return res.json();
 }
 
@@ -36,7 +36,7 @@ export async function fetchRecipesCursorPage(
     if (res.status === 404) {
         throw new Error("Endpoint /api/recipes/cursor no encontrado (ver backend)");
     }
-    if (!res.ok) throw new Error("Error fetch recipes cursor");
+    if (!res.ok) throw new Error("Error al cargar recetas");
     return res.json();
 }
 
@@ -50,7 +50,7 @@ export async function fetchMyRecipesPage(
         `${BASE_URL}/api/users/me/recipes?page=${page}&size=${size}`,
         { headers: { Authorization: `Bearer ${token}` } }
     );
-    if (!res.ok) throw new Error("Error fetch my recipes");
+    if (!res.ok) throw new Error("Error al cargar tus recetas");
     return res.json();
 }
 
@@ -87,7 +87,7 @@ export async function searchRecipesCursor(
     const res = await fetch(`${BASE_URL}/api/recipes/search/cursor?${params.toString()}`, {
         headers: getAuthHeaders(),
     });
-    if (!res.ok) throw new Error("Error search recipes cursor");
+    if (!res.ok) throw new Error("Error al buscar recetas");
     return res.json();
 }
 
