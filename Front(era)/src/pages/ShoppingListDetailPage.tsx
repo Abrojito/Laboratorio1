@@ -7,6 +7,13 @@ import {
     deleteShoppingList
 } from "../api/shoppingListApi";
 import { useModal } from "../context/ModalContext";
+import { quotePrices } from "../api/priceApi";
+import { PriceCandidate, PriceQuoteResponse } from "../types/Prices";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Typography from "@mui/material/Typography";
 
 interface ShoppingListItem {
     id: number;
@@ -30,8 +37,28 @@ const ShoppingListDetailPage: React.FC = () => {
     const [list, setList] = useState<ShoppingList | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [pricingLoading, setPricingLoading] = useState(false);
+    const [quoteResponse, setQuoteResponse] = useState<PriceQuoteResponse | null>(null);
+    const [selectedCandidates, setSelectedCandidates] = useState<Record<string, PriceCandidate>>({});
+    const [totalUI, setTotalUI] = useState(0);
     const token = localStorage.getItem("token") || "";
     const { alert } = useModal();
+
+    const itemKey = (name: string, index: number) => `${name}__${index}`;
+
+    const recalculateTotal = (
+        backendTotal: number,
+        selected: Record<string, PriceCandidate>,
+        items: ShoppingListItem[]
+    ) => {
+        const selectedTotal = items.reduce((acc, item, index) => {
+            const quoteItem = quoteResponse?.items[index];
+            if (!quoteItem || !quoteItem.ambiguous) return acc;
+            const selectedCandidate = selected[itemKey(item.ingredientName, index)];
+            return acc + (selectedCandidate?.price ?? 0);
+        }, 0);
+        return backendTotal + selectedTotal;
+    };
 
     const loadList = async () => {
         if (!id) return;
@@ -80,6 +107,42 @@ const ShoppingListDetailPage: React.FC = () => {
         }
     };
 
+    const handleCalculatePrices = async () => {
+        if (!list) return;
+        setPricingLoading(true);
+        try {
+            const payload = list.items.map((item) => ({
+                name: item.ingredientName,
+                quantityText: item.quantity ?? "",
+            }));
+            const response = await quotePrices(payload);
+            setQuoteResponse(response);
+            setSelectedCandidates({});
+            setTotalUI(response.totalEstimated);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Error al calcular precios.";
+            await alert({ title: "Precios", message });
+        } finally {
+            setPricingLoading(false);
+        }
+    };
+
+    const handleSelectCandidate = (
+        key: string,
+        candidateIndex: string,
+        quoteItem: PriceQuoteResponse["items"][number]
+    ) => {
+        const next = { ...selectedCandidates };
+        if (candidateIndex === "") {
+            delete next[key];
+        } else {
+            const candidate = quoteItem.candidates?.[Number(candidateIndex)];
+            if (candidate) next[key] = candidate;
+        }
+        setSelectedCandidates(next);
+        setTotalUI(recalculateTotal(quoteResponse?.totalEstimated ?? 0, next, list?.items ?? []));
+    };
+
     if (loading) return <div style={{ padding: "1rem" }}>Cargando...</div>;
     if (error || !list) return <div style={{ padding: "1rem" }}>Error: {error ?? "Lista no encontrada."}</div>;
 
@@ -107,11 +170,25 @@ const ShoppingListDetailPage: React.FC = () => {
                 </p>
             )}
 
+            <div style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+                <Button variant="contained" onClick={handleCalculatePrices} disabled={pricingLoading}>
+                    {pricingLoading ? <CircularProgress size={18} color="inherit" /> : "Calcular precios"}
+                </Button>
+            </div>
+
             <h2 style={{ marginTop: "1.5rem", fontSize: "1.3rem" }}>Ingredientes</h2>
             {list.items.length === 0 ? (
                 <p>No hay ingredientes en esta lista.</p>
             ) : (
-                list.items.map(item => (
+                list.items.map((item, index) => {
+                    const key = itemKey(item.ingredientName, index);
+                    const quoteItem = quoteResponse?.items[index];
+                    const selectedCandidate = selectedCandidates[key];
+                    const selectedIndex = quoteItem?.candidates?.findIndex(
+                        (c) => c.description === selectedCandidate?.description && c.price === selectedCandidate?.price
+                    );
+
+                    return (
                     <div key={item.id} style={{
                         display: "flex",
                         alignItems: "center",
@@ -126,6 +203,47 @@ const ShoppingListDetailPage: React.FC = () => {
                             <strong>{item.ingredientName}</strong> — {item.quantity}
                             <br />
                             <small style={{ color: "#666" }}>De receta: {item.sourceRecipeName}</small>
+                            {quoteResponse && (
+                                <div style={{ marginTop: "0.6rem" }}>
+                                    {!quoteItem || !quoteItem.found ? (
+                                        <Typography variant="body2" color="text.secondary">
+                                            Sin precio
+                                        </Typography>
+                                    ) : quoteItem.ambiguous ? (
+                                        <>
+                                            <Typography variant="body2" sx={{ mb: 0.5 }}>
+                                                Elegí producto:
+                                            </Typography>
+                                            <Select
+                                                size="small"
+                                                fullWidth
+                                                value={selectedIndex !== undefined && selectedIndex >= 0 ? String(selectedIndex) : ""}
+                                                onChange={(e) => handleSelectCandidate(key, e.target.value, quoteItem)}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>Seleccionar...</em>
+                                                </MenuItem>
+                                                {(quoteItem.candidates ?? []).map((candidate, candidateIdx) => (
+                                                    <MenuItem key={`${candidate.description}-${candidateIdx}`} value={String(candidateIdx)}>
+                                                        {candidate.description} - ${candidate.price.toFixed(2)}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Typography variant="body2">
+                                                ${Number(quoteItem.price ?? 0).toFixed(2)} (aprox)
+                                            </Typography>
+                                            {quoteItem.matchedDescription && (
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {quoteItem.matchedDescription}
+                                                </Typography>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                             <input
@@ -137,7 +255,13 @@ const ShoppingListDetailPage: React.FC = () => {
                             <span style={{ fontWeight: "bold" }}>{item.checked ? "Hecho" : "Pendiente"}</span>
                         </label>
                     </div>
-                ))
+                )})
+            )}
+
+            {quoteResponse && (
+                <Typography variant="h6" sx={{ mt: 2 }}>
+                    Total estimado: ${totalUI.toFixed(2)}
+                </Typography>
             )}
 
             <div style={{ marginTop: "2rem", display: "flex", gap: "1rem", flexWrap: "wrap" }}>
